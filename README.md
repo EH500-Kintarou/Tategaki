@@ -1,4 +1,4 @@
-[English Readme is here](README_en.md)
+[English Readme is here](README-en.md)
 
 # WPF用縦書きテキストブロック Tategaki
 
