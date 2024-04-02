@@ -26,6 +26,11 @@ namespace Tategaki.Logic
 			get { return FontUriDictionary.Keys.ToArray(); }
 		}
 
+		internal Uri[] AvailableFontUris
+		{
+			get { return FontUriDictionary.Values.Distinct().ToArray(); }
+		}
+
 		#endregion
 
 		#region Glyph

@@ -21,6 +21,11 @@ namespace Tategaki.Logic
 			get { return cache.AvailableFonts; }
 		}
 
+		public static Uri[] AvailableFontUris
+		{
+			get { return cache.AvailableFontUris; }
+		}
+
 		public static Uri GetFontUri(string FamilyName)
 		{
 			return cache.FontUriDictionary[FamilyName];
