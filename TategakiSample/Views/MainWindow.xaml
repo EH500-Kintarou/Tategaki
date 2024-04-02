@@ -1,0 +1,84 @@
+﻿<Window x:Class="TategakiSample.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vc="clr-namespace:TategakiSample.Views.ValueConverters"
+		xmlns:tg="http://schemas.eh500-kintarou.com/Tategaki"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        Title="Tategaki Sample" Width="800" Height="640" 
+		TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True" >
+
+    <Window.Resources>
+        <vc:ColorToBrushConverter x:Key="ColorToBrushConv" />
+        <vc:BooleanToFontWeightConverter x:Key="BooleanToFontWeightConv" />
+        <vc:BooleanToFontStyleConverter x:Key="BooleanToFontStyleConv" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <TextBox Grid.Row="0" Name="textBox1" HorizontalScrollBarVisibility="Auto"  VerticalScrollBarVisibility="Visible" AcceptsReturn="True"
+				 Text="　下人は、老婆をつき放すと、いきなり、太刀の鞘（さや）を払って、白い鋼（はがね）の色をその眼の前へつきつけた。けれども、老婆は黙っている。両手をわなわなふるわせて、肩で息を切りながら、眼を、眼球（めだま）が眶（まぶた）の外へ出そうになるほど、見開いて、唖のように執拗（しゅうね）く黙っている。これを見ると、下人は始めて明白にこの老婆の生死が、全然、自分の意志に支配されていると云う事を意識した。そうしてこの意識は、今までけわしく燃えていた憎悪の心を、いつの間にか冷ましてしまった。後（あと）に残ったのは、ただ、ある仕事をして、それが円満に成就した時の、安らかな得意と満足とがあるばかりである。そこで、下人は、老婆を見下しながら、少し声を柔らげてこう云った。&#xa;「己（おれ）は検非違使（けびいし）の庁の役人などではない。今し方この門の下を通りかかった旅の者だ。だからお前に縄（なわ）をかけて、どうしようと云うような事はない。ただ、今時分この門の上で、何をして居たのだか、それを己に話しさえすればいいのだ。」&#xa;　すると、老婆は、見開いていた眼を、一層大きくして、じっとその下人の顔を見守った。眶（まぶた）の赤くなった、肉食鳥のような、鋭い眼で見たのである。それから、皺で、ほとんど、鼻と一つになった唇を、何か物でも噛んでいるように動かした。細い喉で、尖った喉仏（のどぼとけ）の動いているのが見える。その時、その喉から、鴉（からす）の啼くような声が、喘（あえ）ぎ喘ぎ、下人の耳へ伝わって来た。&#xa;「この髪を抜いてな、この髪を抜いてな、鬘（かずら）にしようと思うたのじゃ。」&#xa;　下人は、老婆の答が存外、平凡なのに失望した。そうして失望すると同時に、また前の憎悪が、冷やかな侮蔑（ぶべつ）と一しょに、心の中へはいって来た。すると、その気色（けしき）が、先方へも通じたのであろう。老婆は、片手に、まだ死骸の頭から奪った長い抜け毛を持ったなり、蟇（ひき）のつぶやくような声で、口ごもりながら、こんな事を云った。&#xa;「成程な、死人（しびと）の髪の毛を抜くと云う事は、何ぼう悪い事かも知れぬ。じゃが、ここにいる死人どもは、皆、そのくらいな事を、されてもいい人間ばかりだぞよ。現在、わしが今、髪を抜いた女などはな、蛇を四寸（しすん）ばかりずつに切って干したのを、干魚（ほしうお）だと云うて、太刀帯（たてわき）の陣へ売りに往（い）んだわ。疫病（えやみ）にかかって死ななんだら、今でも売りに往んでいた事であろ。それもよ、この女の売る干魚は、味がよいと云うて、太刀帯どもが、欠かさず菜料（さいりよう）に買っていたそうな。わしは、この女のした事が悪いとは思うていぬ。せねば、饑死をするのじゃて、仕方がなくした事であろ。されば、今また、わしのしていた事も悪い事とは思わぬぞよ。これとてもやはりせねば、饑死をするじゃて、仕方がなくする事じゃわいの。じゃて、その仕方がない事を、よく知っていたこの女は、大方わしのする事も大目に見てくれるであろ。」" />
+        <GridSplitter Grid.Row="1" ResizeDirection="Rows" Height="5" HorizontalAlignment="Stretch"/>
+        <Grid Grid.Row="2" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="70" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Line Margin" VerticalAlignment="Center" Margin="3" />
+            <Slider Grid.Row="0" Grid.Column="1" Name="slider_margin" Minimum="0" Maximum="100" Value="10"/>
+            <xctk:DoubleUpDown Grid.Row="0" Grid.Column="2" Value="{Binding ElementName=slider_margin, Path=Value}" Minimum="0" Maximum="100" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Spacing" VerticalAlignment="Center" Margin="3" IsEnabled="False" />
+            <Slider Grid.Row="1" Grid.Column="1" Name="slider_spacing" Minimum="10" Maximum="300" Value="100" IsEnabled="False" />
+            <xctk:DoubleUpDown Grid.Row="1" Grid.Column="2" Value="{Binding ElementName=slider_spacing, Path=Value}" Minimum="10" Maximum="300" IsEnabled="False" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Font Size" VerticalAlignment="Center" Margin="3" />
+            <Slider Grid.Row="2" Grid.Column="1" Name="slider_fontsize" Minimum="5" Maximum="72" Value="18"/>
+            <xctk:DoubleUpDown Grid.Row="2" Grid.Column="2" Value="{Binding ElementName=slider_fontsize, Path=Value}" Minimum="5" Maximum="72" />
+        </Grid>
+
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <xctk:ColorPicker Grid.Column="0" Name="color_font" Margin="3" />
+            <ComboBox Grid.Column="1" Margin="3" Name="combobox_fontface" ItemsSource="{Binding Source={x:Static tg:TategakiText.AvailableFonts}}" SelectedValue="ＭＳ 明朝" />
+            <CheckBox Grid.Column="2" Content="Bold" Name="checkbox_isbold" VerticalAlignment="Center" Margin="3" />
+            <CheckBox Grid.Column="3" Content="Italic" Name="checkbox_isitalic" VerticalAlignment="Center" Margin="3" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" >
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                <tg:TategakiMultiline Text="{Binding ElementName=textBox1, Path=Text, UpdateSourceTrigger=PropertyChanged}"
+									  Name="tategakiMul1" HorizontalAlignment="Right" VerticalAlignment="Top"
+									  FontSize="{Binding ElementName=slider_fontsize, Path=Value}"
+									  FontFamily="{Binding ElementName=combobox_fontface, Path=SelectedItem, Mode=OneWay}"
+									  FontStyle="{Binding ElementName=checkbox_isitalic, Path=IsChecked, Converter={StaticResource BooleanToFontStyleConv}}"
+									  FontWeight="{Binding ElementName=checkbox_isbold, Path=IsChecked, Converter={StaticResource BooleanToFontWeightConv}}"
+									  LineMargin="{Binding ElementName=slider_margin, Path=Value}"
+									  Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
+                <tg:TategakiText Text="芥川龍之介" VerticalAlignment="Bottom" FontSize="20" FontFamily="ＭＳ ゴシック"
+								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
+                <tg:TategakiText Text="羅生門" VerticalAlignment="Center" FontSize="36" FontWeight="Bold" FontFamily="ＭＳ ゴシック"
+								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
