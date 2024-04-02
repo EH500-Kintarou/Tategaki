@@ -24,8 +24,11 @@ namespace Tategaki
 	{
 		readonly VisualCollection children;
 		DrawingVisual? drawingText = null;
+		DrawingVisual? drawingBackground = null;
 		Size textSize;
 		Size availableSize;
+		GlyphRun? lastGlyph = null;
+		Rect? lastBgRect = null;
 
 		public TategakiText()
 		{
@@ -181,6 +184,11 @@ namespace Tategaki
 		{
 			this.availableSize = availableSize;
 
+			if(!lastBgRect.HasValue || lastBgRect.Value.Width != availableSize.Width || lastBgRect.Value.Height != availableSize.Height) {
+				RedrawBackground();
+				UpdateLayout();
+			}
+
 			return new Size(
 				double.IsPositiveInfinity(availableSize.Width) ? textSize.Width : availableSize.Width,
 				double.IsPositiveInfinity(availableSize.Height) ? textSize.Height : availableSize.Height);
@@ -200,59 +208,83 @@ namespace Tategaki
 
 		#region Methods
 
-		void Redraw(bool sizeMightChange)
+		void Redraw(bool glyphChanged)
 		{
-			RedrawText();
+			RedrawBackground();
+			RedrawText(glyphChanged);
+
+			UpdateLayout();
 		}
 
-		void RedrawText()
+		void RedrawBackground()
+		{
+			if(drawingBackground != null) {
+				children.Remove(drawingBackground);
+				drawingBackground = null;
+			}
+
+			var drawing = new DrawingVisual();
+			DrawingContext context = drawing.RenderOpen();
+
+			var rectangle = new Rect(0, 0, double.IsPositiveInfinity(availableSize.Width) ? textSize.Width : availableSize.Width, double.IsPositiveInfinity(availableSize.Height) ? textSize.Height : availableSize.Height);
+			context.DrawRectangle(Background, null, rectangle);
+
+			context.Close();
+
+			lastBgRect = rectangle;
+
+			drawingBackground = drawing;
+			children.Insert(0, drawingBackground);
+		}
+
+
+		void RedrawText(bool glyphChanged)
 		{
 			if(drawingText != null) {
 				children.Remove(drawingText);
 				drawingText = null;
 			}
 
-			textSize = new Size();
-
 			if(!string.IsNullOrEmpty(Text)) {
 				var drawing = new DrawingVisual();
 				DrawingContext context = drawing.RenderOpen();
 
-				var language = XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name);
-				var fontname = FontFamily.FamilyNames[XmlLanguage.GetLanguage("en-us")];
-				var face = new GlyphTypeface(Util.GetFontUri(fontname), ((FontWeight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((FontStyle == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
-				var renderingEmSize = FontSize;
-				var spacing = 100;
-				var origin = new Point(0, 0);
-				var advanceWidth = Enumerable.Repeat<double>(renderingEmSize, Text.Length).ToArray();
-				var glyphOffset = Enumerable.Range(0, Text.Length).Select(p => new Point((double)p * (spacing - 100) / 100 * renderingEmSize, 0)).ToArray();
-				var text = Text;
-				var glyphIndices = Util.GetVerticalGlyphIndex(Text, fontname);
+				if(glyphChanged) {
+					var language = XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name);
+					var fontname = FontFamily.FamilyNames[XmlLanguage.GetLanguage("en-us")];
+					var face = new GlyphTypeface(Util.GetFontUri(fontname), ((FontWeight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((FontStyle == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
+					var renderingEmSize = FontSize;
+					var spacing = 100;
+					var origin = new Point(0, 0);
+					var advanceWidth = Enumerable.Repeat<double>(renderingEmSize, Text.Length).ToArray();
+					var glyphOffset = Enumerable.Range(0, Text.Length).Select(p => new Point((double)p * (spacing - 100) / 100 * renderingEmSize, 0)).ToArray();
+					var text = Text;
+					var glyphIndices = Util.GetVerticalGlyphIndex(Text, fontname);
 
-				// 文字列の描画サイズを確認する
-				var glyphrun = new GlyphRun(face, 0, true, renderingEmSize, 1, glyphIndices, origin, advanceWidth, glyphOffset, text.ToArray(), fontname, null, null, language);
-				var glyphbox = glyphrun.ComputeAlignmentBox();
+					// 文字列の描画サイズを確認する
+					var glyphrun = new GlyphRun(face, 0, true, renderingEmSize, 1, glyphIndices, origin, advanceWidth, glyphOffset, text.ToArray(), fontname, null, null, language);
+					var glyphbox = glyphrun.ComputeAlignmentBox();
 
-				// 文字の高さ分右に動かして、かつ左上を原点とする
-				origin.Offset(glyphbox.Height, -glyphbox.Y);
-				glyphrun = new GlyphRun(face, 0, true, renderingEmSize, 1, glyphIndices, origin, advanceWidth, glyphOffset, text.ToArray(), fontname, null, null, language);
+					// 文字の高さ分右に動かして、かつ左上を原点とする
+					origin.Offset(glyphbox.Height, -glyphbox.Y);
+					glyphrun = new GlyphRun(face, 0, true, renderingEmSize, 1, glyphIndices, origin, advanceWidth, glyphOffset, text.ToArray(), fontname, null, null, language);
 
-				// 背景のサイズを設定する
-				var rectangle = new Rect(glyphbox.Height, 0, glyphbox.Width + text.Length * (double)(spacing - 100) / 100 * renderingEmSize, glyphbox.Height);
-
-				context.DrawGlyphRun(Foreground, glyphrun);
+					lastGlyph = glyphrun;
+					textSize = new Size(glyphbox.Height, glyphbox.Width + text.Length * (double)(spacing - 100) / 100 * renderingEmSize);   // 回転後のサイズ
+				}
+				context.DrawGlyphRun(Foreground, lastGlyph);
 				context.Close();
 
-				drawing.Clip = new RectangleGeometry(rectangle);
-				drawing.Transform = new RotateTransform(90, glyphbox.Height, 0);
+				drawing.Clip = new RectangleGeometry(new Rect(textSize.Width, 0, textSize.Height, textSize.Width)); // 回転前の寸法でクリッピングする
+				drawing.Transform = new RotateTransform(90, textSize.Width, 0); // 起点は文字幅分右に行ったところ
+
+				children.Add(drawing);
 
 				drawingText = drawing;
-				children.Add(drawingText);
-
-				textSize = new Size(rectangle.Height, rectangle.Width);
+			} else {
+				lastGlyph = null;
+				textSize = new Size();
 			}
-
-			UpdateLayout();
 		}
 
 		#endregion
