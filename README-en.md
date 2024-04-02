@@ -5,6 +5,8 @@
 This control library provides WPF vertical TextBlock.  
 WPF doesn't support vertical writing so that it is difficult to show a text vertically like a Japnese text. However, this control realize a vertical text like a WPF standard TextBlock control easily.
 
+"Tategaki" means "Vertical writing" in Japanese.
+
 ## Required Environment
 
 - Windows OS
