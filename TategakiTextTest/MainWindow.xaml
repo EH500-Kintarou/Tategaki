@@ -30,6 +30,7 @@
                         <StackPanel Orientation="Horizontal">
                             <tg:TategakiText Text="「こんにちは」"/>
                             <tg:TategakiText Text="{Binding ChangingText}" Background="LightGray" VerticalAlignment="Top"/>
+                            <tg:TategakiText Text="マージン" Margin="5" Foreground="Yellow" Background="Blue" />
                             <tg:TategakiText Text="背景色・文字色" Foreground="White" Background="Green"/>
                             <tg:TategakiText />
                             <tg:TategakiText Text="フォントサイズ" FontSize="24" />
@@ -47,6 +48,7 @@
                         <StackPanel Grid.Column="1" Orientation="Vertical">
                             <TextBlock Text="「こんにちは」"/>
                             <TextBlock Text="{Binding ChangingText}" Background="LightGray" HorizontalAlignment="Left"/>
+                            <TextBlock Text="マージン" Margin="5" Foreground="Yellow" Background="Blue" />
                             <TextBlock Text="背景色・文字色" Foreground="White" Background="Green"/>
                             <TextBlock />
                             <TextBlock Text="フォントサイズ" FontSize="24" />
