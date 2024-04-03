@@ -129,21 +129,9 @@ namespace Tategaki
 			SetText();
 		}
 
-		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
-		{
-			switch(e.Property.Name) {
-				case nameof(this.FontFamily):
-					Util.MakeCache(Text, FontFamily.Source);
-					break;
-			}
-			base.OnPropertyChanged(e);
-		}
-
 		void SetText()
 		{
 			if(itemsctl != null) {
-				Util.MakeCache(Text, FontFamily.Source);
-
 				IEnumerable<string> splited = (Text ?? string.Empty).Split('\n').Select(p => string.IsNullOrEmpty(p) ? " " : p);
 
 				itemsctl.ItemsSource = splited.Select(p => {
