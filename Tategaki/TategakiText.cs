@@ -214,6 +214,8 @@ namespace Tategaki
 			RedrawText(glyphChanged);
 
 			UpdateLayout();
+			if(glyphChanged)
+				InvalidateMeasure();			
 		}
 
 		void RedrawBackground()
