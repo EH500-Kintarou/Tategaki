@@ -192,6 +192,7 @@ namespace Tategaki
 			switch(e.Property.Name) {
 				case nameof(HorizontalAlignment):
 				case nameof(VerticalAlignment):
+					RedrawBackground();
 					InvalidateMeasure();
 					break;
 			}
@@ -207,21 +208,10 @@ namespace Tategaki
 				UpdateLayout();
 			}
 
-			var width = HorizontalAlignment switch {
-				HorizontalAlignment.Left or HorizontalAlignment.Center or HorizontalAlignment.Right
-					=> textSize.Width,
-				HorizontalAlignment.Stretch or _
-					=> double.IsPositiveInfinity(availableSize.Width) ? textSize.Width : availableSize.Width,
-			};
-
-			var height = VerticalAlignment switch {
-				VerticalAlignment.Top or VerticalAlignment.Center or VerticalAlignment.Bottom
-					=> textSize.Height,
-				VerticalAlignment.Stretch or _
-					=> double.IsPositiveInfinity(availableSize.Height) ? textSize.Height : availableSize.Height,
-			};
-
-			return new Size(width, height);
+			if(lastBgRect.HasValue)
+				return new Size(lastBgRect.Value.Width, lastBgRect.Value.Height);
+			else
+				return Size.Empty;	// まあまずはここには来ないので適当に
 		}
 
 		protected override int VisualChildrenCount => children.Count;
@@ -240,8 +230,8 @@ namespace Tategaki
 
 		void Redraw(bool glyphChanged)
 		{
-			RedrawBackground();
 			RedrawText(glyphChanged);
+			RedrawBackground();
 
 			UpdateLayout();
 			if(glyphChanged)
@@ -258,7 +248,21 @@ namespace Tategaki
 			var drawing = new DrawingVisual();
 			DrawingContext context = drawing.RenderOpen();
 
-			var rectangle = new Rect(0, 0, double.IsPositiveInfinity(availableSize.Width) ? textSize.Width : availableSize.Width, double.IsPositiveInfinity(availableSize.Height) ? textSize.Height : availableSize.Height);
+			var width = HorizontalAlignment switch {
+				HorizontalAlignment.Left or HorizontalAlignment.Center or HorizontalAlignment.Right
+					=> textSize.Width,
+				HorizontalAlignment.Stretch or _
+					=> double.IsPositiveInfinity(availableSize.Width) ? textSize.Width : availableSize.Width,
+			};
+
+			var height = VerticalAlignment switch {
+				VerticalAlignment.Top or VerticalAlignment.Center or VerticalAlignment.Bottom
+					=> textSize.Height,
+				VerticalAlignment.Stretch or _
+					=> double.IsPositiveInfinity(availableSize.Height) ? textSize.Height : availableSize.Height,
+			};
+
+			var rectangle = new Rect(0, 0, width, height);
 			context.DrawRectangle(Background, null, rectangle);
 
 			context.Close();
