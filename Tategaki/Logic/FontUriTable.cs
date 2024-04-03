@@ -10,6 +10,9 @@ using WaterTrans.TypeLoader;
 
 namespace Tategaki.Logic
 {
+	/// <summary>
+	/// フォント名をUriに変換するテーブル
+	/// </summary>
 	internal class FontUriTable
 	{
 		static readonly SortedDictionary<string, Uri> _AllVerticalFonts;
@@ -17,9 +20,24 @@ namespace Tategaki.Logic
 		static readonly Dictionary<CultureInfo, IDictionary<string, Uri>> _CultureVerticalFonts;
 		static readonly Dictionary<CultureInfo, IDictionary<string, Uri>> _CultureAdvancedVerticalFonts;
 
+		/// <summary>
+		/// 縦書きフォントを含むすべてのカルチャーのフォント名をUriに変換するテーブル
+		/// </summary>
 		internal static IDictionary<string, Uri> AllVerticalFonts => _AllVerticalFonts;
+
+		/// <summary>
+		/// Advanced縦書きフォントを含むすべてのカルチャーのフォント名をUriに変換するテーブル
+		/// </summary>
 		internal static IDictionary<string, Uri> AllAdvancedVerticalFonts => _AllAdvancedVerticalFonts;
+
+		/// <summary>
+		/// 特定のカルチャーの縦書きフォント名-Uriのテーブルを取得するテーブル
+		/// </summary>
 		internal static IDictionary<CultureInfo, IDictionary<string, Uri>> CultureVerticalFonts => _CultureVerticalFonts;
+
+		/// <summary>
+		/// 特定のカルチャーのAdvanced縦書きフォント名-Uriのテーブルを取得するテーブル
+		/// </summary>
 		internal static IDictionary<CultureInfo, IDictionary<string, Uri>> CultureAdvancedVerticalFonts => _CultureAdvancedVerticalFonts;
 
 		static FontUriTable()
@@ -81,6 +99,13 @@ namespace Tategaki.Logic
 			}
 		}
 
+		/// <summary>
+		/// フォント名からUriを取得するメソッド
+		/// 存在しない場合は適当なフォントにフォールバックする。
+		/// </summary>
+		/// <param name="name">フォント名</param>
+		/// <param name="advanced">Advancedフォントかどうか</param>
+		/// <returns></returns>
 		internal static Uri FromName(string name, bool advanced = false)
 		{
 			var dic = advanced ? _AllAdvancedVerticalFonts : _AllVerticalFonts;

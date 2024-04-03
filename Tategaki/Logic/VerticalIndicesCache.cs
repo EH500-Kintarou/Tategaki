@@ -13,6 +13,9 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Tategaki.Logic
 {
+	/// <summary>
+	/// 縦書きグリフインデックスのキャッシュ
+	/// </summary>
 	internal class VerticalIndicesCache
 	{
 		readonly SingleGlyphConverter conv;
