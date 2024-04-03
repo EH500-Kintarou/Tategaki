@@ -25,7 +25,7 @@ namespace TategakiTextTest
 		private void Timer_Tick(object? sender, EventArgs e)
 		{
 			ChangingText = ChangingText switch {
-				"変化する" => "テキスト",
+				"変化する" => "文字列",
 				_ => "変化する",
 			};
 		}

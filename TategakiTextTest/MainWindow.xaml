@@ -60,6 +60,94 @@
                     </Border>
                 </Grid>
             </TabItem>
+            <TabItem Header="Grid">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="TategakiText" FontSize="16" FontWeight="Bold" />
+                    <Border Grid.Row="1" Grid.Column="0" BorderThickness="1" BorderBrush="Gray" >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1*" />
+                                <RowDefinition Height="1*" />
+                                <RowDefinition Height="1*" />
+                                <RowDefinition Height="1*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <tg:TategakiText Grid.Row="0" Grid.Column="0" Text="左上" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                            <tg:TategakiText Grid.Row="1" Grid.Column="0" Text="左中" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                            <tg:TategakiText Grid.Row="2" Grid.Column="0" Text="左下" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                            <tg:TategakiText Grid.Row="3" Grid.Column="0" Text="左伸長" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Stretch" />
+
+                            <tg:TategakiText Grid.Row="0" Grid.Column="1" Text="中上" Background="Yellow" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                            <tg:TategakiText Grid.Row="1" Grid.Column="1" Text="中中" Background="Yellow" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <tg:TategakiText Grid.Row="2" Grid.Column="1" Text="中下" Background="Yellow" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                            <tg:TategakiText Grid.Row="3" Grid.Column="1" Text="中伸長" Background="Yellow" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
+                            <tg:TategakiText Grid.Row="0" Grid.Column="2" Text="右上" Background="Yellow" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            <tg:TategakiText Grid.Row="1" Grid.Column="2" Text="右中" Background="Yellow" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            <tg:TategakiText Grid.Row="2" Grid.Column="2" Text="右下" Background="Yellow" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+                            <tg:TategakiText Grid.Row="3" Grid.Column="2" Text="右伸長" Background="Yellow" HorizontalAlignment="Right" VerticalAlignment="Stretch" />
+
+                            <tg:TategakiText Grid.Row="0" Grid.Column="3" Text="伸長上" Background="Yellow" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
+                            <tg:TategakiText Grid.Row="1" Grid.Column="3" Text="伸長中" Background="Yellow" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                            <tg:TategakiText Grid.Row="2" Grid.Column="3" Text="伸長下" Background="Yellow" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+                            <tg:TategakiText Grid.Row="3" Grid.Column="3" Text="伸長伸長" Background="Yellow" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="TextBlock" FontSize="16" FontWeight="Bold" />
+                    <Border Grid.Row="1" Grid.Column="1" BorderThickness="1" BorderBrush="Gray" >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1*" />
+                                <RowDefinition Height="1*" />
+                                <RowDefinition Height="1*" />
+                                <RowDefinition Height="1*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="左上" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="左中" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="左下" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="左伸長" Background="Yellow" HorizontalAlignment="Left" VerticalAlignment="Stretch" />
+
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="中上" Background="Yellow" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="中中" Background="Yellow" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="中下" Background="Yellow" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="中伸長" Background="Yellow" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="右上" Background="Yellow" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="右中" Background="Yellow" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="2" Grid.Column="2" Text="右下" Background="Yellow" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+                            <TextBlock Grid.Row="3" Grid.Column="2" Text="右伸長" Background="Yellow" HorizontalAlignment="Right" VerticalAlignment="Stretch" />
+
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="伸長上" Background="Yellow" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
+                            <TextBlock Grid.Row="1" Grid.Column="3" Text="伸長中" Background="Yellow" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="2" Grid.Column="3" Text="伸長下" Background="Yellow" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+                            <TextBlock Grid.Row="3" Grid.Column="3" Text="伸長伸長" Background="Yellow" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
