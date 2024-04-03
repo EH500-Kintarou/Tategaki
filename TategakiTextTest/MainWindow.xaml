@@ -32,6 +32,7 @@
                             <tg:TategakiText Text="{Binding ChangingText}" Background="LightGray" VerticalAlignment="Top"/>
                             <tg:TategakiText Text="マージン" Margin="5" Foreground="Yellow" Background="Blue" />
                             <tg:TategakiText Text="背景色・文字色" Foreground="White" Background="Green"/>
+                            <tg:TategakiText Text="移動する位置" Background="Yellow" VerticalAlignment="{Binding ChangingVertical}" />
                             <tg:TategakiText />
                             <tg:TategakiText Text="フォントサイズ" FontSize="24" />
                             <tg:TategakiText Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />
@@ -50,6 +51,7 @@
                             <TextBlock Text="{Binding ChangingText}" Background="LightGray" HorizontalAlignment="Left"/>
                             <TextBlock Text="マージン" Margin="5" Foreground="Yellow" Background="Blue" />
                             <TextBlock Text="背景色・文字色" Foreground="White" Background="Green"/>
+                            <TextBlock Text="移動する位置" Background="Yellow" HorizontalAlignment="{Binding ChangingHorizontal}" />
                             <TextBlock />
                             <TextBlock Text="フォントサイズ" FontSize="24" />
                             <TextBlock Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />

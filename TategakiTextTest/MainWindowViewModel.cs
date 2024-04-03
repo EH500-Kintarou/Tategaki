@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Printing;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace TategakiTextTest
@@ -28,6 +30,18 @@ namespace TategakiTextTest
 				"変化する" => "文字列",
 				_ => "変化する",
 			};
+			ChangingHorizontal = ChangingHorizontal switch {
+				HorizontalAlignment.Left => HorizontalAlignment.Center,
+				HorizontalAlignment.Center => HorizontalAlignment.Right,
+				HorizontalAlignment.Right => HorizontalAlignment.Stretch,
+				_ => HorizontalAlignment.Left,
+			};
+			ChangingVertical = ChangingVertical switch {
+				VerticalAlignment.Top => VerticalAlignment.Center,
+				VerticalAlignment.Center => VerticalAlignment.Bottom,
+				VerticalAlignment.Bottom => VerticalAlignment.Stretch,
+				_ => VerticalAlignment.Top,
+			};
 		}
 
 		public string? ChangingText
@@ -42,6 +56,39 @@ namespace TategakiTextTest
 			}
 		}
 		private string? _ChangingText;
+
+
+		private HorizontalAlignment _ChangingHorizontal;
+
+		public HorizontalAlignment ChangingHorizontal
+		{
+			get
+			{ return _ChangingHorizontal; }
+			set
+			{ 
+				if(_ChangingHorizontal == value)
+					return;
+				_ChangingHorizontal = value;
+				RaisePropertyChanged();
+			}
+		}
+
+
+		private VerticalAlignment _ChangingVertical;
+
+		public VerticalAlignment ChangingVertical
+		{
+			get
+			{ return _ChangingVertical; }
+			set
+			{ 
+				if(_ChangingVertical == value)
+					return;
+				_ChangingVertical = value;
+				RaisePropertyChanged();
+			}
+		}
+
 
 		#region INotifyPropertyChanged
 
