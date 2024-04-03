@@ -6,7 +6,7 @@
 		xmlns:tg="http://schemas.eh500-kintarou.com/Tategaki"
 		xmlns:vm="clr-namespace:TategakiTextTest.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280" FontSize="20">
+        Title="MainWindow" Height="720" Width="1280" FontFamily="Yu Gothic" FontSize="16">
 
     <Window.DataContext>
         <vm:MainWindowViewModel />
@@ -37,6 +37,7 @@
                             <tg:TategakiText Text="フォントサイズ" FontSize="24" />
                             <tg:TategakiText Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />
                             <tg:TategakiText Text="フォント名（英語）" FontFamily="MS Gothic" FontSize="24" />
+                            <tg:TategakiText Text="縦書きが存在しないフォント名" FontFamily="Yu Gothic UI" FontSize="24" />
                             <tg:TategakiText Text="太字" FontWeight="Bold" />
                             <tg:TategakiText Text="斜体" FontStyle="Italic" />
                             <tg:TategakiText Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
@@ -57,6 +58,7 @@
                             <TextBlock Text="フォントサイズ" FontSize="24" />
                             <TextBlock Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />
                             <TextBlock Text="フォント名（英語）" FontFamily="MS Gothic" FontSize="24" />
+                            <TextBlock Text="縦書きが存在しないフォント名" FontFamily="Yu Gothic UI" FontSize="24" />
                             <TextBlock Text="太字" FontWeight="Bold" />
                             <TextBlock Text="斜体" FontStyle="Italic" />
                             <TextBlock Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
