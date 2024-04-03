@@ -256,7 +256,7 @@ namespace Tategaki
 					var fontname = FontFamily.FamilyNames[XmlLanguage.GetLanguage("en-us")];
 					var face = new GlyphTypeface(Util.GetFontUri(fontname), ((FontWeight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((FontStyle == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
 					var renderingEmSize = FontSize;
-					var spacing = 100;
+					var spacing = Spacing;
 					var origin = new Point(0, 0);
 					var advanceWidth = Enumerable.Repeat<double>(renderingEmSize, Text.Length).ToArray();
 					var glyphOffset = Enumerable.Range(0, Text.Length).Select(p => new Point((double)p * (spacing - 100) / 100 * renderingEmSize, 0)).ToArray();
