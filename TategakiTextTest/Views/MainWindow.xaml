@@ -153,6 +153,9 @@
                     </Border>
                 </Grid>
             </TabItem>
+            <TabItem Header="DocumentViewer">
+                <DocumentViewer x:Name="documentViewer" />
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>
