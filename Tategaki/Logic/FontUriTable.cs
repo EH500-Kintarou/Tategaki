@@ -87,8 +87,13 @@ namespace Tategaki.Logic
 
 			if(dic.TryGetValue(name, out Uri? uri))
 				return uri;
-			else
-				return dic.First().Value;
+			else {
+				var include = dic.Keys.Where(p => p.Contains(name) || name.Contains(p)).FirstOrDefault();
+				if(include != null)
+					return dic[include];
+				else
+					return dic.First().Value;
+			}
 		}
 	}
 }
