@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace TategakiTextTest
+namespace TategakiTextTest.ViewModels
 {
 	public class MainWindowViewModel : INotifyPropertyChanged
 	{
