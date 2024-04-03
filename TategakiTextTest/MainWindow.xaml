@@ -41,6 +41,7 @@
                             <tg:TategakiText Text="斜体" FontStyle="Italic" />
                             <tg:TategakiText Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
                             <tg:TategakiText Text="間隔広め" Spacing="200"/>
+                            <tg:TategakiText Text="Alphabet 12345"/>
                         </StackPanel>
                     </Border>
 
@@ -59,7 +60,7 @@
                             <TextBlock Text="太字" FontWeight="Bold" />
                             <TextBlock Text="斜体" FontStyle="Italic" />
                             <TextBlock Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
-                            <TextBlock Text="間隔は元祖TextBlockには無い" />
+                            <TextBlock Text="Alphabet 12345" />
                         </StackPanel>
                     </Border>
                 </Grid>
