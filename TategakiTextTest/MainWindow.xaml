@@ -1,0 +1,65 @@
+﻿<Window x:Class="TategakiTextTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:tg="http://schemas.eh500-kintarou.com/Tategaki"
+		xmlns:local="clr-namespace:TategakiTextTest"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
+    
+    <Grid>
+        <TabControl>
+            <TabItem Header="基本">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="TategakiText" FontSize="16" FontWeight="Bold" />
+                    <Border Grid.Row="1" Grid.Column="0" BorderThickness="1" BorderBrush="Gray" >
+                        <StackPanel Orientation="Horizontal">
+                            <tg:TategakiText Text="「こんにちは」"/>
+                            <tg:TategakiText Text="{Binding ChangingText}"/>
+                            <tg:TategakiText Text="背景色・文字色" Foreground="White" Background="Green"/>
+                            <tg:TategakiText />
+                            <tg:TategakiText Text="フォントサイズ" FontSize="24" />
+                            <tg:TategakiText Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />
+                            <tg:TategakiText Text="フォント名（英語）" FontFamily="MS Gothic" FontSize="24" />
+                            <tg:TategakiText Text="太字" FontWeight="Bold" />
+                            <tg:TategakiText Text="斜体" FontStyle="Italic" />
+                            <tg:TategakiText Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
+                            <tg:TategakiText Text="間隔広め" Spacing="200"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="TextBlock" FontSize="16" FontWeight="Bold" />
+                    <Border Grid.Row="1" Grid.Column="1" BorderThickness="1" BorderBrush="Gray" >
+                        <StackPanel Grid.Column="1" Orientation="Vertical">
+                            <TextBlock Text="「こんにちは」"/>
+                            <TextBlock Text="{Binding ChangingText}"/>
+                            <TextBlock Text="背景色・文字色" Foreground="White" Background="Green"/>
+                            <TextBlock />
+                            <TextBlock Text="フォントサイズ" FontSize="24" />
+                            <TextBlock Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />
+                            <TextBlock Text="フォント名（英語）" FontFamily="MS Gothic" FontSize="24" />
+                            <TextBlock Text="太字" FontWeight="Bold" />
+                            <TextBlock Text="斜体" FontStyle="Italic" />
+                            <TextBlock Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
+                            <TextBlock Text="間隔は元祖TextBlockには無い" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
