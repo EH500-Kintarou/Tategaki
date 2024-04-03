@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Globalization;
@@ -186,6 +187,17 @@ namespace Tategaki
 
 		#region Overrides
 
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			switch(e.Property.Name) {
+				case nameof(HorizontalAlignment):
+				case nameof(VerticalAlignment):
+					InvalidateMeasure();
+					break;
+			}
+			base.OnPropertyChanged(e);
+		}
+
 		protected override Size MeasureOverride(Size availableSize)
 		{
 			this.availableSize = availableSize;
@@ -195,9 +207,21 @@ namespace Tategaki
 				UpdateLayout();
 			}
 
-			return new Size(
-				double.IsPositiveInfinity(availableSize.Width) ? textSize.Width : availableSize.Width,
-				double.IsPositiveInfinity(availableSize.Height) ? textSize.Height : availableSize.Height);
+			var width = HorizontalAlignment switch {
+				HorizontalAlignment.Left or HorizontalAlignment.Center or HorizontalAlignment.Right
+					=> textSize.Width,
+				HorizontalAlignment.Stretch or _
+					=> double.IsPositiveInfinity(availableSize.Width) ? textSize.Width : availableSize.Width,
+			};
+
+			var height = VerticalAlignment switch {
+				VerticalAlignment.Top or VerticalAlignment.Center or VerticalAlignment.Bottom
+					=> textSize.Height,
+				VerticalAlignment.Stretch or _
+					=> double.IsPositiveInfinity(availableSize.Height) ? textSize.Height : availableSize.Height,
+			};
+
+			return new Size(width, height);
 		}
 
 		protected override int VisualChildrenCount => children.Count;
