@@ -80,5 +80,15 @@ namespace Tategaki.Logic
 				catch(NullReferenceException) { }
 			}
 		}
+
+		internal static Uri FromName(string name, bool advanced = false)
+		{
+			var dic = advanced ? _AllAdvancedVerticalFonts : _AllVerticalFonts;
+
+			if(dic.TryGetValue(name, out Uri? uri))
+				return uri;
+			else
+				return dic.First().Value;
+		}
 	}
 }
