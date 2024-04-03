@@ -11,6 +11,12 @@
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
+
+    <Window.Resources>
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+    </Window.Resources>
     
     <Grid>
         <TabControl>
