@@ -42,8 +42,14 @@ namespace Tategaki
 		/// </summary>
 		public static string[] AvailableFonts
 		{
-			get { return Util.AvailableFonts; }
+			get
+			{
+				if(_AvailableFonts == null)
+					_AvailableFonts = FontUriTable.CultureVerticalFonts[CultureInfo.CurrentUICulture].Select(p => p.Key).ToArray();
+				return _AvailableFonts;
+			}
 		}
+		static string[]? _AvailableFonts = null;
 
 		/// <summary>
 		/// 表示テキスト
@@ -73,10 +79,10 @@ namespace Tategaki
 				TategakiText me = (TategakiText)d;
 
 				var font = e.NewValue as FontFamily;
-				if(font == null)	// nullだったらデフォルトのフォント
+				if(font == null)    // nullだったらデフォルトのフォント
 					me.FontFamily = SystemFonts.MessageFontFamily;
-				else if(!Util.AvailableFontUris.Contains(font.BaseUri ?? Util.GetFontUri(font.FamilyNames.First().Value)))	// 存在しないフォントだったら存在する最初のフォント
-					me.FontFamily = new FontFamily(Util.AvailableFonts.First());
+				else if(!FontUriTable.AllVerticalFonts.ContainsKey(font.Source))    // 存在しないフォントだったら存在する最初のフォント
+					me.FontFamily = new FontFamily(FontUriTable.CultureVerticalFonts[CultureInfo.CurrentUICulture].First().Key);
 				else
 					me.Redraw(true);
 			})
@@ -253,15 +259,16 @@ namespace Tategaki
 
 				if(glyphChanged) {
 					var language = XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name);
-					var fontname = FontFamily.FamilyNames[XmlLanguage.GetLanguage("en-us")];
-					var face = new GlyphTypeface(Util.GetFontUri(fontname), ((FontWeight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((FontStyle == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
+					var fontname = FontFamily.Source;
+					var uri = FontUriTable.AllVerticalFonts[fontname];
+					var face = new GlyphTypeface(uri, ((FontWeight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((FontStyle == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
 					var renderingEmSize = FontSize;
 					var spacing = Spacing;
 					var origin = new Point(0, 0);
 					var advanceWidth = Enumerable.Repeat<double>(renderingEmSize, Text.Length).ToArray();
 					var glyphOffset = Enumerable.Range(0, Text.Length).Select(p => new Point((double)p * (spacing - 100) / 100 * renderingEmSize, 0)).ToArray();
 					var text = Text;
-					var glyphIndices = Util.GetVerticalGlyphIndex(Text, fontname);
+					var glyphIndices = VerticalIndicesCache.GetCache(uri).GetIndices(Text);
 
 					// 文字列の描画サイズを確認する
 					var glyphrun = new GlyphRun(face, 0, true, renderingEmSize, 1, glyphIndices, origin, advanceWidth, glyphOffset, text.ToArray(), fontname, null, null, language);
