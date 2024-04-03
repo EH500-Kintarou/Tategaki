@@ -75,19 +75,7 @@ namespace Tategaki
 			get { return (FontFamily)GetValue(FontFamilyProperty); }
 			set { SetValue(FontFamilyProperty, value); }
 		}
-		public static readonly DependencyProperty FontFamilyProperty =　DependencyProperty.Register(
-			nameof(FontFamily), typeof(FontFamily), typeof(TategakiText), new PropertyMetadata(new FontFamily("游ゴシック")/*SystemFonts.MessageFontFamily*/, (d, e) => {
-				TategakiText me = (TategakiText)d;
-
-				var font = e.NewValue as FontFamily;
-				if(font == null)    // nullだったらデフォルトのフォント
-					me.FontFamily = SystemFonts.MessageFontFamily;
-				else if(!FontUriTable.AllVerticalFonts.ContainsKey(font.Source))    // 存在しないフォントだったら存在する最初のフォント
-					me.FontFamily = new FontFamily(FontUriTable.CultureVerticalFonts[CultureInfo.CurrentUICulture].First().Key);
-				else
-					me.Redraw(true);
-			})
-		);
+		public static readonly DependencyProperty FontFamilyProperty = TextElement.FontFamilyProperty.AddOwner(typeof(TategakiText));
 
 		/// <summary>
 		/// フォントサイズ
@@ -97,16 +85,7 @@ namespace Tategaki
 			get { return (double)GetValue(FontSizeProperty); }
 			set { SetValue(FontSizeProperty, value); }
 		}
-		public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register(
-			nameof(FontSize), typeof(double), typeof(TategakiText), new PropertyMetadata(SystemFonts.MessageFontSize, (d, e) => {
-				TategakiText me = (TategakiText)d;
-
-				if(e.NewValue is double size && size <= 0)    // 0以下だったらデフォルトのフォントサイズ
-					me.FontSize =  SystemFonts.MessageFontSize;
-				else
-					me.Redraw(true);
-			})
-		);
+		public static readonly DependencyProperty FontSizeProperty = TextElement.FontSizeProperty.AddOwner(typeof(TategakiText));
 
 		/// <summary>
 		/// フォントの太さ
@@ -116,12 +95,7 @@ namespace Tategaki
 			get { return (FontWeight)GetValue(FontWeightProperty); }
 			set { SetValue(FontWeightProperty, value); }
 		}
-		public static readonly DependencyProperty FontWeightProperty = DependencyProperty.Register(
-			nameof(FontWeight), typeof(FontWeight), typeof(TategakiText), new PropertyMetadata(SystemFonts.MessageFontWeight, (d, e) => {
-				TategakiText me = (TategakiText)d;
-				me.Redraw(true);
-			})
-		);
+		public static readonly DependencyProperty FontWeightProperty = TextElement.FontWeightProperty.AddOwner(typeof(TategakiText));
 
 		/// <summary>
 		/// フォントスタイル
@@ -131,12 +105,7 @@ namespace Tategaki
 			get { return (FontStyle)GetValue(FontStyleProperty); }
 			set { SetValue(FontStyleProperty, value); }
 		}
-		public static readonly DependencyProperty FontStyleProperty = DependencyProperty.Register(
-			nameof(FontStyle), typeof(FontStyle), typeof(TategakiText), new PropertyMetadata(SystemFonts.MessageFontStyle, (d, e) => {
-				TategakiText me = (TategakiText)d;
-				me.Redraw(true);
-			})
-		);
+		public static readonly DependencyProperty FontStyleProperty = TextElement.FontStyleProperty.AddOwner(typeof(TategakiText));
 
 		/// <summary>
 		/// 文字間隔
@@ -194,6 +163,12 @@ namespace Tategaki
 				case nameof(VerticalAlignment):
 					RedrawBackground();
 					InvalidateMeasure();
+					break;
+				case nameof(FontFamily):
+				case nameof(FontSize):
+				case nameof(FontWeight):
+				case nameof(FontStyle):
+					Redraw(true);
 					break;
 			}
 			base.OnPropertyChanged(e);
@@ -288,7 +263,7 @@ namespace Tategaki
 				if(glyphChanged) {
 					var language = XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name);
 					var fontname = FontFamily.Source;
-					var uri = FontUriTable.AllVerticalFonts[fontname];
+					var uri = FontUriTable.FromName(fontname);
 					var face = new GlyphTypeface(uri, ((FontWeight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((FontStyle == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
 					var renderingEmSize = FontSize;
 					var spacing = Spacing;
