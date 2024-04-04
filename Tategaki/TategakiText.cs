@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
@@ -14,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Tategaki.Logic;
@@ -23,17 +25,10 @@ namespace Tategaki
 {
 	public class TategakiText : FrameworkElement
 	{
-		readonly VisualCollection children;
-		DrawingVisual? drawingText = null;
-		DrawingVisual? drawingBackground = null;
-		Size textSize;
-		Size availableSize;
-		GlyphRun? lastGlyph = null;
-		Rect? lastBgRect = null;
+		GlyphRunParam? param = null;
 
 		public TategakiText()
 		{
-			children = new VisualCollection(this);
 		}
 
 		#region Properties
@@ -55,24 +50,21 @@ namespace Tategaki
 		/// <summary>
 		/// 表示テキスト
 		/// </summary>
-		public string Text
+		public string? Text
 		{
-			get { return (string)GetValue(TextProperty); }
+			get { return (string?)GetValue(TextProperty); }
 			set { SetValue(TextProperty, value); }
 		}
 		public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-			nameof(Text), typeof(string), typeof(TategakiText), new PropertyMetadata((d, e) => {
-				TategakiText me = (TategakiText)d;
-				me.Redraw(true);
-			})
-		);
+			nameof(Text), typeof(string), typeof(TategakiText),
+			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
 
 		/// <summary>
 		/// フォントファミリー
 		/// </summary>
-		public FontFamily FontFamily
+		public FontFamily? FontFamily
 		{
-			get { return (FontFamily)GetValue(FontFamilyProperty); }
+			get { return (FontFamily?)GetValue(FontFamilyProperty); }
 			set { SetValue(FontFamilyProperty, value); }
 		}
 		public static readonly DependencyProperty FontFamilyProperty = TextElement.FontFamilyProperty.AddOwner(typeof(TategakiText));
@@ -116,190 +108,133 @@ namespace Tategaki
 			set { SetValue(SpacingProperty, value); }
 		}
 		public static readonly DependencyProperty SpacingProperty = DependencyProperty.Register(
-			nameof(Spacing), typeof(double), typeof(TategakiText), new PropertyMetadata((double)100, (d, e) => {
-				TategakiText me = (TategakiText)d;
-				me.Redraw(true);
-			})
-		);
+			nameof(Spacing), typeof(double), typeof(TategakiText), new FrameworkPropertyMetadata(
+				100.0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
 
 		/// <summary>
 		/// 文字の色
 		/// </summary>
-		public Brush Foreground
+		public Brush? Foreground
 		{
-			get { return (Brush)GetValue(ForegroundProperty); }
+			get { return (Brush?)GetValue(ForegroundProperty); }
 			set { SetValue(ForegroundProperty, value); }
 		}
-		public static readonly DependencyProperty ForegroundProperty = DependencyProperty.Register(
-			nameof(Foreground), typeof(Brush), typeof(TategakiText), new PropertyMetadata(SystemColors.ControlTextBrush, (d, e) => {
-				TategakiText me = (TategakiText)d;
-				me.Redraw(false);
-			})
-		);
+		public static readonly DependencyProperty ForegroundProperty = TextElement.ForegroundProperty.AddOwner(typeof(TategakiText));
 
 		/// <summary>
 		/// 背景色
 		/// </summary>
-		public Brush Background
+		public Brush? Background
 		{
-			get { return (Brush)GetValue(BackgroundProperty); }
+			get { return (Brush?)GetValue(BackgroundProperty); }
 			set { SetValue(BackgroundProperty, value); }
 		}
 		public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(
-			nameof(Background), typeof(Brush), typeof(TategakiText), new PropertyMetadata(Brushes.Transparent, (d, e) => {
-				TategakiText me = (TategakiText)d;
-				me.Redraw(false);
-			})
-		);
+			nameof(Background), typeof(Brush), typeof(TategakiText), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
 		#endregion
 
 		#region Overrides
 
-		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
-		{
-			switch(e.Property.Name) {
-				case nameof(HorizontalAlignment):
-				case nameof(VerticalAlignment):
-					RedrawBackground();
-					InvalidateMeasure();
-					break;
-				case nameof(FontFamily):
-				case nameof(FontSize):
-				case nameof(FontWeight):
-				case nameof(FontStyle):
-					Redraw(true);
-					break;
-			}
-			base.OnPropertyChanged(e);
-		}
-
+		/// <summary>
+		/// 要素のサイズを決定したいときに呼ばれるメソッド
+		/// </summary>
+		/// <param name="availableSize">この要素が使用可能なサイズ。無限大の場合はどのような大きさでも良いという意味となる。</param>
+		/// <returns>この要素が必要とするサイズ。</returns>
 		protected override Size MeasureOverride(Size availableSize)
 		{
-			this.availableSize = availableSize;
-
-			if(!lastBgRect.HasValue || lastBgRect.Value.Width != availableSize.Width || lastBgRect.Value.Height != availableSize.Height) {
-				RedrawBackground();
-				UpdateLayout();
-			}
-
-			if(lastBgRect.HasValue)
-				return new Size(lastBgRect.Value.Width, lastBgRect.Value.Height);
-			else
-				return Size.Empty;	// まあまずはここには来ないので適当に
-		}
-
-		protected override int VisualChildrenCount => children.Count;
-
-		protected override Visual GetVisualChild(int index)
-		{
-			if(index < 0 || index >= children.Count)
-				throw new ArgumentOutOfRangeException(nameof(index), $"{nameof(index)} is out of range");
-
-			return children[index];
-		}
-
-		#endregion
-
-		#region Methods
-
-		void Redraw(bool glyphChanged)
-		{
-			RedrawText(glyphChanged);
-			RedrawBackground();
-
-			UpdateLayout();
-			if(glyphChanged)
-				InvalidateMeasure();			
-		}
-
-		void RedrawBackground()
-		{
-			if(drawingBackground != null) {
-				children.Remove(drawingBackground);
-				drawingBackground = null;
-			}
-
-			var drawing = new DrawingVisual();
-			DrawingContext context = drawing.RenderOpen();
-
-			var width = HorizontalAlignment switch {
-				HorizontalAlignment.Left or HorizontalAlignment.Center or HorizontalAlignment.Right
-					=> textSize.Width,
-				HorizontalAlignment.Stretch or _
-					=> double.IsPositiveInfinity(availableSize.Width) ? textSize.Width : availableSize.Width,
-			};
-
-			var height = VerticalAlignment switch {
-				VerticalAlignment.Top or VerticalAlignment.Center or VerticalAlignment.Bottom
-					=> textSize.Height,
-				VerticalAlignment.Stretch or _
-					=> double.IsPositiveInfinity(availableSize.Height) ? textSize.Height : availableSize.Height,
-			};
-
-			var rectangle = new Rect(0, 0, width, height);
-			context.DrawRectangle(Background, null, rectangle);
-
-			context.Close();
-
-			lastBgRect = rectangle;
-
-			drawingBackground = drawing;
-			children.Insert(0, drawingBackground);
-		}
-
-
-		void RedrawText(bool glyphChanged)
-		{
-			if(drawingText != null) {
-				children.Remove(drawingText);
-				drawingText = null;
-			}
-
-			if(!string.IsNullOrEmpty(Text)) {
-				var drawing = new DrawingVisual();
-				DrawingContext context = drawing.RenderOpen();
-
-				if(glyphChanged) {
-					var language = XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name);
-					var fontname = FontFamily.Source;
-					var uri = FontUriTable.FromName(fontname);
-					var face = new GlyphTypeface(uri, ((FontWeight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((FontStyle == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
-					var renderingEmSize = FontSize;
-					var spacing = Spacing;
-					var origin = new Point(0, 0);
-					var advanceWidth = Enumerable.Repeat<double>(renderingEmSize, Text.Length).ToArray();
-					var glyphOffset = Enumerable.Range(0, Text.Length).Select(p => new Point((double)p * (spacing - 100) / 100 * renderingEmSize, 0)).ToArray();
-					var text = Text;
-					var glyphIndices = VerticalIndicesCache.GetCache(uri).GetIndices(Text);
-
-					// 文字列の描画サイズを確認する
-					var glyphrun = new GlyphRun(face, 0, true, renderingEmSize, 1, glyphIndices, origin, advanceWidth, glyphOffset, text.ToArray(), fontname, null, null, language);
-					var glyphbox = glyphrun.ComputeAlignmentBox();
-
-					// 文字の高さ分右に動かして、かつ左上を原点とする
-					origin.Offset(glyphbox.Height, -glyphbox.Y);
-					glyphrun = new GlyphRun(face, 0, true, renderingEmSize, 1, glyphIndices, origin, advanceWidth, glyphOffset, text.ToArray(), fontname, null, null, language);
-
-					lastGlyph = glyphrun;
-					textSize = new Size(glyphbox.Height, glyphbox.Width + text.Length * (double)(spacing - 100) / 100 * renderingEmSize);   // 回転後のサイズ
-				}
-				context.DrawGlyphRun(Foreground, lastGlyph);
-				context.Close();
-
-				drawing.Clip = new RectangleGeometry(new Rect(textSize.Width, 0, textSize.Height, textSize.Width)); // 回転前の寸法でクリッピングする
-				drawing.Transform = new RotateTransform(90, textSize.Width, 0); // 起点は文字幅分右に行ったところ
-
-				children.Add(drawing);
-
-				drawingText = drawing;
+			if(string.IsNullOrEmpty(Text)) {
+				param = null;
+				return new Size(FontSize * 4 / 3, 0);	// 文字列の幅分を確保する（1pt=は1/72in, 1px=1/96inより、4/3倍すればよい）
 			} else {
-				lastGlyph = null;
-				textSize = new Size();
+				param = new GlyphRunParam(Text, FontFamily?.Source, FontSize, FontWeight, FontStyle, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
+				return new Size(param.GlyphBox.Height, param.GlyphBox.Width);
+			}
+		}
+
+		/// <summary>
+		/// この要素のサイズを決定したときに呼ばれるメソッド
+		/// </summary>
+		/// <param name="finalSize">最終決定したサイズ</param>
+		/// <returns>実際に使用されたサイズ</returns>
+		protected override Size ArrangeOverride(Size finalSize)
+		{
+			return base.ArrangeOverride(finalSize);
+		}
+
+		/// <summary>
+		/// レイアウトシステムによる描画に介入するメソッド
+		/// この描画指示はこのメソッドが呼ばれたときに直ちに実行はされず、保管され、後の描画処理時に使用されます。
+		/// </summary>
+		/// <param name="ctx">この要素のための描画コンテキスト</param>
+		protected override void OnRender(DrawingContext ctx)
+		{
+			var renderRect = new Rect(0, 0, RenderSize.Width, RenderSize.Height);
+
+			if(Background != null)
+				ctx.DrawRectangle(Background, null, renderRect);			
+
+			if(param != null) {
+				ctx.PushClip(new RectangleGeometry(renderRect));						// これ以後の描画はクリッピングされる
+				ctx.PushTransform(new RotateTransform(90, param.GlyphBox.Height, 0));	// これ以後の描画は回転される
+
+				var glyphrun = param.Create(new Point(param.GlyphBox.Height, -param.GlyphBox.Y));
+				ctx.DrawGlyphRun(Foreground ?? Brushes.Black, glyphrun);
 			}
 		}
 
 		#endregion
 
+		private class GlyphRunParam
+		{
+			public GlyphRunParam(string text, string? fontname, double size, FontWeight weight, FontStyle style, double spacing, XmlLanguage language)
+			{
+				if(string.IsNullOrEmpty(text))
+					throw new ArgumentException("Length of text must be more zan zero.", nameof(text));
+
+				FontUri = FontUriTable.FromName(fontname);
+				if(fontname == null)
+					FontName = FontUriTable.AllVerticalFonts.Where(p => p.Value == FontUri).First().Key;
+				else
+					FontName = fontname;
+				GlyphTypeface = new GlyphTypeface(FontUri, ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
+
+				Text = text;
+				GlyphIndices = VerticalIndicesCache.GetCache(FontUri).GetIndices(Text);
+				
+				RenderingEmSize = size;
+				AdvanceWidths = Enumerable.Repeat<double>(size, Text.Length).ToArray();
+				GlyphOffsets = Enumerable.Range(0, Text.Length).Select(p => new Point(p * (spacing - 100) / 100 * size, 0)).ToArray();
+
+				Language = language;
+
+				GlyphBox = Create(new Point(0, 0)).ComputeAlignmentBox();
+			}
+
+			public string FontName { get;  }
+
+			public Uri FontUri { get;  }
+
+			public GlyphTypeface GlyphTypeface { get;  }
+
+			public double RenderingEmSize { get;  }
+
+			public IList<double> AdvanceWidths { get;  }
+
+			public IList<Point> GlyphOffsets { get;  }
+
+			public string Text { get;  }
+
+			public IList<ushort> GlyphIndices { get;  }
+
+			public XmlLanguage Language { get; }
+
+			public Rect GlyphBox { get; }
+
+			public GlyphRun Create(Point origin)
+			{
+				return new GlyphRun(GlyphTypeface, 0, true, RenderingEmSize, 1, GlyphIndices, origin, AdvanceWidths, GlyphOffsets, Text.ToArray(), FontName, null, null, Language);
+			}
+		}
 	}
 }
