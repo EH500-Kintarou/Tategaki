@@ -136,22 +136,37 @@ namespace Tategaki
 
 		#region Overrides
 
+		/// <summary>
+		/// 要素のサイズを決定したいときに呼ばれるメソッド
+		/// </summary>
+		/// <param name="availableSize">この要素が使用可能なサイズ。無限大の場合はどのような大きさでも良いという意味となる。</param>
+		/// <returns>この要素が必要とするサイズ。</returns>
 		protected override Size MeasureOverride(Size availableSize)
 		{
 			if(string.IsNullOrEmpty(Text)) {
 				param = null;
-				return new Size(0, 0);
+				return new Size(FontSize * 4 / 3, 0);	// 文字列の幅分を確保する（1pt=は1/72in, 1px=1/96inより、4/3倍すればよい）
 			} else {
 				param = new GlyphRunParam(Text, FontFamily?.Source, FontSize, FontWeight, FontStyle, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
 				return new Size(param.GlyphBox.Height, param.GlyphBox.Width);
 			}
 		}
 
+		/// <summary>
+		/// この要素のサイズを決定したときに呼ばれるメソッド
+		/// </summary>
+		/// <param name="finalSize">最終決定したサイズ</param>
+		/// <returns>実際に使用されたサイズ</returns>
 		protected override Size ArrangeOverride(Size finalSize)
 		{
 			return base.ArrangeOverride(finalSize);
 		}
 
+		/// <summary>
+		/// レイアウトシステムによる描画に介入するメソッド
+		/// この描画指示はこのメソッドが呼ばれたときに直ちに実行はされず、保管され、後の描画処理時に使用されます。
+		/// </summary>
+		/// <param name="ctx">この要素のための描画コンテキスト</param>
 		protected override void OnRender(DrawingContext ctx)
 		{
 			var renderRect = new Rect(0, 0, RenderSize.Width, RenderSize.Height);
