@@ -106,9 +106,12 @@ namespace Tategaki.Logic
 		/// <param name="name">フォント名</param>
 		/// <param name="advanced">Advancedフォントかどうか</param>
 		/// <returns></returns>
-		internal static Uri FromName(string name, bool advanced = false)
+		internal static Uri FromName(string? name, bool advanced = false)
 		{
 			var dic = advanced ? _AllAdvancedVerticalFonts : _AllVerticalFonts;
+
+			if(name == null)
+				return dic.First().Value;
 
 			if(dic.TryGetValue(name, out Uri? uri))
 				return uri;
