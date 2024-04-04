@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,6 @@ namespace Tategaki.Logic
 	{
 		readonly SingleGlyphConverter conv;
 		readonly GlyphTypeface gtf;
-		readonly SortedDictionary<char, ushort> indices = new();
 
 		internal VerticalIndicesCache(Uri fontUri, bool advanced = false)
 		{
@@ -43,13 +43,14 @@ namespace Tategaki.Logic
 
 		internal ushort GetIndex(char c)
 		{
-			if(!indices.TryGetValue(c, out ushort index)) {
-				index = conv.Convert(gtf.CharacterToGlyphMap[gtf.CharacterToGlyphMap.ContainsKey(c) ? c : '?']);
-				indices.Add(c, index);
+			try {
+				return conv.Convert(gtf.CharacterToGlyphMap[c]);
 			}
-			return index;
+			catch(KeyNotFoundException) {
+				return conv.Convert(gtf.CharacterToGlyphMap['?']);
+			}
 		}
-		
+
 		internal IList<ushort> GetIndices(string text)
 		{
 			var ret = new ushort[text.Length];
@@ -58,11 +59,6 @@ namespace Tategaki.Logic
 				ret[i] = GetIndex(text[i]);
 			
 			return ret;
-		}
-
-		internal void Clear()
-		{
-			indices.Clear();
 		}
 
 		static readonly Dictionary<(Uri, bool advanced), VerticalIndicesCache> cachedic = new();
