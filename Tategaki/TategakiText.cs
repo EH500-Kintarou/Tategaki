@@ -138,8 +138,13 @@ namespace Tategaki
 
 		protected override Size MeasureOverride(Size availableSize)
 		{
-			param = new GlyphRunParam(Text, FontFamily?.Source, FontSize, FontWeight, FontStyle, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
-			return new Size(param.GlyphBox.Height, param.GlyphBox.Width);
+			if(string.IsNullOrEmpty(Text)) {
+				param = null;
+				return new Size(0, 0);
+			} else {
+				param = new GlyphRunParam(Text, FontFamily?.Source, FontSize, FontWeight, FontStyle, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
+				return new Size(param.GlyphBox.Height, param.GlyphBox.Width);
+			}
 		}
 
 		protected override Size ArrangeOverride(Size finalSize)
@@ -160,8 +165,6 @@ namespace Tategaki
 
 				var glyphrun = param.Create(new Point(param.GlyphBox.Height, -param.GlyphBox.Y));
 				ctx.DrawGlyphRun(Foreground ?? Brushes.Black, glyphrun);
-
-
 			}
 		}
 
@@ -169,8 +172,11 @@ namespace Tategaki
 
 		private class GlyphRunParam
 		{
-			public GlyphRunParam(string? text, string? fontname, double size, FontWeight weight, FontStyle style, double spacing, XmlLanguage language)
+			public GlyphRunParam(string text, string? fontname, double size, FontWeight weight, FontStyle style, double spacing, XmlLanguage language)
 			{
+				if(string.IsNullOrEmpty(text))
+					throw new ArgumentException("Length of text must be more zan zero.", nameof(text));
+
 				FontUri = FontUriTable.FromName(fontname);
 				if(fontname == null)
 					FontName = FontUriTable.AllVerticalFonts.Where(p => p.Value == FontUri).First().Key;
@@ -178,7 +184,7 @@ namespace Tategaki
 					FontName = fontname;
 				GlyphTypeface = new GlyphTypeface(FontUri, ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
 
-				Text = text ?? "";
+				Text = text;
 				GlyphIndices = VerticalIndicesCache.GetCache(FontUri).GetIndices(Text);
 				
 				RenderingEmSize = size;
