@@ -1,12 +1,10 @@
 ﻿<Window x:Class="TategakiSample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vc="clr-namespace:TategakiSample.Views.ValueConverters"
 		xmlns:tg="http://schemas.eh500-kintarou.com/Tategaki"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="Tategaki Sample" Width="800" Height="640" 
+        Title="Tategaki Sample" Width="1280" Height="720" 
 		TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True" >
 
     <Window.Resources>
@@ -42,10 +40,6 @@
             <Slider Grid.Row="0" Grid.Column="1" Name="slider_margin" Minimum="0" Maximum="100" Value="10"/>
             <xctk:DoubleUpDown Grid.Row="0" Grid.Column="2" Value="{Binding ElementName=slider_margin, Path=Value}" Minimum="0" Maximum="100" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Spacing" VerticalAlignment="Center" Margin="3" IsEnabled="False" />
-            <Slider Grid.Row="1" Grid.Column="1" Name="slider_spacing" Minimum="10" Maximum="300" Value="100" IsEnabled="False" />
-            <xctk:DoubleUpDown Grid.Row="1" Grid.Column="2" Value="{Binding ElementName=slider_spacing, Path=Value}" Minimum="10" Maximum="300" IsEnabled="False" />
-
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Font Size" VerticalAlignment="Center" Margin="3" />
             <Slider Grid.Row="2" Grid.Column="1" Name="slider_fontsize" Minimum="5" Maximum="72" Value="18"/>
             <xctk:DoubleUpDown Grid.Row="2" Grid.Column="2" Value="{Binding ElementName=slider_fontsize, Path=Value}" Minimum="5" Maximum="72" />
@@ -76,7 +70,7 @@
 									  Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
                 <tg:TategakiText Text="芥川龍之介" VerticalAlignment="Bottom" FontSize="20" FontFamily="MS Gothic"
 								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
-                <tg:TategakiText Text="羅生門" VerticalAlignment="Center" FontSize="36" FontWeight="Bold" FontFamily="ＭＳ ゴシック"
+                <tg:TategakiText Text="羅生門" VerticalAlignment="Center" FontSize="36" FontWeight="Bold" FontFamily="MS Gothic"
 								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}"/>
             </StackPanel>
         </ScrollViewer>
