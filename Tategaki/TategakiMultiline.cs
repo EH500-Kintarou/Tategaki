@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,22 +42,7 @@ namespace Tategaki
 				me.SetText();
 			})
 		);
-		/*
-		/// <summary>
-		/// 文字間隔
-		/// </summary>
-		public double Spacing
-		{
-			get { return (double)GetValue(SpacingProperty); }
-			set { SetValue(SpacingProperty, value); }
-		}
-		public static readonly DependencyProperty SpacingProperty = DependencyProperty.Register(
-			"Spacing", typeof(double), typeof(LightResizingTategakiMultiline), new PropertyMetadata((double)100, (d, e) => {
-				LightResizingTategakiMultiline me = (LightResizingTategakiMultiline)d;
-				me.SetText();
-			})
-		);
-		*/
+
 		/// <summary>
 		/// 行間隔
 		/// </summary>
@@ -103,22 +87,7 @@ namespace Tategaki
 				me.SetText();
 			})
 		);
-		/*
-		/// <summary>
-		/// 文末にぶら下げる文字
-		/// </summary>
-		public string LastHangingChars
-		{
-			get { return (string)GetValue(LastHangingCharsProperty); }
-			set { SetValue(LastHangingCharsProperty, value); }
-		}
-		public static readonly DependencyProperty LastHangingCharsProperty = DependencyProperty.Register(
-			"LastHangingChars", typeof(string), typeof(LightResizingTategakiMultiline), new PropertyMetadata("、。，．,.｡､", (d, e) => {
-				LightResizingTategakiMultiline me = (LightResizingTategakiMultiline)d;
-				me.SetText();
-			})
-		);
-		*/
+
 		#endregion
 
 		public override void OnApplyTemplate()
