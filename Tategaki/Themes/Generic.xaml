@@ -4,25 +4,6 @@
     xmlns:local="clr-namespace:Tategaki"
     xmlns:vc="clr-namespace:Tategaki.ValueConverters">
 
-    <Style TargetType="{x:Type local:TategakiText}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:TategakiText}">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <Glyphs x:Name="PART_Glyphs" UnicodeString=" " IsSideways="true"
-								Fill="{TemplateBinding Foreground}" FontRenderingEmSize="{TemplateBinding FontSize}">
-                            <Glyphs.LayoutTransform>
-                                <RotateTransform Angle="90"/>
-                            </Glyphs.LayoutTransform>
-                        </Glyphs>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style TargetType="{x:Type local:TategakiMultiline}">
         <Setter Property="Template">
             <Setter.Value>
