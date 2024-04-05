@@ -7,6 +7,8 @@ WPF doesn't support vertical writing so that it is difficult to show a text vert
 
 "Tategaki" means "Vertical writing" in Japanese.
 
+![Screenshot of Tategaki](https://raw.githubusercontent.com/EH500-Kintarou/Tategaki/master/Images/SampleScreenshot.png)
+
 ## Required Environment
 
 - Windows OS
@@ -14,15 +16,28 @@ WPF doesn't support vertical writing so that it is difficult to show a text vert
 
 ## How to use
 ### 1. Get via Nuget
-https://www.nuget.org/packages/Tategaki/  
-(Now only old version (2.1.1) is available in Nuget)
+
+![](https://img.shields.io/badge/Nuget-3.0.0-004880.svg?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
 
 ### 2. Add XAML namespace
-Add namespace of "http://schemas.eh500-kintarou.com/Tategaki" in your XAML and create TategakiText or TategakiMultiline instance.
 
-### 3. Check sample code
+Add namespace of "http://schemas.eh500-kintarou.com/Tategaki" and add the elements of "TategakiText" or "TategakiMultiline" in your XAML.
+```xaml
+<Window x:Class="TategakiTextTest.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:tg="http://schemas.eh500-kintarou.com/Tategaki"
+        Title="MainWindow" />
+```
+```xaml
+<tg:TategakiText Text="「こんにちは」"/>
+```
 
-This repository contains a sample project. It will make you more clear how to use it.
+### 3. Check sample code out
+
+This repository contains [a sample project](https://github.com/EH500-Kintarou/Tategaki/tree/master/TategakiSample). It will make you more clear how to use it.
 
 ## Libraries which is reffered to
 - TypeLoader: https://typeloader.codeplex.com/  
@@ -30,4 +45,10 @@ TypeLoeader URL has been already expired so that it is contained in this reposit
 - Extended WPF Toolkit (Only in sample app): https://github.com/xceedsoftware/wpftoolkit
 
 ## Version History
-See Japanese Readme.
+### ver.3.0.0 (05-April-2024)
+- Overhauled TategakiText Control
+  - It is implemented by inheriting FrameworkElement class instead of a custom control.
+- Overhauled and fastened the process of forbidden characters in TategakiMultiline.
+- Target framework was changed to .NET6 from .NET Framework.
+
+For more older history, see Japanese Readme.
