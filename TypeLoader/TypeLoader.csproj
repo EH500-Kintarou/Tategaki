@@ -4,6 +4,14 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
+	<Title>WaterTrans.TypeLoader</Title>
+	<Description></Description>
+	<Copyright>Copyright © WaterTrans 2010</Copyright>
+	<Company></Company>
+	<Product>WaterTrans.TypeLoader</Product>
+	<Authors>WaterTrans</Authors>
+	<VersionPrefix>2.0</VersionPrefix>
+	<VersionSuffix>net6</VersionSuffix>
   </PropertyGroup>
 
 </Project>
