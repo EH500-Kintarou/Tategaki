@@ -5,6 +5,8 @@
 WPFアプリケーションにおいて縦書きを使用するためのコントロールライブラリです。  
 WPFはネイティブで縦書きをサポートしておらず簡単に日本語の縦書きのようなものを作ることができませんが、このコントロールを利用すれば、WPF標準のTextBlockコントロールを使うような感覚で縦書きを実現することができます。
 
+![Screenshot of Tategaki](https://raw.githubusercontent.com/EH500-Kintarou/Tategaki/pre-release/Images/SampleScreenshot.png)
+
 ## 動作環境
 
 - Windows OS
@@ -25,10 +27,16 @@ XAMLで名前空間"http://schemas.eh500-kintarou.com/Tategaki"を登録し、Ta
 
 ## 利用しているライブラリ
 - TypeLoader: https://typeloader.codeplex.com/  
-TypeLoeaderはすでにリンク切れを起こしているため、当リポジトリ内に取り込んで利用しております。
+TypeLoeaderはすでにリンク切れを起こしているため、当リポジトリ内に取り込んだうえで.NET6でビルドして利用しております。
 - Extended WPF Toolkit (サンプルコード内のみ): https://github.com/xceedsoftware/wpftoolkit
 
 ## バージョン履歴
+### ver.3.0.0 (2024/04/05)
+- TategakiTextコントロールを刷新した。
+  - カスタムコントロールではなく、FrameworkElementを継承したクラスとして実現。
+- TategakiMultilineの禁則文字処理を高速化した。
+- ターゲットを.NET Frameworkから.NET 6に変更した。
+
 ### ver.2.1.1 (2015/12/18)
 - コードを一部C#6化した
 - コントロールの名前空間をURLにした（アセンブリ参照でも使える）
