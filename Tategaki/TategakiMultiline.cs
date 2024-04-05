@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -132,34 +133,54 @@ namespace Tategaki
 		void SetText()
 		{
 			if(itemsctl != null) {
-				IEnumerable<string> splited = (Text ?? string.Empty).Split('\n').Select(p => string.IsNullOrEmpty(p) ? " " : p);
+				var text = Text ?? string.Empty;
 
-				itemsctl.ItemsSource = splited.Select(p => {
-					if(p.Length == 0)
-						return new string[] { };
-					else if(p.Length == 1)
-						return new string[] { p.First().ToString() };
-					else {
-						List<string> ret = new List<string>(p.ToCharArray().Select(p1 => p1.ToString()));
+				var paragraph = new List<string>();
+				var ret = new List<List<string>>() { paragraph };
 
-						for(int i = 0; i < ret.Count; i++) {
-							if(i > 0 && HeadForbiddenChars.Contains(ret[i].First())) {
-								ret[i - 1] = ret[i - 1] + ret[i];
-								ret.RemoveAt(i);
-								i -= 2;
-								continue;
-							}
-							if(i < ret.Count - 1 && LastForbiddenChars.Contains(ret[i].Last())) {
-								ret[i] = ret[i] + ret[i + 1];
-								ret.RemoveAt(i + 1);
-								i -= 1;
-								continue;
-							}
+				int prevStart = -1;
+				bool prevlf = false;	// 前が末尾禁則文字
+
+				for(int i = 0; i < text.Length; i++) {
+					var c = text[i];
+
+					if(c == '\r') {
+						if(prevStart >= 0)
+							paragraph.Add(text[prevStart..i]);
+						prevStart = -1;
+						prevlf = false;
+					} else if(c == '\n') {
+						if(prevStart >= 0)
+							paragraph.Add(text[prevStart..i]);
+
+						if(paragraph.Count == 0)
+							paragraph.Add(string.Empty);
+						paragraph = new List<string>();
+						ret.Add(paragraph);
+
+						prevStart = -1;
+						prevlf = false;
+					} else if(prevStart >= 0 && HeadForbiddenChars.Contains(c)) {
+						prevlf = false;
+					} else if(prevStart >= 0 && LastForbiddenChars.Contains(c)) {
+						if(!prevlf) {
+							paragraph.Add(text[prevStart..i]);
+							prevStart = i;
 						}
-
-						return ret.AsReadOnly().AsEnumerable();
+						prevlf = true;
+					} else {
+						if(!prevlf) {
+							if(prevStart >= 0)
+								paragraph.Add(text[prevStart..i]);
+							prevStart = i;
+						}						
+						prevlf = false;
 					}
-				}).ToArray();
+				}
+				if(prevStart >= 0 && prevStart < text.Length)
+					paragraph.Add(text[prevStart..]);
+
+				itemsctl.ItemsSource = ret;
 			}
 		}
 	}
