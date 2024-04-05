@@ -11,7 +11,7 @@
 	<Product>WaterTrans.TypeLoader</Product>
 	<Authors>WaterTrans</Authors>
 	<VersionPrefix>2.0</VersionPrefix>
-	<VersionSuffix>net6</VersionSuffix>
+	<VersionSuffix></VersionSuffix>
   </PropertyGroup>
 
 </Project>
