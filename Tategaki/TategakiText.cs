@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -143,11 +142,12 @@ namespace Tategaki
 		/// <returns>この要素が必要とするサイズ。</returns>
 		protected override Size MeasureOverride(Size availableSize)
 		{
-			if(string.IsNullOrEmpty(Text)) {
+			var text = Text;
+			if(string.IsNullOrEmpty(text)) {
 				param = null;
 				return new Size(FontSize * 4 / 3, 0);	// 文字列の幅分を確保する（1pt=は1/72in, 1px=1/96inより、4/3倍すればよい）
 			} else {
-				param = new GlyphRunParam(Text, FontFamily?.Source, FontSize, FontWeight, FontStyle, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
+				param = new GlyphRunParam(text!, FontFamily?.Source, FontSize, FontWeight, FontStyle, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
 				return new Size(param.GlyphBox.Height, param.GlyphBox.Width);
 			}
 		}

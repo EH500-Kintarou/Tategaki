@@ -60,7 +60,10 @@ namespace Tategaki.Logic
 				try {
 					var gtf = new GlyphTypeface(uri);
 
-					foreach(var (culture, name) in gtf.FamilyNames) {
+					foreach(var kvp in gtf.FamilyNames) {
+						CultureInfo culture = kvp.Key;
+						string name = kvp.Value;
+
 						if(culture == null || name == null) continue;
 
 						int num = uri.Fragment == "" ? 0 : int.Parse(uri.Fragment.Replace("#", ""));
