@@ -115,12 +115,12 @@ namespace Tategaki
 
 					if(c == '\r') {
 						if(prevStart >= 0)
-							paragraph.Add(text[prevStart..i]);
+							paragraph.Add(text.Substring(prevStart, i - prevStart));
 						prevStart = -1;
 						prevlf = false;
 					} else if(c == '\n') {
 						if(prevStart >= 0)
-							paragraph.Add(text[prevStart..i]);
+							paragraph.Add(text.Substring(prevStart, i - prevStart));
 
 						if(paragraph.Count == 0)
 							paragraph.Add(string.Empty);
@@ -133,21 +133,21 @@ namespace Tategaki
 						prevlf = false;
 					} else if(prevStart >= 0 && LastForbiddenChars.Contains(c)) {
 						if(!prevlf) {
-							paragraph.Add(text[prevStart..i]);
+							paragraph.Add(text.Substring(prevStart, i - prevStart));
 							prevStart = i;
 						}
 						prevlf = true;
 					} else {
 						if(!prevlf) {
 							if(prevStart >= 0)
-								paragraph.Add(text[prevStart..i]);
+								paragraph.Add(text.Substring(prevStart, i - prevStart));
 							prevStart = i;
 						}						
 						prevlf = false;
 					}
 				}
 				if(prevStart >= 0 && prevStart < text.Length)
-					paragraph.Add(text[prevStart..]);
+					paragraph.Add(text.Substring(prevStart, text.Length - prevStart));
 
 				itemsctl.ItemsSource = ret;
 			}
