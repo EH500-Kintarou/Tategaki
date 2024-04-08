@@ -6,7 +6,7 @@
 		xmlns:tg="http://schemas.eh500-kintarou.com/Tategaki"
 		xmlns:vm="clr-namespace:TategakiTextTest.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280" FontFamily="Yu Gothic" FontSize="16">
+        Title="MainWindow" Height="960" Width="1280" FontFamily="Yu Gothic" FontSize="16">
 
     <Window.DataContext>
         <vm:MainWindowViewModel />
@@ -43,6 +43,16 @@
                             <tg:TategakiText Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
                             <tg:TategakiText Text="間隔広め" Spacing="200"/>
                             <tg:TategakiText Text="Alphabet 12345"/>
+                            <tg:TategakiText Text="パディング（未実装）" Background="Yellow" />
+                            <tg:TategakiText Text="文字高さ（未実装）" Background="LightGray" />
+                            <tg:TategakiText Text="文字配置（未実装）" Background="SkyBlue" />
+                            <tg:TategakiText Text="上線（未実装）" />
+                            <tg:TategakiText Text="取り消し線（未実装）" />
+                            <tg:TategakiText Text="基線（未実装）" />
+                            <tg:TategakiText Text="下線（未実装）" />
+                            <tg:TategakiText Text="複数効果（未実装）" />
+                            <tg:TategakiText Text="文字省略（未実装）" />
+                            <tg:TategakiText Text="文字折り返し（未実装）" />
                         </StackPanel>
                     </Border>
 
@@ -63,6 +73,39 @@
                             <TextBlock Text="斜体" FontStyle="Italic" />
                             <TextBlock Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
                             <TextBlock Text="Alphabet 12345" />
+                            <TextBlock Text="Padding = 10" Padding="10" Background="Yellow" />
+                            <TextBlock Text="LineHeight = 40" LineHeight="40" Background="LightGray" />
+                            <TextBlock Text="文字配置を中央に" TextAlignment="Center" Background="SkyBlue" />
+                            <TextBlock Text="上線" TextDecorations="OverLine" />
+                            <TextBlock Text="取り消し線" TextDecorations="Strikethrough" />
+                            <TextBlock Text="基線" TextDecorations="Baseline" />
+                            <TextBlock Text="下線" TextDecorations="Underline" />
+                            <TextBlock Text="複数効果" >
+                                <TextBlock.TextDecorations>
+                                    <TextDecoration Location="Strikethrough" >
+                                        <TextDecoration.Pen>
+                                            <Pen Thickness="3">
+                                                <Pen.Brush>
+                                                    <LinearGradientBrush StartPoint="0,0.5"  EndPoint="1,0.5">
+                                                        <LinearGradientBrush.GradientStops>
+                                                            <GradientStop Color="Yellow" Offset="0" />
+                                                            <GradientStop Color="Red" Offset="1" />
+                                                        </LinearGradientBrush.GradientStops>
+                                                    </LinearGradientBrush>
+                                                </Pen.Brush>
+                                                <Pen.DashStyle>
+                                                    <DashStyle Dashes="2" />
+                                                </Pen.DashStyle>
+                                            </Pen>
+                                        </TextDecoration.Pen>
+                                    </TextDecoration>
+                                    <TextDecoration Location="Underline" />
+                                </TextBlock.TextDecorations>
+                            </TextBlock>
+                            <TextBlock Text="long long long long long long long long long long long long long long long long long long long long long long long long text" TextTrimming="WordEllipsis" />
+                            <TextBlock Text="long long long long long long long long long long long long long long long long long long long long long long long long text" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="looooooooooooooooooooooong long long long long long long long long long long text" TextWrapping="Wrap"/>
+                            <TextBlock Text="looooooooooooooooooooooong long long long long long long long long long long text" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
                 </Grid>
