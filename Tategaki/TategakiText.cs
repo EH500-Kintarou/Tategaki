@@ -199,7 +199,10 @@ namespace Tategaki
 						glyphs.Add(line);
 						line = new List<GlyphRunParam>();
 						halfwidth = null;
-					} else if(c < ' ') {	// それ以外の制御文字は無視（スペースより文字コードが小さいのは制御文字）
+					} else if(c < ' ') {    // それ以外の制御文字は無視（スペースより文字コードが小さいのは制御文字）
+						if(halfwidth != null && start < i)
+							line.Add(new GlyphRunParam(text.Substring(start, i - start), !halfwidth.Value, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
+						halfwidth = null;
 					} else if(c < 0x80 && !hwvert) {	// 半角文字
 						if(halfwidth == false)
 							line.Add(new GlyphRunParam(text.Substring(start, i - start), true, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
