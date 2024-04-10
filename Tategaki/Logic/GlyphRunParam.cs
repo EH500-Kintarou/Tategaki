@@ -19,7 +19,7 @@ namespace Tategaki.Logic
 			if(string.IsNullOrEmpty(text))
 				throw new ArgumentException("Length of text must be more zan zero.", nameof(text));
 
-			if(gtfCache == null || gtfCache.Value.Key == (fontname, weight, style)) {
+			if(gtfCache == null || gtfCache.Value.Key != (fontname, weight, style)) {
 				var uri = FontUriTable.FromName(fontname);
 				fontname ??= FontUriTable.AllVerticalFonts.Where(p => p.Value == uri).First().Key;
 				var gtf = new GlyphTypeface(uri, ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
@@ -33,7 +33,7 @@ namespace Tategaki.Logic
 			FontName = fontname!;
 			GlyphTypeface = gtfCache.Value.Value;
 			RenderingEmSize = size;
-			AdvanceWidths = Enumerable.Repeat(size, text.Length).ToArray();
+			AdvanceWidths = GlyphIndices.Select(p => (isSideways ? GlyphTypeface.AdvanceHeights[p] : GlyphTypeface.AdvanceWidths[p]) * size).ToArray();
 			Spacing = spacing;
 			GlyphOffsets = Enumerable.Range(0, text.Length).Select(p => new Point(p * (spacing - 100) / 100 * size, 0)).ToArray();
 			Language = language;
