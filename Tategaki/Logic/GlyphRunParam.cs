@@ -19,21 +19,23 @@ namespace Tategaki.Logic
 			if(string.IsNullOrEmpty(text))
 				throw new ArgumentException("Length of text must be more zan zero.", nameof(text));
 
+			GlyphTypeface gtf;
 			if(gtfCache == null || gtfCache.Value.Key != (fontname, weight, style)) {
 				var uri = FontUriTable.FromName(fontname);
 				fontname ??= FontUriTable.AllVerticalFonts.Where(p => p.Value == uri).First().Key;
-				var gtf = new GlyphTypeface(uri, ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
+				gtf = new GlyphTypeface(uri, ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
 
 				gtfCache = new KeyValuePair<(string fontname, FontWeight weight, FontStyle style), GlyphTypeface>((fontname, weight, style), gtf);
-			}
+			} else
+				gtf = gtfCache.Value.Value;
 
 			Text = text;
 			GlyphIndices = GetIndices(gtfCache.Value.Value, text, isSideways);
 			IsSideways = isSideways;
 			FontName = fontname!;
-			GlyphTypeface = gtfCache.Value.Value;
+			GlyphTypeface = gtf;
 			RenderingEmSize = size;
-			AdvanceWidths = GlyphIndices.Select(p => (isSideways ? GlyphTypeface.AdvanceHeights[p] : GlyphTypeface.AdvanceWidths[p]) * size).ToArray();
+			AdvanceWidths = GlyphIndices.Select(p => (isSideways ? gtf.AdvanceHeights[p] : gtf.AdvanceWidths[p]) * size).ToArray();
 			Spacing = spacing;
 			GlyphOffsets = Enumerable.Range(0, text.Length).Select(p => new Point(p * (spacing - 100) / 100 * size, 0)).ToArray();
 			Language = language;
