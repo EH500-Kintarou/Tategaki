@@ -18,6 +18,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Tategaki.Logic;
+using WaterTrans.TypeLoader;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Tategaki
@@ -147,7 +148,7 @@ namespace Tategaki
 				param = null;
 				return new Size(FontSize * 4 / 3, 0);	// 文字列の幅分を確保する（1pt=は1/72in, 1px=1/96inより、4/3倍すればよい）
 			} else {
-				param = new GlyphRunParam(text!, FontFamily?.Source, FontSize, FontWeight, FontStyle, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
+				param = new GlyphRunParam(text!, true, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
 				return new Size(param.GlyphBox.Height, param.GlyphBox.Width);
 			}
 		}
@@ -184,57 +185,5 @@ namespace Tategaki
 		}
 
 		#endregion
-
-		private class GlyphRunParam
-		{
-			public GlyphRunParam(string text, string? fontname, double size, FontWeight weight, FontStyle style, double spacing, XmlLanguage language)
-			{
-				if(string.IsNullOrEmpty(text))
-					throw new ArgumentException("Length of text must be more zan zero.", nameof(text));
-
-				FontUri = FontUriTable.FromName(fontname);
-				if(fontname == null)
-					FontName = FontUriTable.AllVerticalFonts.Where(p => p.Value == FontUri).First().Key;
-				else
-					FontName = fontname;
-				GlyphTypeface = new GlyphTypeface(FontUri, ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
-
-				Text = text;
-				GlyphIndices = VerticalIndicesCache.GetCache(FontUri).GetIndices(Text);
-				
-				RenderingEmSize = size;
-				AdvanceWidths = Enumerable.Repeat<double>(size, Text.Length).ToArray();
-				GlyphOffsets = Enumerable.Range(0, Text.Length).Select(p => new Point(p * (spacing - 100) / 100 * size, 0)).ToArray();
-
-				Language = language;
-
-				GlyphBox = Create(new Point(0, 0)).ComputeAlignmentBox();
-			}
-
-			public string FontName { get;  }
-
-			public Uri FontUri { get;  }
-
-			public GlyphTypeface GlyphTypeface { get;  }
-
-			public double RenderingEmSize { get;  }
-
-			public IList<double> AdvanceWidths { get;  }
-
-			public IList<Point> GlyphOffsets { get;  }
-
-			public string Text { get;  }
-
-			public IList<ushort> GlyphIndices { get;  }
-
-			public XmlLanguage Language { get; }
-
-			public Rect GlyphBox { get; }
-
-			public GlyphRun Create(Point origin)
-			{
-				return new GlyphRun(GlyphTypeface, 0, true, RenderingEmSize, 1, GlyphIndices, origin, AdvanceWidths, GlyphOffsets, Text.ToArray(), FontName, null, null, Language);
-			}
-		}
 	}
 }
