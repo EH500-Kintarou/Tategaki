@@ -261,7 +261,7 @@ namespace Tategaki
 
 				foreach(var section in line) {
 					var box = section.GlyphBox;
-					ctx.DrawGlyphRun(foreground, section.Create(new Point(x, height - box.Height - box.Top)));
+					ctx.DrawGlyphRun(foreground, section.Create(new Point(x, y + height - box.Height - box.Top)));
 					x += box.Width;
 				}
 
