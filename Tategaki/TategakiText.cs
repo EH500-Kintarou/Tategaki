@@ -223,9 +223,11 @@ namespace Tategaki
 				glyphs.Add(line);
 			}
 
-			return glyphs
+			var sizeBeforeRotate = glyphs
 				.Select(p => p.Count == 0 ? new Size(FontSize * 4 / 3, 0) : p.Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.GlyphBox.Width), Math.Max(left.Height, right.GlyphBox.Height))))
-				.Aggregate(new Size(), (left, right) => new Size(left.Height +  right.Height, Math.Max(left.Width, right.Width)));
+				.Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.Width), left.Height + right.Height));
+
+			return new Size(sizeBeforeRotate.Height, sizeBeforeRotate.Width);
 		}
 
 		/// <summary>
