@@ -193,8 +193,8 @@ namespace Tategaki
 					var c = text[i];
 
 					if(c == '\n') {     // 改行
-						if(halfwidth != null && start < i - 1)
-							line.Add(new GlyphRunParam(text.Substring(start, i-1 - start), !halfwidth.Value, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
+						if(halfwidth != null && start < i)
+							line.Add(new GlyphRunParam(text.Substring(start, i - start), !halfwidth.Value, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
 						
 						glyphs.Add(line);
 						line = new List<GlyphRunParam>();

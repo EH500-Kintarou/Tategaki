@@ -72,7 +72,6 @@ namespace Tategaki.Logic
 			return new GlyphRun(GlyphTypeface, 0, IsSideways, RenderingEmSize, 1, GlyphIndices, origin, AdvanceWidths, GlyphOffsets, Text.ToArray(), FontName, null, null, Language);
 		}
 
-
 		static IList<ushort> GetIndices(GlyphTypeface gtf, string text, bool vertical)
 		{
 			var conv = GlyphConverterCache.GetConverter(gtf);
@@ -94,6 +93,11 @@ namespace Tategaki.Logic
 			}
 
 			return ret;
+		}
+
+		public override string ToString()
+		{
+			return $"{Text}; ({GlyphBox.Left}, {GlyphBox.Top}, {GlyphBox.Width}, {GlyphBox.Height})";
 		}
 	}
 }
