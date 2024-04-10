@@ -18,7 +18,7 @@ namespace Tategaki
 {
 	public class TategakiText : FrameworkElement
 	{
-		GlyphRunParam? param = null;
+		List<List<GlyphRunParam>> glyphs = new();
 
 		public TategakiText()
 		{
@@ -61,10 +61,20 @@ namespace Tategaki
 			set { SetValue(SpacingProperty, value); }
 		}
 		public static readonly DependencyProperty SpacingProperty = DependencyProperty.Register(
-			nameof(Spacing), typeof(double), typeof(TategakiText), new FrameworkPropertyMetadata(
-				100.0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
+			nameof(Spacing), typeof(double), typeof(TategakiText),
+			new FrameworkPropertyMetadata(100.0, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
 
-		#endregion
+		/// <summary>
+		/// 半角文字を縦書きにする
+		/// </summary>
+		public bool EnableHalfWidthCharVertical
+		{
+			get { return (bool)GetValue(EnableHalfWidthCharVerticalProperty); }
+			set { SetValue(EnableHalfWidthCharVerticalProperty, value); }
+		}
+		public static readonly DependencyProperty EnableHalfWidthCharVerticalProperty = DependencyProperty.Register(
+			nameof(EnableHalfWidthCharVertical), typeof(bool), typeof(TategakiText),
+			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
 
 		#region TextElement
 
@@ -157,6 +167,8 @@ namespace Tategaki
 
 		#endregion
 
+		#endregion
+
 		#region Overrides
 
 		/// <summary>
@@ -167,13 +179,53 @@ namespace Tategaki
 		protected override Size MeasureOverride(Size availableSize)
 		{
 			var text = Text;
-			if(string.IsNullOrEmpty(text)) {
-				param = null;
-				return new Size(FontSize * 4 / 3, 0);   // 文字列の幅分を確保する（1pt=は1/72in, 1px=1/96inより、4/3倍すればよい）
-			} else {
-				param = new GlyphRunParam(text!, true, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name));
-				return new Size(param.GlyphBox.Height, param.GlyphBox.Width);
+			glyphs.Clear();
+
+			if(string.IsNullOrEmpty(text))
+				glyphs.Add(new());
+			else {
+				var line = new List<GlyphRunParam>();
+
+				var hwvert = EnableHalfWidthCharVertical;
+				int start = 0;
+				bool? halfwidth = null;
+				for(int i = 0; i < text!.Length; i++) {
+					var c = text[i];
+
+					if(c == '\n') {     // 改行
+						if(halfwidth != null && start < i - 1)
+							line.Add(new GlyphRunParam(text.Substring(start, i-1 - start), !halfwidth.Value, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
+						
+						glyphs.Add(line);
+						line = new List<GlyphRunParam>();
+						halfwidth = null;
+					} else if(c < ' ') {	// それ以外の制御文字は無視（スペースより文字コードが小さいのは制御文字）
+					} else if(c < 0x80 && !hwvert) {	// 半角文字
+						if(halfwidth == false)
+							line.Add(new GlyphRunParam(text.Substring(start, i - start), true, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
+						if(halfwidth != true)
+							start = i;
+						
+						halfwidth = true;
+					} else {
+						if(halfwidth == true)
+							line.Add(new GlyphRunParam(text.Substring(start, i - start), false, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
+						if(halfwidth != false)
+							start = i;
+
+						halfwidth = false;
+					}
+				}
+
+				if(halfwidth != null && start < text.Length)
+					line.Add(new GlyphRunParam(text.Substring(start, text.Length - start), !halfwidth.Value, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
+
+				glyphs.Add(line);
 			}
+
+			return glyphs
+				.Select(p => p.Count == 0 ? new Size(FontSize * 4 / 3, 0) : p.Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.GlyphBox.Width), Math.Max(left.Height, right.GlyphBox.Height))))
+				.Aggregate(new Size(), (left, right) => new Size(left.Height +  right.Height, Math.Max(left.Width, right.Width)));
 		}
 
 		/// <summary>
@@ -198,12 +250,22 @@ namespace Tategaki
 			if(Background != null)
 				ctx.DrawRectangle(Background, null, renderRect);
 
-			if(param != null) {
-				ctx.PushClip(new RectangleGeometry(renderRect));                        // これ以後の描画はクリッピングされる
-				ctx.PushTransform(new RotateTransform(90, param.GlyphBox.Height, 0));   // これ以後の描画は回転される
+			ctx.PushClip(new RectangleGeometry(renderRect));	// これ以後の描画はクリッピングされる
+			ctx.PushTransform(new RotateTransform(90, RenderSize.Width / 2, RenderSize.Width / 2));     // これ以後の描画は回転される
 
-				var glyphrun = param.Create(new Point(param.GlyphBox.Height, -param.GlyphBox.Y));
-				ctx.DrawGlyphRun(Foreground ?? Brushes.Black, glyphrun);
+			var foreground = Foreground ?? Brushes.Black;
+			var y = 0.0;
+			foreach(var line in glyphs) {
+				var height = line.Max(p => p.GlyphBox.Height);
+				var x = 0.0;
+
+				foreach(var section in line) {
+					var box = section.GlyphBox;
+					ctx.DrawGlyphRun(foreground, section.Create(new Point(x, height - box.Height - box.Top)));
+					x += box.Width;
+				}
+
+				y += height;
 			}
 		}
 
