@@ -42,7 +42,8 @@
                             <tg:TategakiText Text="斜体" FontStyle="Italic" />
                             <tg:TategakiText Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
                             <tg:TategakiText Text="間隔広め" Spacing="200"/>
-                            <tg:TategakiText Text="Alphabet 12345"/>
+                            <tg:TategakiText Text="Half-width vertical disabled"/>
+                            <tg:TategakiText Text="Half-width vertical enabled" EnableHalfWidthCharVertical="True"/>
                             <tg:TategakiText Text="改行文字の&#xa;ある文章" />
                             <tg:TategakiText Text="パディング（未実装）" Background="Yellow" />
                             <tg:TategakiText Text="文字高さ（未実装）" Background="LightGray" />
