@@ -256,7 +256,7 @@ namespace Tategaki
 			var foreground = Foreground ?? Brushes.Black;
 			var y = 0.0;
 			foreach(var line in glyphs) {
-				var height = line.Max(p => p.GlyphBox.Height);
+				var height = line.Count > 0 ? line.Max(p => p.GlyphBox.Height) : 0.0;
 				var x = 0.0;
 
 				foreach(var section in line) {
