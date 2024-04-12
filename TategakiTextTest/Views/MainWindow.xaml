@@ -51,7 +51,7 @@
                             <tg:TategakiText Text="下線" TextDecorations="Underline" />
                             <tg:TategakiText Text="複数効果" >
                                 <tg:TategakiText.TextDecorations>
-                                    <TextDecoration Location="Strikethrough" >
+                                    <TextDecoration Location="Strikethrough" PenThicknessUnit="FontRenderingEmSize" >
                                         <TextDecoration.Pen>
                                             <Pen Thickness="3">
                                                 <Pen.Brush>
@@ -104,7 +104,7 @@
                                         <TextDecoration.Pen>
                                             <Pen Thickness="3">
                                                 <Pen.Brush>
-                                                    <LinearGradientBrush StartPoint="0,0.5"  EndPoint="1,0.5">
+                                                    <LinearGradientBrush StartPoint="0,0.5"  EndPoint="1,0.5" >
                                                         <LinearGradientBrush.GradientStops>
                                                             <GradientStop Color="Yellow" Offset="0" />
                                                             <GradientStop Color="Red" Offset="1" />
@@ -117,7 +117,7 @@
                                             </Pen>
                                         </TextDecoration.Pen>
                                     </TextDecoration>
-                                    <TextDecoration Location="Underline" />
+                                    <TextDecoration Location="Underline" PenThicknessUnit="FontRecommended" PenOffset="-1" PenOffsetUnit="FontRenderingEmSize" />
                                 </TextBlock.TextDecorations>
                             </TextBlock>
                             <TextBlock Text="long long long long long long long long long long long long long long long long long long long long long long long long text" TextTrimming="WordEllipsis" />
