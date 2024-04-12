@@ -240,7 +240,8 @@ namespace Tategaki
 			get { return (Thickness)GetValue(PaddingProperty); }
 			set { SetValue(PaddingProperty, value); }
 		}
-		public static readonly DependencyProperty PaddingProperty = Block.PaddingProperty.AddOwner(typeof(TategakiText));
+		public static readonly DependencyProperty PaddingProperty = Block.PaddingProperty.AddOwner(
+			typeof(TategakiText), new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure));
 
 		// BorderBrushは未実装
 		// BorderThicknessは未実装
