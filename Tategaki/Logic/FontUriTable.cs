@@ -47,14 +47,17 @@ namespace Tategaki.Logic
 			_CultureVerticalFonts = new();
 			_CultureAdvancedVerticalFonts = new();
 
-			string fontDir = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
-			var uris = Directory.GetFiles(fontDir, "*.ttf").Concat(Directory.GetFiles(fontDir, "*.otf")).Select(p => new Uri(p))
-				.Concat(Directory.GetFiles(fontDir, "*.ttc").SelectMany(p => {
-					using(var fs = new FileStream(p, FileMode.Open, FileAccess.Read)) {
-						return Enumerable.Range(0, TypefaceInfo.GetCollectionCount(fs)).Select(i => new UriBuilder("file", "", -1, p, "#" + i).Uri);
-					}
-				})
-			);
+			var fontDirs = new [] {
+				Environment.GetFolderPath(Environment.SpecialFolder.Fonts),
+				Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Microsoft\Windows\Fonts"),
+			};
+			var uris = fontDirs
+				.Where(p => Directory.Exists(p))
+				.SelectMany(p => Directory.GetFiles(p, "*.ttf").Concat(Directory.GetFiles(p, "*.otf")).Select(p => new Uri(p))
+					.Concat(Directory.GetFiles(p, "*.ttc").SelectMany(p1 => {
+						using(var fs = new FileStream(p1, FileMode.Open, FileAccess.Read)) 
+							return Enumerable.Range(0, TypefaceInfo.GetCollectionCount(fs)).Select(i => new UriBuilder("file", "", -1, p1, "#" + i).Uri);
+					})));
 
 			foreach(Uri uri in uris) {
 				try {
