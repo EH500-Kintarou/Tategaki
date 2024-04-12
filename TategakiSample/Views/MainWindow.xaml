@@ -4,7 +4,7 @@
 		xmlns:vc="clr-namespace:TategakiSample.Views.ValueConverters"
 		xmlns:tg="http://schemas.eh500-kintarou.com/Tategaki"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="Tategaki Sample" Width="1280" Height="720" 
+        Title="Tategaki Sample" Width="1280" Height="960" 
 		TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True" >
 
     <Window.Resources>

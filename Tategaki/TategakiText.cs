@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,7 +16,6 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Tategaki.Logic;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Tategaki
 {
@@ -28,6 +28,7 @@ namespace Tategaki
 
 		public TategakiText()
 		{
+			TextDecorations = new TextDecorationCollection();
 		}
 
 		#region Properties
@@ -204,9 +205,19 @@ namespace Tategaki
 
 		#region Inline
 
+		/// <summary>
+		/// 取り消し線などの装飾
+		/// </summary>
+		public TextDecorationCollection TextDecorations
+		{
+			get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
+			set { SetValue(TextDecorationsProperty, value); }
+		}
+		public static readonly DependencyProperty TextDecorationsProperty =
+			Inline.TextDecorationsProperty.AddOwner(typeof(TategakiText), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
 		// BaselineAlignmentは未実装
 		// FlowDirectionは未実装
-		// TextDecorationsは未実装
 
 		#endregion
 
@@ -389,31 +400,69 @@ namespace Tategaki
 		{
 			var renderRect = new Rect(0, 0, RenderSize.Width, RenderSize.Height);
 
+			// 背景を描画
 			if(Background != null)
 				ctx.DrawRectangle(Background, null, renderRect);
 
+			// クリッピングと回転を設定
 			ctx.PushClip(new RectangleGeometry(renderRect));    // これ以後の描画はクリッピングされる
 			ctx.PushTransform(new RotateTransform(90, RenderSize.Width / 2, RenderSize.Width / 2));     // これ以後の描画は回転される
 
+			// 装飾（下線など）を取得
+			var decorations = GetDecorations();
+
+			// 文字を描画
 			var foreground = Foreground ?? Brushes.Black;
 			var y = Padding.Right;
 			foreach(var line in lines) {
 				var height = line.size.Height;
 
-				var x = TextAlignment switch {
+				var xstart = TextAlignment switch {
 					TextAlignment.Right => RenderSize.Height - line.size.Width - Padding.Bottom,
 					TextAlignment.Center => (RenderSize.Height - line.size.Width + Padding.Top - Padding.Bottom) / 2,
 					_ => Padding.Top,
 				};
+				var x = xstart;
 
 				foreach(var section in line.glyphs) {
 					ctx.DrawGlyphRun(foreground, section.glyph.CreateWithOffsetY0(new Point(x, y)));
-
 					x += section.width;
-				}
 
+					// 1行ごとに装飾も実施
+					foreach(var deco in decorations)
+						ctx.DrawLine(deco.pen, new Point(xstart, y + deco.y), new Point(x, y + deco.y));
+				}
 				y += height;
 			}
+		}
+
+		readonly static Pen defaultPen = new Pen(Brushes.Black, 1);
+		private (double y, Pen pen)[] GetDecorations()
+		{
+			var fontheight = (glyphcache?.GlyphTypeface?.Height ?? 1.0) * FontSize;
+			var baseline = glyphcache?.GlyphTypeface?.Baseline ?? 1.0;
+			var strikethrough = glyphcache?.GlyphTypeface?.StrikethroughPosition ?? 0.5;
+			var underline = glyphcache?.GlyphTypeface?.UnderlinePosition ?? 0.0;
+			
+			return (TextDecorations ?? Enumerable.Empty<TextDecoration>())
+				.Select(p => {
+					double y = p.Location switch {
+						TextDecorationLocation.Baseline => baseline * fontheight,
+						TextDecorationLocation.OverLine => 0,
+						TextDecorationLocation.Strikethrough => (baseline - strikethrough) * fontheight,
+						_ => (baseline - underline) * fontheight - 2,
+					};
+
+					var pen = p.Pen ?? defaultPen;
+					if(p.PenThicknessUnit == TextDecorationUnit.FontRenderingEmSize) {
+						pen = pen.Clone();
+						pen.Thickness *= FontSize;
+					}
+
+					y += p.PenOffset * ((p.PenOffsetUnit == TextDecorationUnit.FontRenderingEmSize) ? FontSize : 1);
+
+					return (y, pen);
+				}).ToArray();
 		}
 
 		#endregion
