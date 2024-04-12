@@ -439,14 +439,12 @@ namespace Tategaki
 						};
 
 						var pen = deco.Pen ?? defaultPen;
-						if(deco.PenThicknessUnit == TextDecorationUnit.FontRenderingEmSize) {
-							pen = pen.Clone();
-							pen.Thickness *= FontSize;
-						}
-
+						if(deco.PenThicknessUnit == TextDecorationUnit.FontRenderingEmSize)
+							pen = new Pen(pen.Brush, pen.Thickness *= FontSize);
+						
 						yline += deco.PenOffset * ((deco.PenOffsetUnit == TextDecorationUnit.FontRenderingEmSize) ? FontSize : 1);
 
-						ctx.DrawLine(deco.Pen ?? defaultPen, new Point(xstart, yline), new Point(x, yline));
+						ctx.DrawLine(pen, new Point(xstart, yline), new Point(x, yline));
 					}
 				}
 
