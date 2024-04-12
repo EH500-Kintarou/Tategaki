@@ -43,7 +43,7 @@
                             <tg:TategakiText Text="Half-width vertical disabled"/>
                             <tg:TategakiText Text="Half-width vertical enabled" EnableHalfWidthCharVertical="True"/>
                             <tg:TategakiText Text="改行文字と行の高さが&#xa;ある文章" LineHeight="35" />
-                            <tg:TategakiText Text="パディング（未実装）" Background="Yellow" />
+                            <tg:TategakiText Text="パディング＝10" Background="Yellow" Padding="10" />
                             <tg:TategakiText Text="文字配置" Background="SkyBlue" TextAlignment="{Binding ChangingTextAlignment}" Spacing="200" />
                             <tg:TategakiText Text="上線（未実装）" />
                             <tg:TategakiText Text="取り消し線（未実装）" />
