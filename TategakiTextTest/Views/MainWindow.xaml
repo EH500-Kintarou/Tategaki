@@ -52,8 +52,8 @@
                             <tg:TategakiText Text="基線（未実装）" />
                             <tg:TategakiText Text="下線（未実装）" />
                             <tg:TategakiText Text="複数効果（未実装）" />
-                            <tg:TategakiText Text="文字省略（未実装）" />
-                            <tg:TategakiText Text="文字折り返し（未実装）" />
+                            <tg:TategakiText Text="looooooooooooooooooooooong text wrapping" TextWrapping="Wrap"/>
+                            <tg:TategakiText Text="looooooooooooooooooooooong text wrapping with overflow" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
 
@@ -105,8 +105,8 @@
                             </TextBlock>
                             <TextBlock Text="long long long long long long long long long long long long long long long long long long long long long long long long text" TextTrimming="WordEllipsis" />
                             <TextBlock Text="long long long long long long long long long long long long long long long long long long long long long long long long text" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="looooooooooooooooooooooong long long long long long long long long long long text" TextWrapping="Wrap"/>
-                            <TextBlock Text="looooooooooooooooooooooong long long long long long long long long long long text" TextWrapping="WrapWithOverflow"/>
+                            <TextBlock Text="looooooooooooooooooooooong text wrapping" TextWrapping="Wrap"/>
+                            <TextBlock Text="looooooooooooooooooooooong text wrapping with overflow" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
                     </Border>
                 </Grid>
