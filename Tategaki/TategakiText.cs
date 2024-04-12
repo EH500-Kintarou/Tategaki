@@ -131,7 +131,7 @@ namespace Tategaki
 		}
 		public static readonly DependencyProperty LastHangingCharsProperty = DependencyProperty.Register(
 			nameof(LastHangingChars), typeof(string), typeof(TategakiText),
-			new FrameworkPropertyMetadata("、。，．,.｡､", FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+			new FrameworkPropertyMetadata("、。，．,.｡､ 　", FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
 
 		#endregion
 
