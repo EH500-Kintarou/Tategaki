@@ -53,7 +53,7 @@
                                 <tg:TategakiText.TextDecorations>
                                     <TextDecoration Location="Strikethrough" PenThicknessUnit="FontRenderingEmSize" >
                                         <TextDecoration.Pen>
-                                            <Pen Thickness="3">
+                                            <Pen Thickness="0.5">
                                                 <Pen.Brush>
                                                     <LinearGradientBrush StartPoint="0,0.5"  EndPoint="1,0.5">
                                                         <LinearGradientBrush.GradientStops>
@@ -68,7 +68,7 @@
                                             </Pen>
                                         </TextDecoration.Pen>
                                     </TextDecoration>
-                                    <TextDecoration Location="Underline" />
+                                    <TextDecoration Location="Underline" PenThicknessUnit="FontRecommended" PenOffset="-1" PenOffsetUnit="FontRenderingEmSize" />
                                 </tg:TategakiText.TextDecorations>
                             </tg:TategakiText>
                             <tg:TategakiText Text="looooooooooooooooooooooong text wrapping" TextWrapping="Wrap"/>
@@ -100,9 +100,9 @@
                             <TextBlock Text="下線" TextDecorations="Underline" />
                             <TextBlock Text="複数効果" >
                                 <TextBlock.TextDecorations>
-                                    <TextDecoration Location="Strikethrough" >
+                                    <TextDecoration Location="Strikethrough" PenThicknessUnit="FontRenderingEmSize">
                                         <TextDecoration.Pen>
-                                            <Pen Thickness="3">
+                                            <Pen Thickness="0.5">
                                                 <Pen.Brush>
                                                     <LinearGradientBrush StartPoint="0,0.5"  EndPoint="1,0.5" >
                                                         <LinearGradientBrush.GradientStops>
