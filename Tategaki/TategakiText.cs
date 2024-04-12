@@ -302,6 +302,10 @@ namespace Tategaki
 				context.NewSectionCallback = (int start, int endEx, double width) =>
 					line.Add((new GlyphRunParam(glyphcache, textcache, start, endEx, fontsize, spacing, language), width));
 				context.NewLineCallback = (double width) => {
+					width -= (spacing - 100) / 100.0 * fontsize;
+					if(width < 0)
+						width = 0;
+
 					lines.Add((line, new Size(width, lineheight)));
 					line = new();
 				};
@@ -352,7 +356,11 @@ namespace Tategaki
 						var glyph = line.glyphs[i].glyph;
 						for(int j = 0; j < glyph.GlyphOffsets.Count; j++)
 							glyph.GlyphOffsets[j] = new Point(spacing * j, 0);
-						line.glyphs[i] = (glyph, sectionwiths[i] + spacing * glyph.GlyphOffsets.Count);
+
+						if(i == line.glyphs.Count - 1)
+							line.glyphs[i] = (glyph, sectionwiths[i] + spacing * Math.Max(0, glyph.GlyphOffsets.Count - 1));
+						else
+							line.glyphs[i] = (glyph, sectionwiths[i] + spacing * glyph.GlyphOffsets.Count);
 					}
 				}
 			}

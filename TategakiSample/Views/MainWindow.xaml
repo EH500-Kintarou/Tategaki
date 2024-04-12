@@ -73,9 +73,9 @@
                                  FontStyle="{Binding ElementName=checkbox_isitalic, Path=IsChecked, Converter={StaticResource BooleanToFontStyleConv}}"
                                  FontWeight="{Binding ElementName=checkbox_isbold, Path=IsChecked, Converter={StaticResource BooleanToFontWeightConv}}"
                                  Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
-                <tg:TategakiText Text="芥川龍之介" TextAlignment="Justify" FontSize="20" FontFamily="MS Gothic" LineHeight="36"
+                <tg:TategakiText Text="芥川龍之介" TextAlignment="Right" FontSize="20" FontFamily="MS Gothic" LineHeight="36"
 								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
-                <tg:TategakiText Text="羅生門" VerticalAlignment="Center" FontSize="36" FontWeight="Bold" FontFamily="MS Gothic"
+                <tg:TategakiText Text="羅生門" TextAlignment="Center" FontSize="36" FontWeight="Bold" FontFamily="MS Gothic"
 								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}"/>
             </StackPanel>
         </ScrollViewer>
