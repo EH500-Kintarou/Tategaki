@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -399,12 +400,18 @@ namespace Tategaki
 		{
 			var renderRect = new Rect(0, 0, RenderSize.Width, RenderSize.Height);
 
+			// 背景を描画
 			if(Background != null)
 				ctx.DrawRectangle(Background, null, renderRect);
 
+			// クリッピングと回転を設定
 			ctx.PushClip(new RectangleGeometry(renderRect));    // これ以後の描画はクリッピングされる
 			ctx.PushTransform(new RotateTransform(90, RenderSize.Width / 2, RenderSize.Width / 2));     // これ以後の描画は回転される
 
+			// 装飾（下線など）を取得
+			var decorations = GetDecorations();
+
+			// 文字を描画
 			var foreground = Foreground ?? Brushes.Black;
 			var y = Padding.Right;
 			foreach(var line in lines) {
@@ -420,36 +427,42 @@ namespace Tategaki
 				foreach(var section in line.glyphs) {
 					ctx.DrawGlyphRun(foreground, section.glyph.CreateWithOffsetY0(new Point(x, y)));
 					x += section.width;
+
+					// 1行ごとに装飾も実施
+					foreach(var deco in decorations)
+						ctx.DrawLine(deco.pen, new Point(xstart, y + deco.y), new Point(x, y + deco.y));
 				}
-
-				if(TextDecorations != null && TextDecorations.Count > 0) {
-					var defaultPen = new Pen(Brushes.Black, 1);
-
-					var fontheight = (glyphcache?.GlyphTypeface?.Height ?? 1.0) * FontSize;
-					var baseline = glyphcache?.GlyphTypeface?.Baseline ?? 1.0;
-					var strikethrough = glyphcache?.GlyphTypeface?.StrikethroughPosition ?? 0.5;
-					var underline = glyphcache?.GlyphTypeface?.UnderlinePosition ?? 0.0;
-
-					foreach(var deco in TextDecorations) {
-						double yline = y + deco.Location switch {
-							TextDecorationLocation.Baseline => baseline * fontheight,
-							TextDecorationLocation.OverLine => 0,
-							TextDecorationLocation.Strikethrough => (baseline - strikethrough) * fontheight,
-							_ => (baseline - underline) * fontheight - 2,
-						};
-
-						var pen = deco.Pen ?? defaultPen;
-						if(deco.PenThicknessUnit == TextDecorationUnit.FontRenderingEmSize)
-							pen = new Pen(pen.Brush, pen.Thickness * FontSize);
-						
-						yline += deco.PenOffset * ((deco.PenOffsetUnit == TextDecorationUnit.FontRenderingEmSize) ? FontSize : 1);
-
-						ctx.DrawLine(pen, new Point(xstart, yline), new Point(x, yline));
-					}
-				}
-
 				y += height;
 			}
+		}
+
+		readonly Pen defaultPen = new Pen(Brushes.Black, 1);
+		private (double y, Pen pen)[] GetDecorations()
+		{
+			var fontheight = (glyphcache?.GlyphTypeface?.Height ?? 1.0) * FontSize;
+			var baseline = glyphcache?.GlyphTypeface?.Baseline ?? 1.0;
+			var strikethrough = glyphcache?.GlyphTypeface?.StrikethroughPosition ?? 0.5;
+			var underline = glyphcache?.GlyphTypeface?.UnderlinePosition ?? 0.0;
+			
+			return (TextDecorations ?? Enumerable.Empty<TextDecoration>())
+				.Select(p => {
+					double y = p.Location switch {
+						TextDecorationLocation.Baseline => baseline * fontheight,
+						TextDecorationLocation.OverLine => 0,
+						TextDecorationLocation.Strikethrough => (baseline - strikethrough) * fontheight,
+						_ => (baseline - underline) * fontheight - 2,
+					};
+
+					var pen = p.Pen ?? defaultPen;
+					if(p.PenThicknessUnit == TextDecorationUnit.FontRenderingEmSize) {
+						pen = pen.Clone();
+						pen.Thickness *= FontSize;
+					}
+
+					y += p.PenOffset * ((p.PenOffsetUnit == TextDecorationUnit.FontRenderingEmSize) ? FontSize : 1);
+
+					return (y, pen);
+				}).ToArray();
 		}
 
 		#endregion
