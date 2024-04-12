@@ -7,40 +7,31 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
 using WaterTrans.TypeLoader;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Tategaki.Logic
 {
 	internal class GlyphRunParam
 	{
-		static KeyValuePair<(string fontname, FontWeight weight, FontStyle style), GlyphTypeface>? gtfCache = null;
-
-		public GlyphRunParam(string text, bool isSideways, string? fontname, FontWeight weight, FontStyle style, double size, double spacing, XmlLanguage language)
+		public GlyphRunParam(FontGlyphCache glyphCache, StringGlyphIndexCache textCache, int sliceStart, int sliceEndExclusive, double size, double spacing, XmlLanguage language)
 		{
-			if(string.IsNullOrEmpty(text))
-				throw new ArgumentException("Length of text must be more zan zero.", nameof(text));
+			Text = textCache.Text.Substring(sliceStart, sliceEndExclusive - sliceStart);
 
-			GlyphTypeface gtf;
-			if(gtfCache == null || gtfCache.Value.Key != (fontname, weight, style)) {
-				var uri = FontUriTable.FromName(fontname);
-				fontname ??= FontUriTable.AllVerticalFonts.Where(p => p.Value == uri).First().Key;
-				gtf = new GlyphTypeface(uri, ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
+			GlyphIndices = new ushort[sliceEndExclusive - sliceStart];  // Sliceが欲しい…
+			for(int i = sliceStart; i < sliceEndExclusive; i++)
+				GlyphIndices[i - sliceStart] = textCache.Indices[i];
 
-				gtfCache = new KeyValuePair<(string fontname, FontWeight weight, FontStyle style), GlyphTypeface>((fontname, weight, style), gtf);
-			} else
-				gtf = gtfCache.Value.Value;
+			AdvanceWidths = new double[sliceEndExclusive - sliceStart]; // Sliceが欲しい…
+			for(int i = sliceStart; i < sliceEndExclusive; i++)
+				AdvanceWidths[i - sliceStart] = textCache.AdvanceWidths[i] * size;
 
-			Text = text;
-			GlyphIndices = GetIndices(gtfCache.Value.Value, text, isSideways);
-			IsSideways = isSideways;
-			FontName = fontname!;
-			GlyphTypeface = gtf;
+			IsSideways = textCache.IsVerticals[sliceStart] ?? throw new ArgumentException($"{nameof(textCache)}.{nameof(textCache.IsVerticals)} must not be null", nameof(textCache));	// 簡単のため先頭だけ見る
+			FontName = glyphCache.FontName;
+			GlyphTypeface = glyphCache.GlyphTypeface;
 			RenderingEmSize = size;
-			AdvanceWidths = GlyphIndices.Select(p => (isSideways ? gtf.AdvanceHeights[p] : gtf.AdvanceWidths[p]) * size).ToArray();
 			Spacing = spacing;
-			GlyphOffsets = Enumerable.Range(0, text.Length).Select(p => new Point(p * (spacing - 100) / 100 * size, 0)).ToArray();
+			GlyphOffsets = Enumerable.Range(0, Text.Length).Select(p => new Point(p * (spacing - 100) / 100 * size, 0)).ToArray();
 			Language = language;
-
-			GlyphBox = Create(new Point(0, 0)).ComputeAlignmentBox();
 		}
 
 		#region Properties
@@ -65,8 +56,6 @@ namespace Tategaki.Logic
 
 		public XmlLanguage Language { get; }
 
-		public Rect GlyphBox { get; }
-
 		#endregion
 
 		public GlyphRun Create(Point origin)
@@ -74,32 +63,16 @@ namespace Tategaki.Logic
 			return new GlyphRun(GlyphTypeface, 0, IsSideways, RenderingEmSize, 1, GlyphIndices, origin, AdvanceWidths, GlyphOffsets, Text.ToArray(), FontName, null, null, Language);
 		}
 
-		static IList<ushort> GetIndices(GlyphTypeface gtf, string text, bool vertical)
+		public GlyphRun CreateWithOffsetY0(Point origin)
 		{
-			var conv = GlyphConverterCache.GetConverter(gtf);
-			var ret = new ushort[text.Length];
+			var yoffset = (IsSideways ? GlyphTypeface.Height / 2.0 : GlyphTypeface.Baseline) * RenderingEmSize;
 
-			for(int i = 0; i < ret.Length; i++) {
-				ushort index;
-				try {
-					index = gtf.CharacterToGlyphMap[text[i]];
-				}
-				catch(KeyNotFoundException) {
-					index = gtf.CharacterToGlyphMap['?'];
-				}
-
-				if(vertical)
-					index = conv.Convert(index);
-
-				ret[i] = index;
-			}
-
-			return ret;
+			return Create(new Point(origin.X, origin.Y + yoffset));
 		}
 
 		public override string ToString()
 		{
-			return $"{Text}; ({GlyphBox.Left}, {GlyphBox.Top}, {GlyphBox.Width}, {GlyphBox.Height})";
+			return Text;
 		}
 	}
 }
