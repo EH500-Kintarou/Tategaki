@@ -436,7 +436,7 @@ namespace Tategaki
 			}
 		}
 
-		readonly Pen defaultPen = new Pen(Brushes.Black, 1);
+		readonly static Pen defaultPen = new Pen(Brushes.Black, 1);
 		private (double y, Pen pen)[] GetDecorations()
 		{
 			var fontheight = (glyphcache?.GlyphTypeface?.Height ?? 1.0) * FontSize;
