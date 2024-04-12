@@ -440,7 +440,7 @@ namespace Tategaki
 
 						var pen = deco.Pen ?? defaultPen;
 						if(deco.PenThicknessUnit == TextDecorationUnit.FontRenderingEmSize)
-							pen = new Pen(pen.Brush, pen.Thickness *= FontSize);
+							pen = new Pen(pen.Brush, pen.Thickness * FontSize);
 						
 						yline += deco.PenOffset * ((deco.PenOffsetUnit == TextDecorationUnit.FontRenderingEmSize) ? FontSize : 1);
 
