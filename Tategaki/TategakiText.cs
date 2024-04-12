@@ -468,12 +468,13 @@ namespace Tategaki
 							lineWidth += blockStartWidth;
 							sectionWidth -= blockStartWidth;
 							startPos = blockStartPos;
-						} else {	// 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
+						} else if(TextWrapping == TextWrapping.Wrap) {  // 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
 							NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 							lineWidth += sectionWidth;
 							sectionWidth = 0;
 							startPos = pos;
-						}
+						} else  // 区間の開始地点以降に改行できるところが無かったので、改行そのものを諦める
+							needWrap = false;
 
 						if(needWrap) {
 							NewLineCallback?.Invoke(lineWidth);
@@ -486,7 +487,7 @@ namespace Tategaki
 					currentVertical = isvertical;
 					sectionWidth += width;
 
-					isPrevLastForbidden = LastForbiddenChars.Contains(c);
+					isPrevLastForbidden = LastForbiddenChars.Contains(c) || CheckWordChars(c);
 				}
 			}
 
