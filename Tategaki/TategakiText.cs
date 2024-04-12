@@ -24,6 +24,7 @@ namespace Tategaki
 		StringGlyphIndexCache? textcache;
 		FontGlyphCache? glyphcache;
 		List<(List<(GlyphRunParam glyph, double width)> glyphs, Size size)> lines = new();
+		TextAlignment? lastTextAlignment = null;
 
 		public TategakiText()
 		{
@@ -219,8 +220,17 @@ namespace Tategaki
 			get { return (double)GetValue(LineHeightProperty); }
 			set { SetValue(LineHeightProperty, value); }
 		}
-		public static readonly DependencyProperty LineHeightProperty =
-			Block.LineHeightProperty.AddOwner(typeof(TategakiText));
+		public static readonly DependencyProperty LineHeightProperty = Block.LineHeightProperty.AddOwner(typeof(TategakiText));
+
+		/// <summary>
+		/// 文字の配置
+		/// </summary>
+		public TextAlignment TextAlignment
+		{
+			get { return (TextAlignment)GetValue(TextAlignmentProperty); }
+			set { SetValue(TextAlignmentProperty, value); }
+		}
+		public static readonly DependencyProperty TextAlignmentProperty = Block.TextAlignmentProperty.AddOwner(typeof(TategakiText));
 
 		// BorderBrushは未実装
 		// BorderThicknessは未実装
@@ -232,7 +242,6 @@ namespace Tategaki
 		// LineStackingStrategyは未実装
 		// Marginは未実装
 		// Paddingは未実装
-		// TextAlignmentは未実装
 
 		#endregion
 
@@ -259,6 +268,7 @@ namespace Tategaki
 		{
 			var text = Text;
 			lines.Clear();
+			lastTextAlignment = null;
 
 			//if(string.IsNullOrEmpty(text)) {	// .NET Framework 4.7.2はこれでnullフロー解析が働かない
 			if(text == null || text == "") {
@@ -292,6 +302,10 @@ namespace Tategaki
 				context.NewSectionCallback = (int start, int endEx, double width) =>
 					line.Add((new GlyphRunParam(glyphcache, textcache, start, endEx, fontsize, spacing, language), width));
 				context.NewLineCallback = (double width) => {
+					width -= (spacing - 100) / 100.0 * fontsize;
+					if(width < 0)
+						width = 0;
+
 					lines.Add((line, new Size(width, lineheight)));
 					line = new();
 				};
@@ -306,6 +320,7 @@ namespace Tategaki
 			return new Size(sizeBeforeRotate.Height, sizeBeforeRotate.Width);
 		}
 
+
 		/// <summary>
 		/// この要素のサイズを決定したときに呼ばれるメソッド
 		/// </summary>
@@ -313,7 +328,46 @@ namespace Tategaki
 		/// <returns>実際に使用されたサイズ</returns>
 		protected override Size ArrangeOverride(Size finalSize)
 		{
-			return base.ArrangeOverride(finalSize);
+			var fontsize = FontSize;
+			var nowAlign = TextAlignment;
+
+			// TextAlignmentの調整を行う
+			if(lastTextAlignment != TextAlignment.Justify && nowAlign == TextAlignment.Justify) {
+				foreach(var line in lines) {
+					var sectionwiths = line.glyphs.Select(p => p.glyph.AdvanceWidths.Sum()).ToArray();
+					var textwidth = sectionwiths.Sum();
+					var charcount = line.glyphs.Sum(p => p.glyph.AdvanceWidths.Count);
+					var spacing = charcount >= 2 ? (finalSize.Height - textwidth) / (charcount - 1) : 0.0;
+
+					for(int i = 0; i < line.glyphs.Count; i++) {
+						var glyph = line.glyphs[i].glyph;
+						for(int j = 0; j < glyph.GlyphOffsets.Count; j++)
+							glyph.GlyphOffsets[j] = new Point(spacing * j, 0);
+						line.glyphs[i] = (glyph, sectionwiths[i] + spacing * glyph.GlyphOffsets.Count);
+					}
+				}
+			} else if(lastTextAlignment == TextAlignment.Justify && nowAlign != TextAlignment.Justify) {
+				var spacing = (Spacing - 100) / 100 * fontsize;
+
+				foreach(var line in lines) {
+					var sectionwiths = line.glyphs.Select(p => p.glyph.AdvanceWidths.Sum()).ToArray();
+
+					for(int i = 0; i < line.glyphs.Count; i++) {
+						var glyph = line.glyphs[i].glyph;
+						for(int j = 0; j < glyph.GlyphOffsets.Count; j++)
+							glyph.GlyphOffsets[j] = new Point(spacing * j, 0);
+
+						if(i == line.glyphs.Count - 1)
+							line.glyphs[i] = (glyph, sectionwiths[i] + spacing * Math.Max(0, glyph.GlyphOffsets.Count - 1));
+						else
+							line.glyphs[i] = (glyph, sectionwiths[i] + spacing * glyph.GlyphOffsets.Count);
+					}
+				}
+			}
+
+			lastTextAlignment = nowAlign;
+
+			return finalSize;
 		}
 
 		/// <summary>
@@ -335,7 +389,12 @@ namespace Tategaki
 			var y = 0.0;
 			foreach(var line in lines) {
 				var height = line.size.Height;
-				var x = 0.0;
+
+				var x = TextAlignment switch {
+					TextAlignment.Right => RenderSize.Height - line.size.Width,
+					TextAlignment.Center => (RenderSize.Height - line.size.Width) / 2,
+					_ => 0.0,
+				};
 
 				foreach(var section in line.glyphs) {
 					ctx.DrawGlyphRun(foreground, section.glyph.CreateWithOffsetY0(new Point(x, y)));
