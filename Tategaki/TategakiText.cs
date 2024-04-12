@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -12,7 +13,9 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using Tategaki.Logic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Tategaki
 {
@@ -77,6 +80,60 @@ namespace Tategaki
 		public static readonly DependencyProperty EnableHalfWidthCharVerticalProperty = DependencyProperty.Register(
 			nameof(EnableHalfWidthCharVertical), typeof(bool), typeof(TategakiText),
 			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
+
+		#region TextWrapping
+
+		/// <summary>
+		/// 文字を折り返すオプション
+		/// </summary>
+		public TextWrapping TextWrapping
+		{
+			get { return (TextWrapping)GetValue(TextWrappingProperty); }
+			set { SetValue(TextWrappingProperty, value); }
+		}
+		public static readonly DependencyProperty TextWrappingProperty = DependencyProperty.Register(
+			nameof(TextWrapping), typeof(TextWrapping), typeof(TategakiText),
+			new FrameworkPropertyMetadata(TextWrapping.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender),
+			IsValidTextWrap);
+
+		/// <summary>
+		/// 文末に禁止された文字
+		/// </summary>
+		public string LastForbiddenChars
+		{
+			get { return (string)GetValue(LastForbiddenCharsProperty); }
+			set { SetValue(LastForbiddenCharsProperty, value); }
+		}
+		public static readonly DependencyProperty LastForbiddenCharsProperty = DependencyProperty.Register(
+			nameof(LastForbiddenChars), typeof(string), typeof(TategakiText),
+			new FrameworkPropertyMetadata("（［｛「『([{｢", FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+
+		/// <summary>
+		/// 文頭に禁止された文字
+		/// </summary>
+		public string HeadForbiddenChars
+		{
+			get { return (string)GetValue(HeadForbiddenCharsProperty); }
+			set { SetValue(HeadForbiddenCharsProperty, value); }
+		}
+		public static readonly DependencyProperty HeadForbiddenCharsProperty = DependencyProperty.Register(
+			nameof(HeadForbiddenChars), typeof(string), typeof(TategakiText),
+			new FrameworkPropertyMetadata("、。，．・？！゛゜ヽヾゝゞ々ー）］｝」』!),.:;?]}｡｣､･ｰﾞﾟァィゥェォッャュョヮヵヶぁぃぅぇぉっゃゅょゎゕゖㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇷ゚ㇺㇻㇼㇽㇾㇿ々〻",
+				FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+
+		/// <summary>
+		/// 文末にぶら下げる文字
+		/// </summary>
+		public string LastHangingChars
+		{
+			get { return (string)GetValue(LastHangingCharsProperty); }
+			set { SetValue(LastHangingCharsProperty, value); }
+		}
+		public static readonly DependencyProperty LastHangingCharsProperty = DependencyProperty.Register(
+			nameof(LastHangingChars), typeof(string), typeof(TategakiText),
+			new FrameworkPropertyMetadata("、。，．,.｡､", FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+
+		#endregion
 
 		#region TextElement
 
@@ -179,6 +236,16 @@ namespace Tategaki
 
 		#endregion
 
+		#region Validation
+
+		private static bool IsValidTextWrap(object o)
+		{
+			TextWrapping value = (TextWrapping)o;
+			return value == TextWrapping.Wrap || value == TextWrapping.NoWrap || value == TextWrapping.WrapWithOverflow;
+		}
+
+		#endregion
+
 		#endregion
 
 		#region Overrides
@@ -209,61 +276,29 @@ namespace Tategaki
 				if(glyphcache == null || !glyphcache.ParamEquals(fontname, weight, style))
 					glyphcache = FontGlyphCache.GetCache(fontname, weight, style);
 
-				if(textcache == null || !textcache.ParamEquals(text, fontname, weight, style, hwvert)) 
+				if(textcache == null || !textcache.ParamEquals(text, fontname, weight, style, hwvert))
 					textcache = new StringGlyphIndexCache(text, glyphcache, hwvert);
 
 				var lineheight = Math.Max(double.IsNaN(LineHeight) ? 0 : LineHeight, glyphcache.GlyphTypeface.Height * fontsize);
 
 				var line = new List<(GlyphRunParam glyph, double width)>();
-				int start = 0;
-				bool? currentvert = null;
-				double sectionwidth = 0;
-				double totalwidth = 0;
-				for(int i = 0; i < textcache.Text.Length; i++) {
-					var c = textcache.Text[i];
-					var index = textcache.Indices[i];
-					var isvert = textcache.IsVerticals[i];
-					var advwidth = textcache.AdvanceWidths[i];
+				var context = new ContextAnalyzer() {
+					TextWrapping = TextWrapping,
+					AvailableWidth = availableSize.Height,  // 90°回るのでWidthとHeightが入れ替わる
+					LastForbiddenChars = LastForbiddenChars,
+					HeadForbiddenChars = HeadForbiddenChars,
+					LastHangingChars = LastHangingChars,
+				};
+				context.NewSectionCallback = (int start, int endEx, double width) =>
+					line.Add((new GlyphRunParam(glyphcache, textcache, start, endEx, fontsize, spacing, language), width));
+				context.NewLineCallback = (double width) => {
+					lines.Add((line, new Size(width, lineheight)));
+					line = new();
+				};
 
-					if(c == '\n') {     // 改行
-						if(currentvert != null && start < i) {
-							line.Add((new GlyphRunParam(glyphcache, textcache, start, i, fontsize, spacing, language), sectionwidth));
-							totalwidth += sectionwidth;
-							sectionwidth = 0;
-						}
-
-						lines.Add((line, new Size(totalwidth, lineheight)));
-						line = new();
-						totalwidth = 0;
-						currentvert = null;
-					} else if(isvert == null) {    // 縦も横も無い文字（制御文字など）なら無視
-						if(currentvert != null && start < i) {
-							line.Add((new GlyphRunParam(glyphcache, textcache, start, i, fontsize, spacing, language), sectionwidth));
-							totalwidth += sectionwidth;
-							sectionwidth = 0;
-						}
-						currentvert = null;
-					} else {
-						if(currentvert != null && currentvert != isvert) {
-							line.Add((new GlyphRunParam(glyphcache, textcache, start, i, fontsize, spacing, language), sectionwidth));
-							totalwidth += sectionwidth;
-							sectionwidth = 0;
-						}
-						if(currentvert == null && isvert != null)
-							start = i;
-
-						currentvert = isvert;
-						sectionwidth += advwidth * fontsize;
-					}
-				}
-
-				if(currentvert != null && start < text.Length) {
-					line.Add((new GlyphRunParam(glyphcache, textcache, start, text.Length, fontsize, spacing, language), sectionwidth));
-					totalwidth += sectionwidth;
-					sectionwidth = 0;
-				}
-
-				lines.Add((line, new Size(totalwidth, lineheight)));
+				for(int i = 0; i < textcache.Text.Length; i++)
+					context.NextChar(textcache.Text[i], i, textcache.IsVerticals[i], textcache.AdvanceWidths[i] * fontsize);
+				context.GetRemaining(text.Length);
 			}
 
 			var sizeBeforeRotate = lines.Select(p => p.size).Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.Width), left.Height + right.Height));
@@ -293,7 +328,7 @@ namespace Tategaki
 			if(Background != null)
 				ctx.DrawRectangle(Background, null, renderRect);
 
-			ctx.PushClip(new RectangleGeometry(renderRect));	// これ以後の描画はクリッピングされる
+			ctx.PushClip(new RectangleGeometry(renderRect));    // これ以後の描画はクリッピングされる
 			ctx.PushTransform(new RotateTransform(90, RenderSize.Width / 2, RenderSize.Width / 2));     // これ以後の描画は回転される
 
 			var foreground = Foreground ?? Brushes.Black;
@@ -313,5 +348,172 @@ namespace Tategaki
 		}
 
 		#endregion
+
+		/// <summary>
+		/// 文字を1文字ずつ受けて改行位置などを判断していくメソッド
+		/// </summary>
+		private struct ContextAnalyzer
+		{
+			public ContextAnalyzer()
+			{
+				LastForbiddenChars = "";
+				HeadForbiddenChars = "";
+				LastHangingChars = "";
+			}
+
+			#region Properties
+
+			/// <summary>
+			/// 区間（=1つのGlyphRunで表現できる範囲）が切り替わったときに呼ばれるメソッド
+			/// </summary>
+			public NewSectionCallback? NewSectionCallback { get; set; } = default;
+
+			/// <summary>
+			/// 改行が発生したときに呼ばれるメソッド
+			/// </summary>
+			public NewLineCallback? NewLineCallback { get; set; } = default;
+
+			/// <summary>
+			/// 改行オプション
+			/// </summary>
+			public TextWrapping TextWrapping { get; set; } = default;
+
+			/// <summary>
+			/// 文字を表示可能な幅
+			/// </summary>
+			public double AvailableWidth { get; set; } = default;
+
+			/// <summary>
+			/// 文末に禁止された文字
+			/// </summary>
+			public string LastForbiddenChars { get; set; }
+
+			/// <summary>
+			/// 文頭に禁止された文字
+			/// </summary>
+			public string HeadForbiddenChars { get; set; }
+
+			/// <summary>
+			/// 文末にぶら下げる文字
+			/// </summary>
+			public string LastHangingChars { get; set; }
+
+			#endregion
+
+			int startPos = 0;				// 現在の区間のスタート位置
+			bool? currentVertical = null;	// 現在縦書きか横書きか
+			double sectionWidth = 0;		// 区間の幅
+			double lineWidth = 0;           // 行の幅
+
+			int connectionStartPos = 0;
+			double connectionStartWidth = 0;
+			bool isPrevLastForbidden = false;
+
+			public void NextChar(char c, int pos, bool? isvertical, double width)
+			{
+				if(c == '\n') {     // 改行
+					if(currentVertical != null && startPos < pos) {
+						NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
+						lineWidth += sectionWidth;
+						sectionWidth = 0;
+					}
+
+					NewLineCallback?.Invoke(lineWidth);
+					lineWidth = 0;
+					currentVertical = null;
+				} else if(isvertical == null) {    // 縦も横も無い文字（制御文字など）なら無視
+					if(currentVertical != null && startPos < pos) {
+						NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
+						lineWidth += sectionWidth;
+						sectionWidth = 0;
+					}
+					currentVertical = null;
+				} else {
+					// ○: 普通の文字 / ●: 文末禁止文字 / ◎: 文頭禁止文字
+					// 　　⇩オーバーフロー
+					// ○○○○○
+					// 　　⇧connectionStartPos←こいつで改行
+					// 　　　⇩オーバーフロー
+					// ○○●◎○○
+					// 　　⇧connectionStartPos←こいつで改行
+					// 　　　　⇩オーバーフロー
+					// ○○●○◎○○
+					// 　　⇧connectionStartPos←こいつで改行
+					// 　　　　　⇩オーバーフロー
+					// ○○●○○◎○○
+					// 　　　　⇧connectionStartPos ←こいつで改行
+					// 　　　　　⇩オーバーフロー
+					// ○○●○◎◎○○
+					// 　　⇧connectionStartPos ←こいつで改行
+					// 　　　　　⇩オーバーフロー
+					// ○○●○◎○◎○○
+					// 　　　　　⇧connectionStartPos ←こいつで改行
+					//
+					// connectionStartPosをposで上書きする条件は「前回が●でない、かつ、現在が◎でない」
+					// 「●と次」または「◎と手前」はつながった（行をまたぐことができない）範囲という意味を込めてconnection～という名前にしている
+
+					if(!isPrevLastForbidden && !HeadForbiddenChars.Contains(c)) {
+						connectionStartPos = pos;
+						connectionStartWidth = sectionWidth;
+					}
+
+					bool needWrap = TextWrapping != TextWrapping.NoWrap && (lineWidth + sectionWidth + width) > AvailableWidth;
+					if(needWrap && LastHangingChars.Contains(c))
+						needWrap = false;   // ぶらさげ文字だったらやっぱり改行は無しにする
+
+					// 区間の切り替わり目か確認
+					if(currentVertical != null && (currentVertical != isvertical || needWrap)) {
+						if(startPos < connectionStartPos) { // スタート地点以降につながっている部分がある
+							NewSectionCallback?.Invoke(startPos, connectionStartPos, connectionStartWidth);
+							lineWidth += connectionStartWidth;
+							sectionWidth -= connectionStartWidth;
+							startPos = connectionStartPos;
+						} else {	// 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
+							NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
+							lineWidth += sectionWidth;
+							sectionWidth = 0;
+							startPos = pos;
+						}
+
+						if(needWrap) {
+							NewLineCallback?.Invoke(lineWidth);
+							lineWidth = 0;
+						}
+					}
+					if(currentVertical == null && isvertical != null)   // 無効な文字以降初めての有効な文字ならスタート地点とする
+						startPos = pos;
+
+					currentVertical = isvertical;
+					sectionWidth += width;
+
+					isPrevLastForbidden = LastForbiddenChars.Contains(c);
+				}
+			}
+
+			public void GetRemaining(int pos)
+			{
+				if(currentVertical != null && startPos < pos) {
+					NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
+					lineWidth += sectionWidth;
+					sectionWidth = 0;
+					startPos = pos;
+				}
+
+				if(lineWidth > 0)
+					NewLineCallback?.Invoke(lineWidth);
+			}
+
+			private bool CheckWordChars(char c)
+			{
+				return ('0' <= c && c <= '9') ||
+					   ('a' <= c && c <= 'z') ||
+					   ('A' <= c && c <= 'Z') ||
+					   c == '_';
+			}
+		}
+
+		delegate void NewSectionCallback(int start, int endEx, double width);
+
+		delegate void NewLineCallback(double width);
 	}
 }
