@@ -186,7 +186,7 @@ namespace Tategaki
 			//if(string.IsNullOrEmpty(text)) {	// .NET Framework 4.7.2はこれでnullフロー解析が働かない
 			if(text == null || text == "") {
 				textcache = null;
-				lines.Add((new(), new(0, FontSize * 4 / 3)));	// 高さはフォントサイズの4/3倍ピクセルの空行
+				lines.Add((new(), new(0, FontSize)));
 			} else {
 				var fontname = FontFamily?.Source;
 				var weight = FontWeight;
