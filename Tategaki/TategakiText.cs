@@ -27,6 +27,7 @@ namespace Tategaki
 
 		public TategakiText()
 		{
+			TextDecorations = new TextDecorationCollection();
 		}
 
 		#region Properties
@@ -206,9 +207,9 @@ namespace Tategaki
 		/// <summary>
 		/// 取り消し線などの装飾
 		/// </summary>
-		public TextDecorationCollection? TextDecorations
+		public TextDecorationCollection TextDecorations
 		{
-			get { return (TextDecorationCollection?)GetValue(TextDecorationsProperty); }
+			get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
 			set { SetValue(TextDecorationsProperty, value); }
 		}
 		public static readonly DependencyProperty TextDecorationsProperty =
@@ -434,7 +435,7 @@ namespace Tategaki
 							TextDecorationLocation.Baseline => baseline * fontheight,
 							TextDecorationLocation.OverLine => 0,
 							TextDecorationLocation.Strikethrough => (baseline - strikethrough) * fontheight,
-							_ => (baseline - underline) * fontheight,
+							_ => (baseline - underline) * fontheight - 1,
 						};
 
 						ctx.DrawLine(deco.Pen ?? defaultPen, new Point(xstart, y + yline), new Point(x, y + yline));
