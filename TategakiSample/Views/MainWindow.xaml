@@ -40,9 +40,13 @@
             <Slider Grid.Row="0" Grid.Column="1" Name="slider_height" Minimum="1" Maximum="100" Value="24"/>
             <xctk:DoubleUpDown Grid.Row="0" Grid.Column="2" Value="{Binding ElementName=slider_height, Path=Value}" Minimum="1" Maximum="100" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Font Size" VerticalAlignment="Center" Margin="3" />
-            <Slider Grid.Row="2" Grid.Column="1" Name="slider_fontsize" Minimum="5" Maximum="72" Value="18"/>
-            <xctk:DoubleUpDown Grid.Row="2" Grid.Column="2" Value="{Binding ElementName=slider_fontsize, Path=Value}" Minimum="5" Maximum="72" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Font Size" VerticalAlignment="Center" Margin="3" />
+            <Slider Grid.Row="1" Grid.Column="1" Name="slider_fontsize" Minimum="5" Maximum="96" Value="18"/>
+            <xctk:DoubleUpDown Grid.Row="1" Grid.Column="2" Value="{Binding ElementName=slider_fontsize, Path=Value}" Minimum="5" Maximum="96" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Spacing" VerticalAlignment="Center" Margin="3" />
+            <Slider Grid.Row="2" Grid.Column="1" Name="slider_spacing" Minimum="10" Maximum="1000" Value="100"/>
+            <xctk:DoubleUpDown Grid.Row="2" Grid.Column="2" Value="{Binding ElementName=slider_spacing, Path=Value}" Minimum="10" Maximum="1000" />
         </Grid>
 
         <Grid Grid.Row="3">
@@ -62,11 +66,12 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
                 <tg:TategakiText Text="{Binding ElementName=textBox1, Path=Text, UpdateSourceTrigger=PropertyChanged}"
                                  Name="tategakiMul1" HorizontalAlignment="Right" VerticalAlignment="Top" TextWrapping="Wrap"
+                                 LineHeight="{Binding ElementName=slider_height, Path=Value}"
                                  FontSize="{Binding ElementName=slider_fontsize, Path=Value}"
+                                 Spacing="{Binding ElementName=slider_spacing, Path=Value}"
                                  FontFamily="{Binding ElementName=combobox_fontface, Path=SelectedItem, Mode=OneWay}"
                                  FontStyle="{Binding ElementName=checkbox_isitalic, Path=IsChecked, Converter={StaticResource BooleanToFontStyleConv}}"
                                  FontWeight="{Binding ElementName=checkbox_isbold, Path=IsChecked, Converter={StaticResource BooleanToFontWeightConv}}"
-                                 LineHeight="{Binding ElementName=slider_height, Path=Value}"
                                  Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
                 <tg:TategakiText Text="芥川龍之介" VerticalAlignment="Bottom" FontSize="20" FontFamily="MS Gothic" LineHeight="36"
 								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />

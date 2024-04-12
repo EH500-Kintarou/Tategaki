@@ -297,7 +297,7 @@ namespace Tategaki
 				};
 
 				for(int i = 0; i < textcache.Text.Length; i++)
-					context.NextChar(textcache.Text[i], i, textcache.IsVerticals[i], textcache.AdvanceWidths[i] * fontsize);
+					context.NextChar(textcache.Text[i], i, textcache.IsVerticals[i], textcache.AdvanceWidths[i] * fontsize, (spacing - 100) / 100.0 * fontsize);
 				context.GetRemaining(text.Length);
 			}
 
@@ -409,7 +409,7 @@ namespace Tategaki
 			double blockStartWidth = 0;
 			bool isPrevLastForbidden = false;
 
-			public void NextChar(char c, int pos, bool? isvertical, double width)
+			public void NextChar(char c, int pos, bool? isvertical, double width, double spacing)
 			{
 				if(c == '\n') {     // 改行
 					if(currentVertical != null && startPos < pos) {
@@ -457,7 +457,7 @@ namespace Tategaki
 						blockStartWidth = sectionWidth;
 					}
 
-					bool needWrap = TextWrapping != TextWrapping.NoWrap && (lineWidth + sectionWidth + width) > AvailableWidth;
+					bool needWrap = TextWrapping != TextWrapping.NoWrap && (lineWidth + sectionWidth + width) > AvailableWidth;	// はみ出し判定にはspacingは使わない
 					if(needWrap && LastHangingChars.Contains(c))
 						needWrap = false;   // ぶらさげ文字だったらやっぱり改行は無しにする
 
@@ -485,7 +485,7 @@ namespace Tategaki
 						startPos = pos;
 
 					currentVertical = isvertical;
-					sectionWidth += width;
+					sectionWidth += width + spacing;
 
 					isPrevLastForbidden = LastForbiddenChars.Contains(c) || CheckWordChars(c);
 				}
