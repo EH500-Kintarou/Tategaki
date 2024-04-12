@@ -41,7 +41,7 @@ namespace Tategaki
 			get
 			{
 				if(_AvailableFonts == null)
-					_AvailableFonts = FontUriTable.CultureVerticalFonts[CultureInfo.CurrentUICulture].Select(p => p.Key).ToArray();
+					_AvailableFonts = VerticalFontTable.FamilyNames.ToArray();
 				return _AvailableFonts;
 			}
 		}
@@ -436,7 +436,6 @@ namespace Tategaki
 			}
 		}
 
-		readonly static Pen defaultPen = new Pen(Brushes.Black, 1);
 		private (double y, Pen pen)[] GetDecorations()
 		{
 			var fontheight = (glyphcache?.GlyphTypeface?.Height ?? 1.0) * FontSize;
@@ -444,6 +443,8 @@ namespace Tategaki
 			var strikethrough = glyphcache?.GlyphTypeface?.StrikethroughPosition ?? 0.5;
 			var underline = glyphcache?.GlyphTypeface?.UnderlinePosition ?? 0.0;
 			
+			Pen defaultPen = new Pen(Foreground, 1);
+
 			return (TextDecorations ?? Enumerable.Empty<TextDecoration>())
 				.Select(p => {
 					double y = p.Location switch {
