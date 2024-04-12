@@ -16,6 +16,7 @@ using Tategaki.Logic;
 
 namespace Tategaki
 {
+	[Obsolete]
 	public class TategakiMultiline : Control
 	{
 		ItemsControl? itemsctl;
