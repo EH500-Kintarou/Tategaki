@@ -232,6 +232,16 @@ namespace Tategaki
 		}
 		public static readonly DependencyProperty TextAlignmentProperty = Block.TextAlignmentProperty.AddOwner(typeof(TategakiText));
 
+		/// <summary>
+		/// パディング
+		/// </summary>
+		public Thickness Padding
+		{
+			get { return (Thickness)GetValue(PaddingProperty); }
+			set { SetValue(PaddingProperty, value); }
+		}
+		public static readonly DependencyProperty PaddingProperty = Block.PaddingProperty.AddOwner(typeof(TategakiText));
+
 		// BorderBrushは未実装
 		// BorderThicknessは未実装
 		// BreakColumnBeforeは未実装
@@ -240,8 +250,6 @@ namespace Tategaki
 		// FlowDirectionは未実装
 		// IsHyphenationEnabledは未実装
 		// LineStackingStrategyは未実装
-		// Marginは未実装
-		// Paddingは未実装
 
 		#endregion
 
@@ -294,7 +302,7 @@ namespace Tategaki
 				var line = new List<(GlyphRunParam glyph, double width)>();
 				var context = new ContextAnalyzer() {
 					TextWrapping = TextWrapping,
-					AvailableWidth = availableSize.Height,  // 90°回るのでWidthとHeightが入れ替わる
+					AvailableWidth = availableSize.Height - Padding.Top - Padding.Bottom,  // 90°回るのでWidthとHeightが入れ替わる
 					LastForbiddenChars = LastForbiddenChars,
 					HeadForbiddenChars = HeadForbiddenChars,
 					LastHangingChars = LastHangingChars,
@@ -316,8 +324,7 @@ namespace Tategaki
 			}
 
 			var sizeBeforeRotate = lines.Select(p => p.size).Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.Width), left.Height + right.Height));
-
-			return new Size(sizeBeforeRotate.Height, sizeBeforeRotate.Width);
+			return new Size(sizeBeforeRotate.Height + Padding.Left + Padding.Right, (TextAlignment == TextAlignment.Justify) ? availableSize.Height : sizeBeforeRotate.Width + Padding.Top + Padding.Bottom);
 		}
 
 
@@ -333,11 +340,13 @@ namespace Tategaki
 
 			// TextAlignmentの調整を行う
 			if(lastTextAlignment != TextAlignment.Justify && nowAlign == TextAlignment.Justify) {
+				var finalwidth = finalSize.Height - Padding.Top - Padding.Bottom;
+
 				foreach(var line in lines) {
 					var sectionwiths = line.glyphs.Select(p => p.glyph.AdvanceWidths.Sum()).ToArray();
 					var textwidth = sectionwiths.Sum();
 					var charcount = line.glyphs.Sum(p => p.glyph.AdvanceWidths.Count);
-					var spacing = charcount >= 2 ? (finalSize.Height - textwidth) / (charcount - 1) : 0.0;
+					var spacing = charcount >= 2 ? (finalwidth - textwidth) / (charcount - 1) : 0.0;
 
 					for(int i = 0; i < line.glyphs.Count; i++) {
 						var glyph = line.glyphs[i].glyph;
@@ -386,14 +395,14 @@ namespace Tategaki
 			ctx.PushTransform(new RotateTransform(90, RenderSize.Width / 2, RenderSize.Width / 2));     // これ以後の描画は回転される
 
 			var foreground = Foreground ?? Brushes.Black;
-			var y = 0.0;
+			var y = Padding.Right;
 			foreach(var line in lines) {
 				var height = line.size.Height;
 
 				var x = TextAlignment switch {
-					TextAlignment.Right => RenderSize.Height - line.size.Width,
-					TextAlignment.Center => (RenderSize.Height - line.size.Width) / 2,
-					_ => 0.0,
+					TextAlignment.Right => RenderSize.Height - line.size.Width - Padding.Bottom,
+					TextAlignment.Center => (RenderSize.Height - line.size.Width + Padding.Top - Padding.Bottom) / 2,
+					_ => Padding.Top,
 				};
 
 				foreach(var section in line.glyphs) {
