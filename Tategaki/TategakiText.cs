@@ -431,14 +431,22 @@ namespace Tategaki
 					var underline = glyphcache?.GlyphTypeface?.UnderlinePosition ?? 0.0;
 
 					foreach(var deco in TextDecorations) {
-						double yline = deco.Location switch {
+						double yline = y + deco.Location switch {
 							TextDecorationLocation.Baseline => baseline * fontheight,
 							TextDecorationLocation.OverLine => 0,
 							TextDecorationLocation.Strikethrough => (baseline - strikethrough) * fontheight,
 							_ => (baseline - underline) * fontheight - 2,
 						};
 
-						ctx.DrawLine(deco.Pen ?? defaultPen, new Point(xstart, y + yline), new Point(x, y + yline));
+						var pen = deco.Pen ?? defaultPen;
+						if(deco.PenThicknessUnit == TextDecorationUnit.FontRenderingEmSize) {
+							pen = pen.Clone();
+							pen.Thickness *= FontSize;
+						}
+
+						yline += deco.PenOffset * ((deco.PenOffsetUnit == TextDecorationUnit.FontRenderingEmSize) ? FontSize : 1);
+
+						ctx.DrawLine(deco.Pen ?? defaultPen, new Point(xstart, yline), new Point(x, yline));
 					}
 				}
 
