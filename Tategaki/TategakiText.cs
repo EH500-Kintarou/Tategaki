@@ -154,6 +154,17 @@ namespace Tategaki
 
 		#region Block
 
+		/// <summary>
+		/// 行の高さ。FontSizeを下回るとFontSizeが優先される。
+		/// </summary>
+		public double LineHeight
+		{
+			get { return (double)GetValue(LineHeightProperty); }
+			set { SetValue(LineHeightProperty, value); }
+		}
+		public static readonly DependencyProperty LineHeightProperty =
+			Block.LineHeightProperty.AddOwner(typeof(TategakiText));
+
 		// BorderBrushは未実装
 		// BorderThicknessは未実装
 		// BreakColumnBeforeは未実装
@@ -161,7 +172,6 @@ namespace Tategaki
 		// ClearFloatersは未実装
 		// FlowDirectionは未実装
 		// IsHyphenationEnabledは未実装
-		// LineHeightは未実装
 		// LineStackingStrategyは未実装
 		// Marginは未実装
 		// Paddingは未実装
@@ -202,6 +212,8 @@ namespace Tategaki
 				if(textcache == null || !textcache.ParamEquals(text, fontname, weight, style, hwvert)) 
 					textcache = new StringGlyphIndexCache(text, glyphcache, hwvert);
 
+				var lineheight = Math.Max(double.IsNaN(LineHeight) ? 0 : LineHeight, glyphcache.GlyphTypeface.Height * fontsize);
+
 				var line = new List<(GlyphRunParam glyph, double width)>();
 				int start = 0;
 				bool? currentvert = null;
@@ -220,7 +232,7 @@ namespace Tategaki
 							sectionwidth = 0;
 						}
 
-						lines.Add((line, new Size(totalwidth, glyphcache.GlyphTypeface.Height * fontsize)));
+						lines.Add((line, new Size(totalwidth, lineheight)));
 						line = new();
 						totalwidth = 0;
 						currentvert = null;
@@ -251,7 +263,7 @@ namespace Tategaki
 					sectionwidth = 0;
 				}
 
-				lines.Add((line, new Size(totalwidth, glyphcache.GlyphTypeface.Height * fontsize)));
+				lines.Add((line, new Size(totalwidth, lineheight)));
 			}
 
 			var sizeBeforeRotate = lines.Select(p => p.size).Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.Width), left.Height + right.Height));
