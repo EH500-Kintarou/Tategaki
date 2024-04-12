@@ -61,7 +61,7 @@
         <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" >
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
                 <tg:TategakiText Text="{Binding ElementName=textBox1, Path=Text, UpdateSourceTrigger=PropertyChanged}"
-                                 Name="tategakiMul1" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                 Name="tategakiMul1" HorizontalAlignment="Right" VerticalAlignment="Top" TextWrapping="Wrap"
                                  FontSize="{Binding ElementName=slider_fontsize, Path=Value}"
                                  FontFamily="{Binding ElementName=combobox_fontface, Path=SelectedItem, Mode=OneWay}"
                                  FontStyle="{Binding ElementName=checkbox_isitalic, Path=IsChecked, Converter={StaticResource BooleanToFontStyleConv}}"
