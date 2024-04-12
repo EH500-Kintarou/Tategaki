@@ -49,7 +49,6 @@
                             <tg:TategakiText Text="取り消し線" TextDecorations="Strikethrough" />
                             <tg:TategakiText Text="基線" TextDecorations="Baseline" />
                             <tg:TategakiText Text="下線" TextDecorations="Underline" />
-                            <!--
                             <tg:TategakiText Text="複数効果" >
                                 <tg:TategakiText.TextDecorations>
                                     <TextDecoration Location="Strikethrough" >
@@ -72,7 +71,6 @@
                                     <TextDecoration Location="Underline" />
                                 </tg:TategakiText.TextDecorations>
                             </tg:TategakiText>
-                            -->
                             <tg:TategakiText Text="looooooooooooooooooooooong text wrapping" TextWrapping="Wrap"/>
                             <tg:TategakiText Text="looooooooooooooooooooooong text wrapping with overflow" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
