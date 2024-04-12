@@ -41,6 +41,20 @@ namespace TategakiTextTest.ViewModels
 				VerticalAlignment.Bottom => VerticalAlignment.Stretch,
 				_ => VerticalAlignment.Top,
 			};
+
+			if(ChangingWeight == FontWeights.Normal && ChangingStyle == FontStyles.Normal) {
+				ChangingWeight = FontWeights.Bold;
+				ChangingStyle = FontStyles.Normal;
+			} else if(ChangingWeight != FontWeights.Normal && ChangingStyle == FontStyles.Normal) {
+				ChangingWeight = FontWeights.Bold;
+				ChangingStyle = FontStyles.Italic;
+			} else if(ChangingWeight != FontWeights.Normal && ChangingStyle != FontStyles.Normal) {
+				ChangingWeight = FontWeights.Normal;
+				ChangingStyle = FontStyles.Italic;
+			} else {
+				ChangingWeight = FontWeights.Normal;
+				ChangingStyle = FontStyles.Normal;
+			}
 		}
 
 		public string? ChangingText
@@ -80,10 +94,40 @@ namespace TategakiTextTest.ViewModels
 			get
 			{ return _ChangingVertical; }
 			set
-			{ 
+			{
 				if(_ChangingVertical == value)
 					return;
 				_ChangingVertical = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		private FontWeight _ChangingWeight;
+
+		public FontWeight ChangingWeight
+		{
+			get
+			{ return _ChangingWeight; }
+			set
+			{
+				if(_ChangingWeight == value)
+					return;
+				_ChangingWeight = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		private FontStyle _ChangingStyle;
+
+		public FontStyle ChangingStyle
+		{
+			get
+			{ return _ChangingStyle; }
+			set
+			{
+				if(_ChangingStyle == value)
+					return;
+				_ChangingStyle = value;
 				RaisePropertyChanged();
 			}
 		}

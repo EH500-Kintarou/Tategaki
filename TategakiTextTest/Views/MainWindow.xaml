@@ -38,9 +38,7 @@
                             <tg:TategakiText Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />
                             <tg:TategakiText Text="フォント名（英語）" FontFamily="MS Gothic" FontSize="24" />
                             <tg:TategakiText Text="縦書きが存在しないフォント名" FontFamily="Yu Gothic UI" FontSize="24" />
-                            <tg:TategakiText Text="太字" FontWeight="Bold" />
-                            <tg:TategakiText Text="斜体" FontStyle="Italic" />
-                            <tg:TategakiText Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
+                            <tg:TategakiText Text="太字・斜体" FontWeight="{Binding ChangingWeight}" FontStyle="{Binding ChangingStyle}" />
                             <tg:TategakiText Text="間隔広め" Spacing="200"/>
                             <tg:TategakiText Text="Half-width vertical disabled"/>
                             <tg:TategakiText Text="Half-width vertical enabled" EnableHalfWidthCharVertical="True"/>
@@ -70,9 +68,7 @@
                             <TextBlock Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />
                             <TextBlock Text="フォント名（英語）" FontFamily="MS Gothic" FontSize="24" />
                             <TextBlock Text="縦書きが存在しないフォント名" FontFamily="Yu Gothic UI" FontSize="24" />
-                            <TextBlock Text="太字" FontWeight="Bold" />
-                            <TextBlock Text="斜体" FontStyle="Italic" />
-                            <TextBlock Text="太字・斜体" FontWeight="Bold" FontStyle="Italic" />
+                            <TextBlock Text="太字・斜体" FontWeight="{Binding ChangingWeight}" FontStyle="{Binding ChangingStyle}" />
                             <TextBlock Text="Alphabet 12345" />
                             <TextBlock Text="改行文字と行の高さが&#xa;ある文章" LineHeight="35" />
                             <TextBlock Text="Padding = 10" Padding="10" Background="Yellow" />
