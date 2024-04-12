@@ -29,6 +29,13 @@ namespace TategakiTextTest.ViewModels
 				"変化する" => "文字列",
 				_ => "変化する",
 			};
+			ChangingTextAlignment = ChangingTextAlignment switch {
+				TextAlignment.Left => TextAlignment.Center,
+				TextAlignment.Center => TextAlignment.Right,
+				TextAlignment.Right => TextAlignment.Justify,
+				_ => TextAlignment.Left,
+			};
+
 			ChangingHorizontal = ChangingHorizontal switch {
 				HorizontalAlignment.Left => HorizontalAlignment.Center,
 				HorizontalAlignment.Center => HorizontalAlignment.Right,
@@ -71,7 +78,19 @@ namespace TategakiTextTest.ViewModels
 		private string? _ChangingText;
 
 
-		private HorizontalAlignment _ChangingHorizontal;
+		public TextAlignment ChangingTextAlignment
+		{
+			get
+			{ return _ChangingTextAlignment; }
+			set
+			{
+				if(_ChangingTextAlignment == value)
+					return;
+				_ChangingTextAlignment = value;
+				RaisePropertyChanged();
+			}
+		}
+		private TextAlignment _ChangingTextAlignment;
 
 		public HorizontalAlignment ChangingHorizontal
 		{
@@ -85,9 +104,7 @@ namespace TategakiTextTest.ViewModels
 				RaisePropertyChanged();
 			}
 		}
-
-
-		private VerticalAlignment _ChangingVertical;
+		private HorizontalAlignment _ChangingHorizontal;
 
 		public VerticalAlignment ChangingVertical
 		{
@@ -101,8 +118,7 @@ namespace TategakiTextTest.ViewModels
 				RaisePropertyChanged();
 			}
 		}
-
-		private FontWeight _ChangingWeight;
+		private VerticalAlignment _ChangingVertical;
 
 		public FontWeight ChangingWeight
 		{
@@ -116,8 +132,7 @@ namespace TategakiTextTest.ViewModels
 				RaisePropertyChanged();
 			}
 		}
-
-		private FontStyle _ChangingStyle;
+		private FontWeight _ChangingWeight;
 
 		public FontStyle ChangingStyle
 		{
@@ -131,7 +146,7 @@ namespace TategakiTextTest.ViewModels
 				RaisePropertyChanged();
 			}
 		}
-
+		private FontStyle _ChangingStyle;
 
 		#region INotifyPropertyChanged
 

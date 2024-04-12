@@ -44,7 +44,7 @@
                             <tg:TategakiText Text="Half-width vertical enabled" EnableHalfWidthCharVertical="True"/>
                             <tg:TategakiText Text="改行文字と行の高さが&#xa;ある文章" LineHeight="35" />
                             <tg:TategakiText Text="パディング（未実装）" Background="Yellow" />
-                            <tg:TategakiText Text="文字配置（未実装）" Background="SkyBlue" />
+                            <tg:TategakiText Text="文字配置" Background="SkyBlue" TextAlignment="{Binding ChangingTextAlignment}" Spacing="200" />
                             <tg:TategakiText Text="上線（未実装）" />
                             <tg:TategakiText Text="取り消し線（未実装）" />
                             <tg:TategakiText Text="基線（未実装）" />
@@ -72,7 +72,7 @@
                             <TextBlock Text="Alphabet 12345" />
                             <TextBlock Text="改行文字と行の高さが&#xa;ある文章" LineHeight="35" />
                             <TextBlock Text="Padding = 10" Padding="10" Background="Yellow" />
-                            <TextBlock Text="文字配置を中央に" TextAlignment="Center" Background="SkyBlue" />
+                            <TextBlock Text="文字配置" Background="SkyBlue" TextAlignment="{Binding ChangingTextAlignment}" />
                             <TextBlock Text="上線" TextDecorations="OverLine" />
                             <TextBlock Text="取り消し線" TextDecorations="Strikethrough" />
                             <TextBlock Text="基線" TextDecorations="Baseline" />
