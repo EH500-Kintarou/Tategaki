@@ -131,7 +131,7 @@ namespace Tategaki
 		}
 		public static readonly DependencyProperty LastHangingCharsProperty = DependencyProperty.Register(
 			nameof(LastHangingChars), typeof(string), typeof(TategakiText),
-			new FrameworkPropertyMetadata("、。，．,.｡､", FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
+			new FrameworkPropertyMetadata("、。，．,.｡､ 　", FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.Inherits));
 
 		#endregion
 
@@ -405,8 +405,8 @@ namespace Tategaki
 			double sectionWidth = 0;		// 区間の幅
 			double lineWidth = 0;           // 行の幅
 
-			int connectionStartPos = 0;
-			double connectionStartWidth = 0;
+			int blockStartPos = 0;
+			double blockStartWidth = 0;
 			bool isPrevLastForbidden = false;
 
 			public void NextChar(char c, int pos, bool? isvertical, double width)
@@ -432,29 +432,29 @@ namespace Tategaki
 					// ○: 普通の文字 / ●: 文末禁止文字 / ◎: 文頭禁止文字
 					// 　　⇩オーバーフロー
 					// ○○○○○
-					// 　　⇧connectionStartPos←こいつで改行
+					// 　　⇧blockStartPos←こいつで改行
 					// 　　　⇩オーバーフロー
 					// ○○●◎○○
-					// 　　⇧connectionStartPos←こいつで改行
+					// 　　⇧blockStartPos←こいつで改行
 					// 　　　　⇩オーバーフロー
 					// ○○●○◎○○
-					// 　　⇧connectionStartPos←こいつで改行
+					// 　　⇧blockStartPos←こいつで改行
 					// 　　　　　⇩オーバーフロー
 					// ○○●○○◎○○
-					// 　　　　⇧connectionStartPos ←こいつで改行
+					// 　　　　⇧blockStartPos ←こいつで改行
 					// 　　　　　⇩オーバーフロー
 					// ○○●○◎◎○○
-					// 　　⇧connectionStartPos ←こいつで改行
+					// 　　⇧blockStartPos ←こいつで改行
 					// 　　　　　⇩オーバーフロー
 					// ○○●○◎○◎○○
-					// 　　　　　⇧connectionStartPos ←こいつで改行
+					// 　　　　　⇧blockStartPos ←こいつで改行
 					//
-					// connectionStartPosをposで上書きする条件は「前回が●でない、かつ、現在が◎でない」
-					// 「●と次」または「◎と手前」はつながった（行をまたぐことができない）範囲という意味を込めてconnection～という名前にしている
+					// blockStartPosをposで上書きする条件は「前回が●でない、かつ、現在が◎でない」
+					// 「●と次」または「◎と手前」は塊（行をまたぐことができない）という意味を込めてblock～という名前にしている
 
 					if(!isPrevLastForbidden && !HeadForbiddenChars.Contains(c)) {
-						connectionStartPos = pos;
-						connectionStartWidth = sectionWidth;
+						blockStartPos = pos;
+						blockStartWidth = sectionWidth;
 					}
 
 					bool needWrap = TextWrapping != TextWrapping.NoWrap && (lineWidth + sectionWidth + width) > AvailableWidth;
@@ -463,17 +463,18 @@ namespace Tategaki
 
 					// 区間の切り替わり目か確認
 					if(currentVertical != null && (currentVertical != isvertical || needWrap)) {
-						if(startPos < connectionStartPos) { // スタート地点以降につながっている部分がある
-							NewSectionCallback?.Invoke(startPos, connectionStartPos, connectionStartWidth);
-							lineWidth += connectionStartWidth;
-							sectionWidth -= connectionStartWidth;
-							startPos = connectionStartPos;
-						} else {	// 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
+						if(startPos < blockStartPos) { // スタート地点以降につながっている部分がある
+							NewSectionCallback?.Invoke(startPos, blockStartPos, blockStartWidth);
+							lineWidth += blockStartWidth;
+							sectionWidth -= blockStartWidth;
+							startPos = blockStartPos;
+						} else if(TextWrapping == TextWrapping.Wrap) {  // 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
 							NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 							lineWidth += sectionWidth;
 							sectionWidth = 0;
 							startPos = pos;
-						}
+						} else  // 区間の開始地点以降に改行できるところが無かったので、改行そのものを諦める
+							needWrap = false;
 
 						if(needWrap) {
 							NewLineCallback?.Invoke(lineWidth);
@@ -486,7 +487,7 @@ namespace Tategaki
 					currentVertical = isvertical;
 					sectionWidth += width;
 
-					isPrevLastForbidden = LastForbiddenChars.Contains(c);
+					isPrevLastForbidden = LastForbiddenChars.Contains(c) || CheckWordChars(c);
 				}
 			}
 
