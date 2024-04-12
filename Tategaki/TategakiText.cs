@@ -18,7 +18,9 @@ namespace Tategaki
 {
 	public class TategakiText : FrameworkElement
 	{
-		List<List<GlyphRunParam>> glyphs = new();
+		StringGlyphIndexCache? textcache;
+		FontGlyphCache? glyphcache;
+		List<(List<(GlyphRunParam glyph, double width)> glyphs, Size size)> lines = new();
 
 		public TategakiText()
 		{
@@ -179,56 +181,80 @@ namespace Tategaki
 		protected override Size MeasureOverride(Size availableSize)
 		{
 			var text = Text;
-			glyphs.Clear();
+			lines.Clear();
 
-			if(string.IsNullOrEmpty(text))
-				glyphs.Add(new());
-			else {
-				var line = new List<GlyphRunParam>();
-
+			//if(string.IsNullOrEmpty(text)) {	// .NET Framework 4.7.2はこれでnullフロー解析が働かない
+			if(text == null || text == "") {
+				textcache = null;
+				lines.Add((new(), new(0, FontSize)));
+			} else {
+				var fontname = FontFamily?.Source;
+				var weight = FontWeight;
+				var style = FontStyle;
 				var hwvert = EnableHalfWidthCharVertical;
+				var spacing = Spacing;
+				var fontsize = FontSize;
+				var language = XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name);
+
+				if(glyphcache == null || !glyphcache.ParamEquals(fontname, weight, style))
+					glyphcache = FontGlyphCache.GetCache(fontname, weight, style);
+
+				if(textcache == null || !textcache.ParamEquals(text, fontname, weight, style, hwvert)) 
+					textcache = new StringGlyphIndexCache(text, glyphcache, hwvert);
+
+				var line = new List<(GlyphRunParam glyph, double width)>();
 				int start = 0;
-				bool? halfwidth = null;
-				for(int i = 0; i < text!.Length; i++) {
-					var c = text[i];
+				bool? currentvert = null;
+				double sectionwidth = 0;
+				double totalwidth = 0;
+				for(int i = 0; i < textcache.Text.Length; i++) {
+					var c = textcache.Text[i];
+					var index = textcache.Indices[i];
+					var isvert = textcache.IsVerticals[i];
+					var advwidth = textcache.AdvanceWidths[i];
 
 					if(c == '\n') {     // 改行
-						if(halfwidth != null && start < i)
-							line.Add(new GlyphRunParam(text.Substring(start, i - start), !halfwidth.Value, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
-						
-						glyphs.Add(line);
-						line = new List<GlyphRunParam>();
-						halfwidth = null;
-					} else if(c < ' ') {    // それ以外の制御文字は無視（スペースより文字コードが小さいのは制御文字）
-						if(halfwidth != null && start < i)
-							line.Add(new GlyphRunParam(text.Substring(start, i - start), !halfwidth.Value, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
-						halfwidth = null;
-					} else if(c < 0x80 && !hwvert) {	// 半角文字
-						if(halfwidth == false)
-							line.Add(new GlyphRunParam(text.Substring(start, i - start), true, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
-						if(halfwidth != true)
-							start = i;
-						
-						halfwidth = true;
+						if(currentvert != null && start < i) {
+							line.Add((new GlyphRunParam(glyphcache, textcache, start, i, fontsize, spacing, language), sectionwidth));
+							totalwidth += sectionwidth;
+							sectionwidth = 0;
+						}
+
+						lines.Add((line, new Size(totalwidth, glyphcache.GlyphTypeface.Height * fontsize)));
+						line = new();
+						totalwidth = 0;
+						currentvert = null;
+					} else if(isvert == null) {    // 縦も横も無い文字（制御文字など）なら無視
+						if(currentvert != null && start < i) {
+							line.Add((new GlyphRunParam(glyphcache, textcache, start, i, fontsize, spacing, language), sectionwidth));
+							totalwidth += sectionwidth;
+							sectionwidth = 0;
+						}
+						currentvert = null;
 					} else {
-						if(halfwidth == true)
-							line.Add(new GlyphRunParam(text.Substring(start, i - start), false, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
-						if(halfwidth != false)
+						if(currentvert != null && currentvert != isvert) {
+							line.Add((new GlyphRunParam(glyphcache, textcache, start, i, fontsize, spacing, language), sectionwidth));
+							totalwidth += sectionwidth;
+							sectionwidth = 0;
+						}
+						if(currentvert == null && isvert != null)
 							start = i;
 
-						halfwidth = false;
+						currentvert = isvert;
+						sectionwidth += advwidth * fontsize;
 					}
 				}
 
-				if(halfwidth != null && start < text.Length)
-					line.Add(new GlyphRunParam(text.Substring(start, text.Length - start), !halfwidth.Value, FontFamily?.Source, FontWeight, FontStyle, FontSize, Spacing, XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name)));
+				if(currentvert != null && start < text.Length) {
+					line.Add((new GlyphRunParam(glyphcache, textcache, start, text.Length, fontsize, spacing, language), sectionwidth));
+					totalwidth += sectionwidth;
+					sectionwidth = 0;
+				}
 
-				glyphs.Add(line);
+				lines.Add((line, new Size(totalwidth, glyphcache.GlyphTypeface.Height * fontsize)));
 			}
 
-			var sizeBeforeRotate = glyphs
-				.Select(p => p.Count == 0 ? new Size(FontSize * 4 / 3, 0) : p.Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.GlyphBox.Width), Math.Max(left.Height, right.GlyphBox.Height))))
-				.Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.Width), left.Height + right.Height));
+			var sizeBeforeRotate = lines.Select(p => p.size).Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.Width), left.Height + right.Height));
 
 			return new Size(sizeBeforeRotate.Height, sizeBeforeRotate.Width);
 		}
@@ -260,14 +286,14 @@ namespace Tategaki
 
 			var foreground = Foreground ?? Brushes.Black;
 			var y = 0.0;
-			foreach(var line in glyphs) {
-				var height = line.Count > 0 ? line.Max(p => p.GlyphBox.Height) : 0.0;
+			foreach(var line in lines) {
+				var height = line.size.Height;
 				var x = 0.0;
 
-				foreach(var section in line) {
-					var box = section.GlyphBox;
-					ctx.DrawGlyphRun(foreground, section.Create(new Point(x, y + height - box.Height - box.Top)));
-					x += box.Width;
+				foreach(var section in line.glyphs) {
+					ctx.DrawGlyphRun(foreground, section.glyph.CreateWithOffsetY0(new Point(x, y)));
+
+					x += section.width;
 				}
 
 				y += height;
