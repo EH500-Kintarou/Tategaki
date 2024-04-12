@@ -435,7 +435,7 @@ namespace Tategaki
 							TextDecorationLocation.Baseline => baseline * fontheight,
 							TextDecorationLocation.OverLine => 0,
 							TextDecorationLocation.Strikethrough => (baseline - strikethrough) * fontheight,
-							_ => (baseline - underline) * fontheight - 1,
+							_ => (baseline - underline) * fontheight - 2,
 						};
 
 						ctx.DrawLine(deco.Pen ?? defaultPen, new Point(xstart, y + yline), new Point(x, y + yline));
