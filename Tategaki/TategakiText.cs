@@ -15,7 +15,6 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Tategaki.Logic;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Tategaki
 {
@@ -204,9 +203,19 @@ namespace Tategaki
 
 		#region Inline
 
+		/// <summary>
+		/// 取り消し線などの装飾
+		/// </summary>
+		public TextDecorationCollection? TextDecorations
+		{
+			get { return (TextDecorationCollection?)GetValue(TextDecorationsProperty); }
+			set { SetValue(TextDecorationsProperty, value); }
+		}
+		public static readonly DependencyProperty TextDecorationsProperty =
+			Inline.TextDecorationsProperty.AddOwner(typeof(TategakiText), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
 		// BaselineAlignmentは未実装
 		// FlowDirectionは未実装
-		// TextDecorationsは未実装
 
 		#endregion
 
@@ -400,16 +409,36 @@ namespace Tategaki
 			foreach(var line in lines) {
 				var height = line.size.Height;
 
-				var x = TextAlignment switch {
+				var xstart = TextAlignment switch {
 					TextAlignment.Right => RenderSize.Height - line.size.Width - Padding.Bottom,
 					TextAlignment.Center => (RenderSize.Height - line.size.Width + Padding.Top - Padding.Bottom) / 2,
 					_ => Padding.Top,
 				};
+				var x = xstart;
 
 				foreach(var section in line.glyphs) {
 					ctx.DrawGlyphRun(foreground, section.glyph.CreateWithOffsetY0(new Point(x, y)));
-
 					x += section.width;
+				}
+
+				if(TextDecorations != null && TextDecorations.Count > 0) {
+					var defaultPen = new Pen(Brushes.Black, 1);
+
+					var fontheight = (glyphcache?.GlyphTypeface?.Height ?? 1.0) * FontSize;
+					var baseline = glyphcache?.GlyphTypeface?.Baseline ?? 1.0;
+					var strikethrough = glyphcache?.GlyphTypeface?.StrikethroughPosition ?? 0.5;
+					var underline = glyphcache?.GlyphTypeface?.UnderlinePosition ?? 0.0;
+
+					foreach(var deco in TextDecorations) {
+						double yline = deco.Location switch {
+							TextDecorationLocation.Baseline => baseline * fontheight,
+							TextDecorationLocation.OverLine => 0,
+							TextDecorationLocation.Strikethrough => (baseline - strikethrough) * fontheight,
+							_ => (baseline - underline) * fontheight,
+						};
+
+						ctx.DrawLine(deco.Pen ?? defaultPen, new Point(xstart, y + yline), new Point(x, y + yline));
+					}
 				}
 
 				y += height;
