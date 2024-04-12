@@ -45,11 +45,34 @@
                             <tg:TategakiText Text="改行文字と行の高さが&#xa;ある文章" LineHeight="35" />
                             <tg:TategakiText Text="パディング＝10" Background="Yellow" Padding="10" />
                             <tg:TategakiText Text="文字配置" Background="SkyBlue" TextAlignment="{Binding ChangingTextAlignment}" Spacing="200" />
-                            <tg:TategakiText Text="上線（未実装）" />
-                            <tg:TategakiText Text="取り消し線（未実装）" />
-                            <tg:TategakiText Text="基線（未実装）" />
-                            <tg:TategakiText Text="下線（未実装）" />
-                            <tg:TategakiText Text="複数効果（未実装）" />
+                            <tg:TategakiText Text="上線" TextDecorations="OverLine" />
+                            <tg:TategakiText Text="取り消し線" TextDecorations="Strikethrough" />
+                            <tg:TategakiText Text="基線" TextDecorations="Baseline" />
+                            <tg:TategakiText Text="下線" TextDecorations="Underline" />
+                            <!--
+                            <tg:TategakiText Text="複数効果" >
+                                <tg:TategakiText.TextDecorations>
+                                    <TextDecoration Location="Strikethrough" >
+                                        <TextDecoration.Pen>
+                                            <Pen Thickness="3">
+                                                <Pen.Brush>
+                                                    <LinearGradientBrush StartPoint="0,0.5"  EndPoint="1,0.5">
+                                                        <LinearGradientBrush.GradientStops>
+                                                            <GradientStop Color="Yellow" Offset="0" />
+                                                            <GradientStop Color="Red" Offset="1" />
+                                                        </LinearGradientBrush.GradientStops>
+                                                    </LinearGradientBrush>
+                                                </Pen.Brush>
+                                                <Pen.DashStyle>
+                                                    <DashStyle Dashes="2" />
+                                                </Pen.DashStyle>
+                                            </Pen>
+                                        </TextDecoration.Pen>
+                                    </TextDecoration>
+                                    <TextDecoration Location="Underline" />
+                                </tg:TategakiText.TextDecorations>
+                            </tg:TategakiText>
+                            -->
                             <tg:TategakiText Text="looooooooooooooooooooooong text wrapping" TextWrapping="Wrap"/>
                             <tg:TategakiText Text="looooooooooooooooooooooong text wrapping with overflow" TextWrapping="WrapWithOverflow"/>
                         </StackPanel>
