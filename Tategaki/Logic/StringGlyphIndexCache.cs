@@ -29,22 +29,24 @@ namespace Tategaki.Logic
 					widths[i] = 0;
 					isvert[i] = null;
 				} else {
-					ushort index;
 					try {
-						index = fontglyph.GlyphTypeface.CharacterToGlyphMap[c];
+						if(!fontglyph.GlyphTypeface.CharacterToGlyphMap.TryGetValue(c, out var index))
+							index = fontglyph.GlyphTypeface.CharacterToGlyphMap['?'];
+
+						if(c >= 0x80 || halfWidthCharVertical) {
+							indices[i] = fontglyph.VerticalGlyphConverter.Convert(index);
+							widths[i] = fontglyph.GlyphTypeface.AdvanceHeights[index];
+							isvert[i] = true;
+						} else {
+							indices[i] = index;
+							widths[i] = fontglyph.GlyphTypeface.AdvanceWidths[index];
+							isvert[i] = false;
+						}
 					}
 					catch(KeyNotFoundException) {
-						index = fontglyph.GlyphTypeface.CharacterToGlyphMap['c'];
-					}
-
-					if(c >= 0x80 || halfWidthCharVertical) {
-						indices[i] = fontglyph.VerticalGlyphConverter.Convert(index);
-						widths[i] = fontglyph.GlyphTypeface.AdvanceHeights[index];
-						isvert[i] = true;
-					} else {
-						indices[i] = index;
-						widths[i] = fontglyph.GlyphTypeface.AdvanceWidths[index];
-						isvert[i] = false;
+						indices[i] = 0;
+						widths[i] = 0;
+						isvert[i] = null;
 					}
 				}
 			}
