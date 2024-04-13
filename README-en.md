@@ -55,7 +55,7 @@ TypeLoeader URL has been already expired so that it is contained in this reposit
 - Following functions are added to TategakiText.
   - TextWrapping property is implemented.
   - Forbidden charactor rules (Last-forbidden, Head-forbidden) and last hanging charactor rule are implemented.
-  - TextDecotarions property is implemented.
+  - TextDecorations property is implemented.
   - LineHeight property is implemented.
   - TextAlignment property is implemented.
   - Padding is implemented.
