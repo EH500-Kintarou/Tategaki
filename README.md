@@ -53,7 +53,7 @@ TypeLoeaderはすでにリンク切れを起こしているため、当リポジ
 - TategakiTextに以下の機能を実装
   - TextWrappingプロパティを実装（複数行対応）
   - 禁則文字（文末禁止文字、文頭禁止文字）、文末ぶらさげ文字を実装
-  - TextDecotarionsプロパティを実装（下線、取消線などを付けられるようになった）
+  - TextDecorationsプロパティを実装（下線、取消線などを付けられるようになった）
   - LineHeightプロパティを実装（行の高さを設定できるようになった）
   - TextAlignmentプロパティを実装
   - Paddingプロパティを実装
