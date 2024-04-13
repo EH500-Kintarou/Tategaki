@@ -418,19 +418,19 @@ namespace Tategaki
 			// 文字を描画
 			var foreground = Foreground ?? Brushes.Black;
 			var y = Padding.Right;
-			foreach(var line in lines) {
-				var height = line.size.Height;
+			foreach(var (glyphs, size) in lines) {
+				var height = size.Height;
 
 				var xstart = TextAlignment switch {
-					TextAlignment.Right => RenderSize.Height - line.size.Width - Padding.Bottom,
-					TextAlignment.Center => (RenderSize.Height - line.size.Width + Padding.Top - Padding.Bottom) / 2,
+					TextAlignment.Right => RenderSize.Height - size.Width - Padding.Bottom,
+					TextAlignment.Center => (RenderSize.Height - size.Width + Padding.Top - Padding.Bottom) / 2,
 					_ => Padding.Top,
 				};
 				var x = xstart;
 
-				foreach(var section in line.glyphs) {
-					ctx.DrawGlyphRun(foreground, section.glyph.CreateWithOffsetY0(new Point(x, y)));
-					x += section.width;
+				foreach(var (glyph, width) in glyphs) {
+					ctx.DrawGlyphRun(foreground, glyph.CreateWithOffsetY0(new Point(x, y)));
+					x += width;
 
 					// 1行ごとに装飾も実施
 					foreach(var deco in decorations)
