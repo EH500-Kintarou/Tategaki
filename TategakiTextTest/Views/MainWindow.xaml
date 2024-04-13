@@ -40,8 +40,8 @@
                             <tg:TategakiText Text="縦書きが存在しないフォント名" FontFamily="Yu Gothic UI" FontSize="24" />
                             <tg:TategakiText Text="太字・斜体" FontWeight="{Binding ChangingWeight}" FontStyle="{Binding ChangingStyle}" />
                             <tg:TategakiText Text="間隔広め" Spacing="200"/>
-                            <tg:TategakiText Text="Half-width vertical disabled"/>
-                            <tg:TategakiText Text="Half-width vertical enabled" EnableHalfWidthCharVertical="True"/>
+                            <tg:TategakiText Text="Half-width vertical disabled" FontFamily="MS PMincho"/>
+                            <tg:TategakiText Text="Half-width vertical enabled" EnableHalfWidthCharVertical="True" FontFamily="MS PMincho" />
                             <tg:TategakiText Text="改行文字と行の高さが&#xa;ある文章" LineHeight="35" />
                             <tg:TategakiText Text="パディング＝10" Background="Yellow" Padding="10" />
                             <tg:TategakiText Text="文字配置" Background="SkyBlue" TextAlignment="{Binding ChangingTextAlignment}" Spacing="200" />
