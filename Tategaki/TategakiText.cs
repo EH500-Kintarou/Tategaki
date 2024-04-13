@@ -336,7 +336,11 @@ namespace Tategaki
 			}
 
 			var sizeBeforeRotate = lines.Select(p => p.size).Aggregate(new Size(), (left, right) => new Size(Math.Max(left.Width, right.Width), left.Height + right.Height));
-			return new Size(sizeBeforeRotate.Height + Padding.Left + Padding.Right, (TextAlignment == TextAlignment.Justify) ? availableSize.Height : sizeBeforeRotate.Width + Padding.Top + Padding.Bottom);
+			var underlinemargin = ((glyphcache?.GlyphTypeface?.Baseline ?? 1.0) - (glyphcache?.GlyphTypeface?.UnderlinePosition ?? 0.0) - 1) * FontSize + 1;
+			var width = sizeBeforeRotate.Height + Padding.Left + Padding.Right + underlinemargin;
+			var height = (TextAlignment == TextAlignment.Justify) ? availableSize.Height : sizeBeforeRotate.Width + Padding.Top + Padding.Bottom;
+
+			return new Size(width, height);
 		}
 
 
@@ -438,12 +442,13 @@ namespace Tategaki
 
 		private (double y, Pen pen)[] GetDecorations()
 		{
-			var fontheight = (glyphcache?.GlyphTypeface?.Height ?? 1.0) * FontSize;
+			var fontsize = FontSize;
+			var fontheight = (glyphcache?.GlyphTypeface?.Height ?? 1.0) * fontsize;
 			var baseline = glyphcache?.GlyphTypeface?.Baseline ?? 1.0;
 			var strikethrough = glyphcache?.GlyphTypeface?.StrikethroughPosition ?? 0.5;
 			var underline = glyphcache?.GlyphTypeface?.UnderlinePosition ?? 0.0;
-			
-			Pen defaultPen = new Pen(Foreground, 1);
+			var stthickness = glyphcache?.GlyphTypeface.StrikethroughPosition ?? 1.0;
+			var ulthickness = glyphcache?.GlyphTypeface.UnderlineThickness ?? 1.0;
 
 			return (TextDecorations ?? Enumerable.Empty<TextDecoration>())
 				.Select(p => {
@@ -451,16 +456,22 @@ namespace Tategaki
 						TextDecorationLocation.Baseline => baseline * fontheight,
 						TextDecorationLocation.OverLine => 0,
 						TextDecorationLocation.Strikethrough => (baseline - strikethrough) * fontheight,
-						_ => (baseline - underline) * fontheight - 2,
+						_ => (baseline - underline) * fontheight,	// default: Underline
+					};
+					double thickness = p.Location switch {
+						TextDecorationLocation.Baseline => ulthickness * fontsize,
+						TextDecorationLocation.OverLine => ulthickness * fontsize,
+						TextDecorationLocation.Strikethrough => stthickness * fontsize,
+						_ => ulthickness * fontsize,				// default: Underline
 					};
 
-					var pen = p.Pen ?? defaultPen;
+					var pen = p.Pen ?? new Pen(Foreground, thickness);
 					if(p.PenThicknessUnit == TextDecorationUnit.FontRenderingEmSize) {
 						pen = pen.Clone();
-						pen.Thickness *= FontSize;
+						pen.Thickness *= fontsize;
 					}
 
-					y += p.PenOffset * ((p.PenOffsetUnit == TextDecorationUnit.FontRenderingEmSize) ? FontSize : 1);
+					y += p.PenOffset * ((p.PenOffsetUnit == TextDecorationUnit.FontRenderingEmSize) ? fontsize : 1);
 
 					return (y, pen);
 				}).ToArray();

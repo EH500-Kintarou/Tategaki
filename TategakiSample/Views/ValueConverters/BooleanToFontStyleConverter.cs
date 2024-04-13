@@ -13,12 +13,18 @@ namespace TategakiSample.Views.ValueConverters
 	{
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			return (bool)value ? FontStyles.Italic : FontStyles.Normal;
+			if(value is  bool val)
+				return val ? FontStyles.Italic : FontStyles.Normal;
+			else
+				return DependencyProperty.UnsetValue;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			return (FontStyle)value != FontStyles.Normal;
+			if(value is FontStyle val)
+				return !val.Equals(FontStyles.Normal);
+			else
+				return false;
 		}
 	}
 }
