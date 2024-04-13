@@ -59,7 +59,7 @@
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
             <xctk:ColorPicker Grid.Column="0" Name="color_font" Margin="3" />
-            <ComboBox Grid.Column="1" Margin="3" Name="combobox_fontface" ItemsSource="{Binding Source={x:Static tg:TategakiText.AvailableFonts}}" SelectedValue="ＭＳ 明朝" />
+            <ComboBox Grid.Column="1" Margin="3" Name="combobox_fontface" ItemsSource="{Binding Source={x:Static tg:TategakiText.AvailableFonts}}" SelectedValue="游明朝" />
             <CheckBox Grid.Column="2" Content="Bold" Name="checkbox_isbold" VerticalAlignment="Center" Margin="3" />
             <CheckBox Grid.Column="3" Content="Italic" Name="checkbox_isitalic" VerticalAlignment="Center" Margin="3" />
             <CheckBox Grid.Column="4" Content="Underline" Name="checkbox_isunderline" VerticalAlignment="Center" Margin="3" />
@@ -77,9 +77,9 @@
                                  FontWeight="{Binding ElementName=checkbox_isbold, Path=IsChecked, Converter={StaticResource BooleanToFontWeightConv}}"
                                  TextDecorations="{Binding ElementName=checkbox_isunderline, Path=IsChecked, Converter={StaticResource BooleanToUnderlineConv}}"
                                  Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
-                <tg:TategakiText Text="芥川龍之介" TextAlignment="Right" FontSize="20" FontFamily="MS Gothic" LineHeight="36"
+                <tg:TategakiText Text="芥川龍之介" TextAlignment="Right" FontSize="20" FontFamily="Yu Mincho" LineHeight="36"
 								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
-                <tg:TategakiText Text="羅生門" TextAlignment="Center" FontSize="36" FontWeight="Bold" FontFamily="MS Gothic"
+                <tg:TategakiText Text="羅生門" TextAlignment="Center" FontSize="36" FontWeight="Bold" FontFamily="Yu Gothic"
 								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}"/>
             </StackPanel>
         </ScrollViewer>
