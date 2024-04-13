@@ -1,11 +1,11 @@
-[English Readme is here](README-en.md)
+[English Readme is here](https://github.com/EH500-Kintarou/Tategaki/blob/master/README-en.md)
 
 # WPF用縦書きテキストブロック Tategaki
 
 WPFアプリケーションにおいて縦書きを使用するためのコントロールライブラリです。  
 WPFはネイティブで縦書きをサポートしておらず簡単に日本語の縦書きのようなものを作ることができませんが、このコントロールを利用すれば、WPF標準のTextBlockコントロールを使うような感覚で縦書きを実現することができます。
 
-![](https://img.shields.io/badge/Nuget-3.0.1-blue?logo=nuget&style=plastic)
+![](https://img.shields.io/badge/Nuget-3.1.0-blue?logo=nuget&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.7.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-6-orange?logo=.net&style=plastic)
 
@@ -18,7 +18,7 @@ WPFはネイティブで縦書きをサポートしておらず簡単に日本�
 
 ## 使用方法
 ### 1. Nugetからインストール
-![](https://img.shields.io/badge/Nuget-3.0.1-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
+![](https://img.shields.io/badge/Nuget-3.1.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
 
 ### 2. XAML名前空間を設定
 XAMLで名前空間 "http://schemas.eh500-kintarou.com/Tategaki" を登録し、"TategakiText"要素および"TategakiMultiline"要素を追加することで縦書きのテキストを表示させることができるようになります。
@@ -39,16 +39,28 @@ XAMLで名前空間 "http://schemas.eh500-kintarou.com/Tategaki" を登録し、
 このリポジトリにはサンプルコードが含まれています。 [サンプルコード](https://github.com/EH500-Kintarou/Tategaki/tree/master/TategakiSample) を見ることでより理解が深まります。
 
 ## プロジェクトURL
-![](https://img.shields.io/badge/Github-3.0.1-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
-![](https://img.shields.io/badge/Nuget-3.0.1-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
-![](https://img.shields.io/badge/Blogger-3.0.1-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
+![](https://img.shields.io/badge/Github-3.1.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
+![](https://img.shields.io/badge/Nuget-3.1.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
+![](https://img.shields.io/badge/Blogger-3.1.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
 
 ## 利用しているライブラリ
 - TypeLoader: https://typeloader.codeplex.com/  
-TypeLoeaderはすでにリンク切れを起こしているため、当リポジトリ内に取り込んだうえで.NET6でビルドして利用しております。
+TypeLoeaderはすでにリンク切れを起こしているため、当リポジトリ内に取り込んだうえで利用しております。
 - Extended WPF Toolkit (サンプルコード内のみ): https://github.com/xceedsoftware/wpftoolkit
 
 ## バージョン履歴
+### ver.3.1.0 (2024/04/13)
+- TategakiTextに以下の機能を実装
+  - TextWrappingプロパティを実装（複数行対応）
+  - 禁則文字（文末禁止文字、文頭禁止文字）、文末ぶらさげ文字を実装
+  - TextDecotarionsプロパティを実装（下線、取消線などを付けられるようになった）
+  - LineHeightプロパティを実装（行の高さを設定できるようになった）
+  - TextAlignmentプロパティを実装
+  - Paddingプロパティを実装
+  - EnableHalfWidthCharVerticalプロパティを追加（半角文字を縦書きにするか横書きにするかのオプション）
+- 使えるフォントの種類が増えた（今までは全ユーザー用にインストールされたフォントしか使えなかった）
+- TategakiMultilineにObsolete属性を追加（TategakiTextで複数行表示ができるようになり、使う必要がなくなったため）
+
 ### ver.3.0.1 (2024/04/06)
 - ターゲットに.NET Framework 4.7.2も追加。
 
