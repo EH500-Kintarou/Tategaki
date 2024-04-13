@@ -38,8 +38,8 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Line Height" VerticalAlignment="Center" Margin="3" />
-            <Slider Grid.Row="0" Grid.Column="1" Name="slider_height" Minimum="1" Maximum="100" Value="24"/>
-            <xctk:DoubleUpDown Grid.Row="0" Grid.Column="2" Value="{Binding ElementName=slider_height, Path=Value}" Minimum="1" Maximum="100" />
+            <Slider Grid.Row="0" Grid.Column="1" Name="slider_height" Minimum="1" Maximum="500" Value="24"/>
+            <xctk:DoubleUpDown Grid.Row="0" Grid.Column="2" Value="{Binding ElementName=slider_height, Path=Value}" Minimum="1" Maximum="500" />
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Font Size" VerticalAlignment="Center" Margin="3" />
             <Slider Grid.Row="1" Grid.Column="1" Name="slider_fontsize" Minimum="5" Maximum="96" Value="18"/>
