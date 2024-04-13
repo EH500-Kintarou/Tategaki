@@ -41,7 +41,7 @@ namespace Tategaki
 			get
 			{
 				if(_AvailableFonts == null)
-					_AvailableFonts = FontUriTable.CultureVerticalFonts[CultureInfo.CurrentUICulture].Select(p => p.Key).ToArray();
+					_AvailableFonts = VerticalFontTable.FamilyNames.ToArray();
 				return _AvailableFonts;
 			}
 		}

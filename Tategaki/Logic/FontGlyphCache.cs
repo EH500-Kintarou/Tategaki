@@ -12,18 +12,19 @@ namespace Tategaki.Logic
 {
 	internal class FontGlyphCache
 	{
-		readonly TypefaceInfo info;
+		readonly TypefaceInfo typeinfo;
+		readonly VerticalFontInfo fontinfo;
 
 		public FontGlyphCache(string? fontname, FontWeight weight, FontStyle style)
 		{
-			var uri = FontUriTable.FromName(fontname);
-			fontname ??= FontUriTable.AllVerticalFonts.Where(p => p.Value == uri).First().Key;
-			var gtf = new GlyphTypeface(uri, ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation));
+			fontinfo = VerticalFontTable.FromName(fontname);
+			var stylesim = ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation);
+			var gtf = new GlyphTypeface(fontinfo.FontUri, stylesim);
 
-			int num = uri.Fragment == "" ? 0 : int.Parse(uri.Fragment.Replace("#", ""));
-			info = new TypefaceInfo(gtf.GetFontStream(), num);
+			int num = fontinfo.FontUri.Fragment == "" ? 0 : int.Parse(fontinfo.FontUri.Fragment.Replace("#", ""));
+			typeinfo = new TypefaceInfo(gtf.GetFontStream(), num);
 
-			FontName = fontname;
+			FontName = fontinfo.OutstandingFamilyName;
 			FontWeight = weight;
 			FontStyle = style;
 			GlyphTypeface = gtf;
@@ -37,23 +38,18 @@ namespace Tategaki.Logic
 
 		public GlyphTypeface GlyphTypeface { get; }
 
-		public SingleGlyphConverter AdvancedVerticalGlyphConverter
-		{
-			get
-			{
-				if(_AdvancedVerticalGlyphConverter == null)
-					_AdvancedVerticalGlyphConverter = info.GetAdvancedVerticalGlyphConverter();
-				return _AdvancedVerticalGlyphConverter;
-			}
-		}
-		SingleGlyphConverter? _AdvancedVerticalGlyphConverter = null;
-
 		public SingleGlyphConverter VerticalGlyphConverter
 		{
 			get
 			{
-				if(_VerticalGlyphConverter == null)
-					_VerticalGlyphConverter = info.GetVerticalGlyphConverter();
+				if(_VerticalGlyphConverter == null) {
+					if(fontinfo.ConverterType.HasFlag(VerticalConverterType.Advanced))
+						_VerticalGlyphConverter = typeinfo.GetAdvancedVerticalGlyphConverter();
+					else if(fontinfo.ConverterType.HasFlag(VerticalConverterType.Normal))
+						_VerticalGlyphConverter = typeinfo.GetVerticalGlyphConverter();
+					else
+						throw new InvalidOperationException("No font converter found");
+				}
 				return _VerticalGlyphConverter;
 			}
 		}
@@ -61,12 +57,9 @@ namespace Tategaki.Logic
 
 		public bool ParamEquals(string? fontname, FontWeight weight, FontStyle style)
 		{
-			if(fontname == null) {
-				var uri = FontUriTable.FromName(fontname);
-				fontname ??= FontUriTable.AllVerticalFonts.Where(p => p.Value == uri).First().Key;
-			}
+			var uri = VerticalFontTable.FromName(fontname);
 
-			return FontName == fontname && FontWeight == weight && FontStyle == style;
+			return FontName == uri.OutstandingFamilyName && FontWeight == weight && FontStyle == style;
 		}
 
 		#region GlobalCache
