@@ -11,14 +11,23 @@
     <Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
     <Company>EH500_Kintarou</Company>
     <Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>3.0.1</VersionPrefix>
+	<VersionPrefix>3.1.0</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/EH500-Kintarou/Tategaki</RepositoryUrl>
-	<PackageTags>WPF;Tategaki;縦書き</PackageTags>
+	<PackageTags>WPF;Tategaki;縦書き:Vertical writing</PackageTags>
 	<PackageProjectUrl>https://github.com/EH500-Kintarou/Tategaki</PackageProjectUrl>
-	<PackageReleaseNotes>.NET Framework 4.7.2に対応</PackageReleaseNotes>
+	<PackageReleaseNotes>- TategakiTextに以下の機能を実装
+  - TextWrappingプロパティを実装（複数行対応）
+  - 禁則文字（文末禁止文字、文頭禁止文字）、文末ぶらさげ文字を実装
+  - TextDecotarionsプロパティを実装（下線、取消線などを付けられるようになった）
+  - LineHeightプロパティを実装（行の高さを設定できるようになった）
+  - TextAlignmentプロパティを実装
+  - Paddingプロパティを実装
+  - EnableHalfWidthCharVerticalプロパティを追加（半角文字を縦書きにするか横書きにするかのオプション）
+- 使えるフォントの種類が増えた（今までは全ユーザー用にインストールされたフォントしか使えなかった）
+- TategakiMultilineにObsolete属性を追加（TategakiTextで複数行表示ができるようになり、使う必要がなくなったため）</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
