@@ -65,7 +65,7 @@ namespace Tategaki.Logic.Font
 		private NecessaryTables ReadTypeface(ReadOnlySpan<byte> data, uint offsetTablePos)
 		{
 			var tables = ReadOffsetTable(data.Slice((int)offsetTablePos));
-			CalcAllTableChecksum(data, tables);
+			//CalcAllTableChecksum(data, tables);	// Checksumの検証をすると起動に時間がかかる
 
 			var maxp = ReadMaxp(data, tables);
 			var head = ReadHead(data, tables);

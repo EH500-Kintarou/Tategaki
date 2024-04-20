@@ -18,7 +18,7 @@ namespace Tategaki.Logic
 
 		public FontGlyphCache(FontNameInfo fontname, FontWeight weight, FontStyle style, FontStretch stretch)
 		{
-			var tf = new Typeface(new FontFamily(fontname.OutstandingFamilyName), style, weight, stretch);
+			var tf = new Typeface(new FontFamily(fontname.InvaliantFamilyName), style, weight, stretch);
 			if(!tf.TryGetGlyphTypeface(out var gtf))
 				throw new NotSupportedException("Cannot load GlyphTypeface");
 
@@ -30,11 +30,10 @@ namespace Tategaki.Logic
 			FontStretch = stretch;
 			GlyphTypeface = gtf;
 
-			VerticalSubstitution = new ReadOnlyDictionary<ushort, ushort>(
-				(otf.Gsub?.GetSubstitution<SingleSubstitution>("vert") ?? Enumerable.Empty<SingleSubstitution>())
-					.SelectMany(p => p.Table)
-					.ToDictionary(p => p.Key, p => p.Value)
-			);
+			var subst = new Dictionary<ushort, ushort>();
+			foreach(var table in (otf.Gsub?.GetSubstitution<SingleSubstitution>("vert") ?? Enumerable.Empty<SingleSubstitution>()).SelectMany(p => p.Table))
+				subst[table.Key] = table.Value;
+			VerticalSubstitution = new ReadOnlyDictionary<ushort, ushort>(subst);
 		}
 
 		public FontNameInfo FontName { get; }

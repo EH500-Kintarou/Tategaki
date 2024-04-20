@@ -36,24 +36,28 @@ namespace Tategaki.Logic
 
 			var curculname = FamilierFamilyNames.FirstOrDefault(p => p.culture.Equals(CultureInfo.CurrentCulture)).familyname;
 			var invculname = FamilierFamilyNames.FirstOrDefault(p => p.culture.Equals(CultureInfo.InvariantCulture)).familyname;
+			var enusculname = FamilierFamilyNames.FirstOrDefault(p => p.culture.Equals(CultureInfo.GetCultureInfo("en-us"))).familyname;
+			var firstname = FamilierFamilyNames.FirstOrDefault().familyname;
 
-			if(!string.IsNullOrEmpty(curculname))
-				OutstandingFamilyName = curculname;
-			else if(!string.IsNullOrEmpty(invculname))
-				OutstandingFamilyName = invculname;
-			else if(FamilierFamilyNames.Count > 0)
-				OutstandingFamilyName = FamilierFamilyNames[0].familyname;
-			else
-				throw new ArgumentException("No familier FamilyName was found");
+			var outstanding = new[] { curculname, invculname, enusculname, firstname };
+			var invaliant = new[] { invculname, enusculname, curculname, firstname };
+
+			OutstandingFamilyName = outstanding.Where(p => !string.IsNullOrEmpty(p)).FirstOrDefault() ?? throw new ArgumentException("No outstanding FamilyName is found");
+			InvaliantFamilyName = invaliant.Where(p => !string.IsNullOrEmpty(p)).FirstOrDefault() ?? throw new ArgumentException("No invaliant FamilyName is found");
 
 			FamilyNames = new ReadOnlyDictionary<CultureInfo, string>(new Dictionary<CultureInfo, string>(gtf.FamilyNames));
 			FaceNames = new ReadOnlyDictionary<CultureInfo, string>(new Dictionary<CultureInfo, string>(gtf.FaceNames));
 		}
 
 		/// <summary>
-		/// 代表的なフォント名（現在カルチャーでの名前→Invaliant Cultureでの名前→それ以外の何か　の優先順位で何か名前が入る）
+		/// 代表的なフォント名（現在カルチャーでの名前→Invaliant Cultureでの名前→英語での名前→それ以外の何か　の優先順位で何か名前が入る）
 		/// </summary>
 		public string OutstandingFamilyName { get; }
+
+		/// <summary>
+		/// 普遍的なフォント名（Invaliant Cultureでの名前→英語での名前→現在カルチャーでの名前→それ以外の何か　の優先順位で何か名前が入る）
+		/// </summary>
+		public string InvaliantFamilyName { get; }
 
 		/// <summary>
 		/// FontFamily名から検索を掛けるとヒットする名前
