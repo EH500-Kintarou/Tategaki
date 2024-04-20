@@ -34,7 +34,7 @@ namespace Tategaki.Logic
 							index = fontglyph.GlyphTypeface.CharacterToGlyphMap['?'];
 
 						if(c >= 0x80 || halfWidthCharVertical) {
-							indices[i] = fontglyph.VerticalGlyphConverter.Convert(index);
+							indices[i] = fontglyph.VerticalSubstitution.TryGetValue(index, out var subst) ? subst : index;
 							widths[i] = fontglyph.GlyphTypeface.AdvanceHeights[index];
 							isvert[i] = true;
 						} else {
@@ -69,9 +69,9 @@ namespace Tategaki.Logic
 		public bool HalfWidthCharVertical { get; }
 
 
-		public bool ParamEquals(string text, string? fontname, FontWeight fontweight, FontStyle style, bool halfWidthCharVertical)
+		public bool ParamEquals(string text, FontNameInfo fontname, FontWeight fontweight, FontStyle style, FontStretch stretch, bool halfWidthCharVertical)
 		{
-			return Text == text && FontGlyph.ParamEquals(fontname, fontweight, style) && HalfWidthCharVertical == halfWidthCharVertical;
+			return Text == text && FontGlyph.ParamEquals(fontname, fontweight, style, stretch) && HalfWidthCharVertical == halfWidthCharVertical;
 		}
 	}
 }

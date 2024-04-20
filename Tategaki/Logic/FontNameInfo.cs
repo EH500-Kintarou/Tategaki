@@ -9,13 +9,13 @@ using System.Windows.Media;
 
 namespace Tategaki.Logic
 {
-	internal class VerticalFontInfo
+	/// <summary>
+	/// フォント名情報（カルチャー等の対応）を格納するクラス
+	/// </summary>
+	internal class FontNameInfo : IEquatable<FontNameInfo>
 	{
-		public VerticalFontInfo(GlyphTypeface gtf, string sourceName, VerticalConverterType convType)
+		public FontNameInfo(GlyphTypeface gtf, string sourceName)
 		{
-			if(!convType.HasFlag(VerticalConverterType.Normal) && !convType.HasFlag(VerticalConverterType.Advanced))
-				throw new ArgumentOutOfRangeException($"{nameof(convType)} must contain Normal or Advanced.", nameof(convType));
-
 			if(gtf.FamilyNames.Select(p => p.Value).Contains(sourceName))    // FamilyNameがそのまま含まれていたら、gtf.FamilyNamesをそのまま採用
 				FamilierFamilyNames = gtf.FamilyNames.Select(p => (p.Key, p.Value)).ToList().AsReadOnly();
 			else {
@@ -46,16 +46,9 @@ namespace Tategaki.Logic
 			else
 				throw new ArgumentException("No familier FamilyName was found");
 
-			FontUri = gtf.FontUri;
 			FamilyNames = new ReadOnlyDictionary<CultureInfo, string>(new Dictionary<CultureInfo, string>(gtf.FamilyNames));
 			FaceNames = new ReadOnlyDictionary<CultureInfo, string>(new Dictionary<CultureInfo, string>(gtf.FaceNames));
-			ConverterType = convType;
 		}
-
-		/// <summary>
-		/// フォントのURI
-		/// </summary>
-		public Uri FontUri { get; }
 
 		/// <summary>
 		/// 代表的なフォント名（現在カルチャーでの名前→Invaliant Cultureでの名前→それ以外の何か　の優先順位で何か名前が入る）
@@ -77,17 +70,12 @@ namespace Tategaki.Logic
 		/// </summary>
 		public IReadOnlyDictionary<CultureInfo, string> FaceNames { get; }
 
-		/// <summary>
-		/// このフォントが保有している縦書きコンバーターの種類
-		/// </summary>
-		public VerticalConverterType ConverterType { get; }
-	}
+		public bool Equals(FontNameInfo? other)
+		{
+			if(other == null)
+				return false;
 
-	[Flags]
-	internal enum VerticalConverterType : uint
-	{
-		None = 0,
-		Normal = 1,
-		Advanced = 2,
+			return OutstandingFamilyName == other.OutstandingFamilyName;
+		}
 	}
 }

@@ -14,6 +14,11 @@ using Tategaki.Logic.Font.Tables.Metrix;
 
 namespace Tategaki.Logic.Font
 {
+	/// <summary>
+	/// OpenTypeのフォントを読み込むクラス
+	/// 参考1： https://learn.microsoft.com/en-us/typography/opentype/spec/
+	/// 参考2： https://aznote.jakou.com/prog/opentype/index.html
+	/// </summary>
 	internal class OpenTypeFont
 	{
 		public OpenTypeFont(Uri fontUri)

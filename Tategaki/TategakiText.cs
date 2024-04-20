@@ -180,6 +180,17 @@ namespace Tategaki
 		public static readonly DependencyProperty FontStyleProperty = TextElement.FontStyleProperty.AddOwner(typeof(TategakiText));
 
 		/// <summary>
+		/// フォントの引き伸ばし
+		/// </summary>
+		public FontStretch FontStretch
+		{
+			get { return (FontStretch)GetValue(FontStretchProperty); }
+			set { SetValue(FontStretchProperty, value); }
+		}
+		public static readonly DependencyProperty FontStretchProperty =
+			TextElement.FontStretchProperty.AddOwner(typeof(TategakiText));
+
+		/// <summary>
 		/// 文字の色
 		/// </summary>
 		public Brush? Foreground
@@ -198,8 +209,6 @@ namespace Tategaki
 			set { SetValue(BackgroundProperty, value); }
 		}
 		public static readonly DependencyProperty BackgroundProperty = TextElement.BackgroundProperty.AddOwner(typeof(TategakiText));
-
-		// FontStretchは未実装
 
 		#endregion
 
@@ -295,18 +304,19 @@ namespace Tategaki
 				textcache = null;
 				lines.Add((new(), new(0, FontSize)));
 			} else {
-				var fontname = FontFamily?.Source;
+				var fontname = VerticalFontTable.FromName(FontFamily?.Source);
 				var weight = FontWeight;
 				var style = FontStyle;
+				var stretch = FontStretch;
 				var hwvert = EnableHalfWidthCharVertical;
 				var spacing = Spacing;
 				var fontsize = FontSize;
 				var language = XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name);
 
-				if(glyphcache == null || !glyphcache.ParamEquals(fontname, weight, style))
-					glyphcache = FontGlyphCache.GetCache(fontname, weight, style);
+				if(glyphcache == null || !glyphcache.ParamEquals(fontname, weight, style, stretch))
+					glyphcache = FontGlyphCache.GetCache(fontname, weight, style, stretch);
 
-				if(textcache == null || !textcache.ParamEquals(text, fontname, weight, style, hwvert))
+				if(textcache == null || !textcache.ParamEquals(text, fontname, weight, style, stretch, hwvert))
 					textcache = new StringGlyphIndexCache(text, glyphcache, hwvert);
 
 				var lineheight = Math.Max(double.IsNaN(LineHeight) ? 0 : LineHeight, glyphcache.GlyphTypeface.Height * fontsize);

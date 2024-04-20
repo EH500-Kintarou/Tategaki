@@ -24,7 +24,7 @@ namespace Tategaki.Logic
 				AdvanceWidths[i - sliceStart] = textCache.AdvanceWidths[i] * size;
 
 			IsSideways = textCache.IsVerticals[sliceStart] ?? throw new ArgumentException($"{nameof(textCache)}.{nameof(textCache.IsVerticals)} must not be null", nameof(textCache));	// 簡単のため先頭だけ見る
-			FontName = glyphCache.FontName;
+			FontName = glyphCache.FontName.OutstandingFamilyName;
 			GlyphTypeface = glyphCache.GlyphTypeface;
 			RenderingEmSize = size;
 			Spacing = spacing;
