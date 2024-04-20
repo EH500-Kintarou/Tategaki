@@ -83,6 +83,33 @@ namespace Tategaki
 			nameof(EnableHalfWidthCharVertical), typeof(bool), typeof(TategakiText),
 			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
 
+		/// <summary>
+		/// プロポーショナルフォントを有効にする
+		/// </summary>
+		public bool EnableProportionalAlternate
+		{
+			get { return (bool)GetValue(EnableProportionalAlternateProperty); }
+			set { SetValue(EnableProportionalAlternateProperty, value); }
+		}
+		public static readonly DependencyProperty EnableProportionalAlternateProperty = DependencyProperty.Register(
+			nameof(EnableProportionalAlternate), typeof(bool), typeof(TategakiText),
+			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
+
+		/// <summary>
+		/// 代替レンダリングを有効にする
+		/// falseの場合はDrawGlyphRunを使用して描画します。多くの場合はこちらで問題ないです。
+		/// trueの場合、DrawGeometryを使用して描画します。描画処理は重くなりますが、ＭＳ Ｐ明朝などで文字間隔がおかしくなる場合はこちらを使用すると改善することがあります。
+		/// </summary>
+		public bool EnableAlternateRendering
+		{
+			get { return (bool)GetValue(EnableAlternateRenderingProperty); }
+			set { SetValue(EnableAlternateRenderingProperty, value); }
+		}
+		public static readonly DependencyProperty EnableAlternateRenderingProperty = DependencyProperty.Register(
+			nameof(EnableAlternateRendering), typeof(bool), typeof(TategakiText),
+			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
+
+
 		#region TextWrapping
 
 		/// <summary>
@@ -309,6 +336,7 @@ namespace Tategaki
 				var style = FontStyle;
 				var stretch = FontStretch;
 				var hwvert = EnableHalfWidthCharVertical;
+				var enablevpal = EnableProportionalAlternate;
 				var spacing = Spacing;
 				var fontsize = FontSize;
 				var language = XmlLanguage.GetLanguage(CultureInfo.CurrentUICulture.Name);
@@ -316,8 +344,8 @@ namespace Tategaki
 				if(glyphcache == null || !glyphcache.ParamEquals(fontname, weight, style, stretch))
 					glyphcache = FontGlyphCache.GetCache(fontname, weight, style, stretch);
 
-				if(textcache == null || !textcache.ParamEquals(text, fontname, weight, style, stretch, hwvert))
-					textcache = new StringGlyphIndexCache(text, glyphcache, hwvert);
+				if(textcache == null || !textcache.ParamEquals(text, glyphcache, hwvert, enablevpal))
+					textcache = new StringGlyphIndexCache(text, glyphcache, hwvert, enablevpal);
 
 				var lineheight = Math.Max(double.IsNaN(LineHeight) ? 0 : LineHeight, glyphcache.GlyphTypeface.Height * fontsize);
 
@@ -413,6 +441,7 @@ namespace Tategaki
 		protected override void OnRender(DrawingContext ctx)
 		{
 			var renderRect = new Rect(0, 0, RenderSize.Width, RenderSize.Height);
+			var altrender = EnableAlternateRendering;
 
 			// 背景を描画
 			if(Background != null)
@@ -439,8 +468,30 @@ namespace Tategaki
 				var x = xstart;
 
 				foreach(var (glyph, width) in glyphs) {
-					ctx.DrawGlyphRun(foreground, glyph.CreateWithOffsetY0(new Point(x, y)));
-					x += width;
+					if(altrender) {
+						for(int i = 0; i < glyph.Text.Length; i++) {
+							var geometry = glyph.GlyphTypeface.GetGlyphOutline(glyph.GlyphIndices[i], FontSize, FontSize);
+							var aw = glyph.AdvanceWidths[i];
+
+							var tf = new TransformGroup();
+							if(glyph.IsSideways) {
+								tf.Children.Add(new RotateTransform(-90, 0, 0));
+								tf.Children.Add(new TranslateTransform(
+									x + glyph.GlyphOffsets[i].X + glyph.AlternateRenderingOffsets[i].X + glyph.GlyphTypeface.Baseline * glyph.RenderingEmSize,
+									y + glyph.GlyphOffsets[i].Y + glyph.AlternateRenderingOffsets[i].Y + glyph.GlyphTypeface.Height * glyph.RenderingEmSize));
+							} else {
+								tf.Children.Add(new TranslateTransform(
+									x + glyph.GlyphOffsets[i].X + glyph.AlternateRenderingOffsets[i].X,
+									y + glyph.GlyphOffsets[i].Y + glyph.AlternateRenderingOffsets[i].Y + glyph.GlyphTypeface.Baseline * glyph.RenderingEmSize));
+							}
+							geometry.Transform = tf;
+							ctx.DrawGeometry(foreground, null, geometry);
+							x += aw;
+						}
+					} else {
+						ctx.DrawGlyphRun(foreground, glyph.CreateWithOffsetY0(new Point(x, y)));
+						x += width;
+					}
 
 					// 1行ごとに装飾も実施
 					foreach(var deco in decorations)

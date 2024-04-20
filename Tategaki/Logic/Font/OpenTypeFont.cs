@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tategaki.Logic.Font.Tables;
+using Tategaki.Logic.Font.Tables.Glyph;
 using Tategaki.Logic.Font.Tables.GsubGpos;
 using Tategaki.Logic.Font.Tables.Head;
 using Tategaki.Logic.Font.Tables.Maxp;
@@ -71,10 +72,12 @@ namespace Tategaki.Logic.Font
 			var head = ReadHead(data, tables);
 			var hhea = ReadHhea(data, tables);
 			var hmtx = ReadHmtx(data, tables, hhea, maxp);
+			Loca = ReadLoca(data, tables, maxp, head);
 			Vhea = ReadVhea(data, tables);
 			Vmtx = ReadVmtx(data, tables, Vhea, maxp);
 			Gsub = ReadGsub(data, tables);
 			Gpos = ReadGpos(data, tables);
+			Glyf = ReadGlyf(data, tables, Loca);
 
 			return new NecessaryTables(tables, maxp, head, hhea, hmtx);
 		}
@@ -130,32 +133,39 @@ namespace Tategaki.Logic.Font
 			return sum == table.Checksum;
 		}
 
-
-		private MaxpTable ReadMaxp(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
+		private static MaxpTable ReadMaxp(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
 		{
 			var table = tables[TableNames.MAXP];
 			return new MaxpTable(data.Slice((int)table.Offset, (int)table.Length));
 		}
 
-		private HeadTable ReadHead(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
+		private static HeadTable ReadHead(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
 		{
 			var table = tables[TableNames.HEAD];
 			return new HeadTable(data.Slice((int)table.Offset, (int)table.Length));
 		}
 
-		private HheaTable ReadHhea(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
+		private static HheaTable ReadHhea(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
 		{
 			var table = tables[TableNames.HHEA];
 			return new HheaTable(data.Slice((int)table.Offset, (int)table.Length));
 		}
 
-		private HmtxTable ReadHmtx(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables, HheaTable hhea, MaxpTable maxp)
+		private static HmtxTable ReadHmtx(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables, HheaTable hhea, MaxpTable maxp)
 		{
 			var table = tables[TableNames.HMTX];
 			return new HmtxTable(data.Slice((int)table.Offset, (int)table.Length), hhea.NumberOfHMetrics, maxp.NumGlyphs);
 		}
 
-		private VheaTable? ReadVhea(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
+		private static LocaTable? ReadLoca(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables, MaxpTable maxp, HeadTable head)
+		{
+			if(tables.TryGetValue(TableNames.LOCA, out var table))
+				return new LocaTable(data.Slice((int)table.Offset, (int)table.Length), maxp.NumGlyphs, head.IndexToLocFormat);
+			else
+				return null;
+		}
+
+		private static VheaTable? ReadVhea(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
 		{
 			if(tables.TryGetValue(TableNames.VHEA, out var table))
 				return new VheaTable(data.Slice((int)table.Offset, (int)table.Length));
@@ -163,7 +173,7 @@ namespace Tategaki.Logic.Font
 				return null;
 		}
 
-		private VmtxTable? ReadVmtx(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables, VheaTable? vhea, MaxpTable maxp)
+		private static VmtxTable? ReadVmtx(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables, VheaTable? vhea, MaxpTable maxp)
 		{
 			if(vhea != null && tables.TryGetValue(TableNames.VMTX, out var table))
 				return new VmtxTable(data.Slice((int)table.Offset, (int)table.Length), vhea.NumberOfVerMetrics, maxp.NumGlyphs);
@@ -171,7 +181,7 @@ namespace Tategaki.Logic.Font
 				return null;
 		}
 
-		private GsubTable? ReadGsub(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
+		private static GsubTable? ReadGsub(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
 		{
 			if(tables.TryGetValue(TableNames.GSUB, out var table))
 				return new GsubTable(data.Slice((int)table.Offset, (int)table.Length));
@@ -179,10 +189,18 @@ namespace Tategaki.Logic.Font
 				return null;
 		}
 
-		private GposTable? ReadGpos(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
+		private static GposTable? ReadGpos(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
 		{
 			if(tables.TryGetValue(TableNames.GPOS, out var table))
 				return new GposTable(data.Slice((int)table.Offset, (int)table.Length));
+			else
+				return null;
+		}
+
+		private static GlyfTable? ReadGlyf(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables, LocaTable? loca)
+		{
+			if(loca != null && tables.TryGetValue(TableNames.GLYF, out var table))
+				return new GlyfTable(data.Slice((int)table.Offset, (int)table.Length), loca);
 			else
 				return null;
 		}
@@ -199,10 +217,12 @@ namespace Tategaki.Logic.Font
 		public HeadTable Head { get; }
 		public HheaTable Hhea { get; }
 		public HmtxTable Hmtx { get; }
+		public LocaTable? Loca { get; private set; } = null;
 		public VheaTable? Vhea { get; private set; } = null;
 		public VmtxTable? Vmtx { get; private set; } = null;
 		public GsubTable? Gsub { get; private set; } = null;
 		public GposTable? Gpos { get; private set; } = null;
+		public GlyfTable? Glyf { get; private set; } = null;
 
 		private class NecessaryTables
 		{

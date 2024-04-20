@@ -13,22 +13,31 @@ namespace Tategaki.Logic
 	{
 		public GlyphRunParam(FontGlyphCache glyphCache, StringGlyphIndexCache textCache, int sliceStart, int sliceEndExclusive, double size, double spacing, XmlLanguage language)
 		{
-			Text = textCache.Text.Substring(sliceStart, sliceEndExclusive - sliceStart);
+			var sliceCount = sliceEndExclusive - sliceStart;
 
-			GlyphIndices = new ushort[sliceEndExclusive - sliceStart];  // Sliceが欲しい…
-			for(int i = sliceStart; i < sliceEndExclusive; i++)
-				GlyphIndices[i - sliceStart] = textCache.Indices[i];
+			Text = textCache.Text.Substring(sliceStart, sliceCount);
 
-			AdvanceWidths = new double[sliceEndExclusive - sliceStart]; // Sliceが欲しい…
-			for(int i = sliceStart; i < sliceEndExclusive; i++)
-				AdvanceWidths[i - sliceStart] = textCache.AdvanceWidths[i] * size;
+			GlyphIndices = new ushort[sliceCount];
+			AdvanceWidths = new double[sliceCount];
+			GlyphOffsets = new Point[sliceCount];
+			AlternateRenderingOffsets = new Point[sliceCount];
+			double totalwidth = 0;
+			for(int i = 0; i < sliceCount; i++) {
+				var width = textCache.AdvanceWidths[i + sliceStart] * size;
+
+				GlyphIndices[i] = textCache.Indices[i + sliceStart];
+				AdvanceWidths[i] = width;
+				GlyphOffsets[i] = new Point((textCache.XOffset[i + sliceStart] + i * (spacing - 100) / 100) * size, 0);
+				AlternateRenderingOffsets[i] = new Point(textCache.AlternateRenderingXOffset[i + sliceStart] * size, 0);
+
+				totalwidth += width;
+			}
 
 			IsSideways = textCache.IsVerticals[sliceStart] ?? throw new ArgumentException($"{nameof(textCache)}.{nameof(textCache.IsVerticals)} must not be null", nameof(textCache));	// 簡単のため先頭だけ見る
 			FontName = glyphCache.FontName.OutstandingFamilyName;
 			GlyphTypeface = glyphCache.GlyphTypeface;
 			RenderingEmSize = size;
 			Spacing = spacing;
-			GlyphOffsets = Enumerable.Range(0, Text.Length).Select(p => new Point(p * (spacing - 100) / 100 * size, 0)).ToArray();
 			Language = language;
 		}
 
@@ -53,6 +62,8 @@ namespace Tategaki.Logic
 		public IList<Point> GlyphOffsets { get; }
 
 		public XmlLanguage Language { get; }
+
+		public IList<Point> AlternateRenderingOffsets { get; }
 
 		#endregion
 

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
-using System.Windows.Media;
 using System.Windows;
+using System.Windows.Media;
 using Tategaki.Logic.Font;
+using Tategaki.Logic.Font.Tables.Glyph;
 using Tategaki.Logic.Font.Tables.GsubGpos;
-using System.Collections.ObjectModel;
+using Tategaki.Logic.Font.Tables.Metrix;
 
 namespace Tategaki.Logic
 {
@@ -30,10 +31,27 @@ namespace Tategaki.Logic
 			FontStretch = stretch;
 			GlyphTypeface = gtf;
 
-			var subst = new Dictionary<ushort, ushort>();
+			var vert = new Dictionary<ushort, ushort>();
 			foreach(var table in (otf.Gsub?.GetSubstitution<SingleSubstitution>("vert") ?? Enumerable.Empty<SingleSubstitution>()).SelectMany(p => p.Table))
-				subst[table.Key] = table.Value;
-			VerticalSubstitution = new ReadOnlyDictionary<ushort, ushort>(subst);
+				vert[table.Key] = table.Value;
+			VerticalSubstitution = new ReadOnlyDictionary<ushort, ushort>(vert);
+
+			var vpal = new Dictionary<ushort, GlyphAdjustment>();
+			foreach(var table in (otf.Gpos?.GetPositioning<SingleAdjustment>("vpal") ?? Enumerable.Empty<SingleAdjustment>()).SelectMany(p => p.Table))
+				vpal[table.Key] = new GlyphAdjustment() {
+					XPlacement = (double)table.Value.XPlacement / otf.Head.UnitsPerEm,
+					YPlacement = (double)table.Value.YPlacement / otf.Head.UnitsPerEm,
+					XAdvance = (double)table.Value.XAdvance / otf.Head.UnitsPerEm,
+					YAdvance = (double)table.Value.YAdvance / otf.Head.UnitsPerEm,
+				};
+			VerticalProportionalAdjustment = new ReadOnlyDictionary<ushort, GlyphAdjustment>(vpal);
+
+			GlyphMetrics = new ReadOnlyDictionary<ushort, GlyphMetrics>((otf.Glyf?.Glyphs ?? Enumerable.Empty<GlyphData?>())
+				.Select((gd, index) => (gd, index))
+				.Where(p => p.gd != null)
+				.ToDictionary(
+					p => (ushort)p.index,
+					p => new GlyphMetrics((double)p.gd!.XMin / otf.Head.UnitsPerEm, (double)p.gd.YMin / otf.Head.UnitsPerEm, (double)p.gd.XMax / otf.Head.UnitsPerEm, (double)p.gd.YMax / otf.Head.UnitsPerEm)));
 		}
 
 		public FontNameInfo FontName { get; }
@@ -47,6 +65,10 @@ namespace Tategaki.Logic
 		public GlyphTypeface GlyphTypeface { get; }
 
 		public IReadOnlyDictionary<ushort, ushort> VerticalSubstitution { get; }
+
+		public IReadOnlyDictionary<ushort, GlyphAdjustment> VerticalProportionalAdjustment { get; }
+
+		public IReadOnlyDictionary<ushort, GlyphMetrics> GlyphMetrics { get; }
 
 		public bool Equals(FontGlyphCache? other)
 		{
