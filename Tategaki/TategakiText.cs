@@ -23,7 +23,7 @@ namespace Tategaki
 	{
 		StringGlyphIndexCache? textcache;
 		FontGlyphCache? glyphcache;
-		List<(List<(GlyphRunParam glyph, double width)> glyphs, Size size)> lines = new();
+		List<(List<GlyphRunParam> glyphs, Size size)> lines = new();
 		TextAlignment? lastTextAlignment = null;
 
 		public TategakiText()
@@ -349,7 +349,7 @@ namespace Tategaki
 
 				var lineheight = Math.Max(double.IsNaN(LineHeight) ? 0 : LineHeight, glyphcache.GlyphTypeface.Height * fontsize);
 
-				var line = new List<(GlyphRunParam glyph, double width)>();
+				var line = new List<GlyphRunParam>();
 				var context = new ContextAnalyzer() {
 					TextWrapping = TextWrapping,
 					AvailableWidth = availableSize.Height - Padding.Top - Padding.Bottom,  // 90°回るのでWidthとHeightが入れ替わる
@@ -358,7 +358,7 @@ namespace Tategaki
 					LastHangingChars = LastHangingChars,
 				};
 				context.NewSectionCallback = (int start, int endEx, double width) =>
-					line.Add((new GlyphRunParam(glyphcache, textcache, start, endEx, fontsize, spacing, language), width));
+					line.Add(new GlyphRunParam(glyphcache, textcache, start, endEx, fontsize, spacing, language));
 				context.NewLineCallback = (double width) => {
 					width -= (spacing - 100) / 100.0 * fontsize;
 					if(width < 0)
@@ -397,23 +397,17 @@ namespace Tategaki
 				var finalwidth = finalSize.Height - Padding.Top - Padding.Bottom;
 
 				foreach(var line in lines) {
-					var textwidth = line.glyphs.Sum(p => p.glyph.TotalAdvanceWidth);
-					var charcount = line.glyphs.Sum(p => p.glyph.AdvanceWidths.Count);
+					var textwidth = line.glyphs.Sum(p => p.TotalAdvanceWidth);
+					var charcount = line.glyphs.Sum(p => p.AdvanceWidths.Count);
 					var spacing = (charcount >= 2 && textwidth <= finalwidth) ? (finalwidth - textwidth) / (charcount - 1) : 0.0;
 
-					for(int i = 0; i < line.glyphs.Count; i++) {
-						var glyph = line.glyphs[i].glyph;
-						glyph.ApplyJustifyAlignmentOffset(spacing);
-						line.glyphs[i] = (glyph, i == line.glyphs.Count - 1 ? glyph.TotalBoxWidth : glyph.TotalBoxWidthWithSpacing);
-					}
+					foreach(var glyph in line.glyphs)
+						glyph.ApplyJustifyAlignmentOffset(spacing);					
 				}
 			} else if(lastTextAlignment == TextAlignment.Justify && nowAlign != TextAlignment.Justify) {    // Justify→Justify以外に変化
 				foreach(var line in lines) {
-					for(int i = 0; i < line.glyphs.Count; i++) {
-						var glyph = line.glyphs[i].glyph;
+					foreach(var glyph in line.glyphs)
 						glyph.ApplyNormalAlignmentOffset();
-						line.glyphs[i] = (glyph, i == line.glyphs.Count - 1 ? glyph.TotalBoxWidth : glyph.TotalBoxWidthWithSpacing);
-					}
 				}
 			}
 
@@ -455,10 +449,12 @@ namespace Tategaki
 					_ => Padding.Top,
 				};
 				var x = xstart;
+				var xNoLastSpacing = x;
 
-				foreach(var (glyph, width) in glyphs) {
+				foreach(var glyph in glyphs) {
 					if(altrender) {
-						var xnext = x + width;
+						var xnext = x + glyph.TotalBoxWidthWithSpacing;
+						xNoLastSpacing = x + glyph.TotalBoxWidth;
 						for(int i = 0; i < glyph.Text.Length; i++) {
 							var geometry = glyph.GlyphTypeface.GetGlyphOutline(glyph.GlyphIndices[i], FontSize, FontSize);
 							var aw = glyph.AdvanceWidths[i];
@@ -478,16 +474,18 @@ namespace Tategaki
 							ctx.DrawGeometry(foreground, null, geometry);
 							x += aw;
 						}
-						x = xnext;
+						x += xnext;
 					} else {
 						ctx.DrawGlyphRun(foreground, glyph.CreateWithOffsetY0(new Point(x, y)));
-						x += width;
+						xNoLastSpacing = x + glyph.TotalBoxWidth;
+						x += glyph.TotalBoxWidthWithSpacing;
 					}
-
-					// 1行ごとに装飾も実施
-					foreach(var deco in decorations)
-						ctx.DrawLine(deco.pen, new Point(xstart, y + deco.y), new Point(x, y + deco.y));
 				}
+
+				// 1行ごとに装飾も実施
+				foreach(var deco in decorations)
+					ctx.DrawLine(deco.pen, new Point(xstart, y + deco.y), new Point(xNoLastSpacing, y + deco.y));
+
 				y += height;
 			}
 		}
