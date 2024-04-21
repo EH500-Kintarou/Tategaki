@@ -474,7 +474,7 @@ namespace Tategaki
 							ctx.DrawGeometry(foreground, null, geometry);
 							x += aw;
 						}
-						x += xnext;
+						x = xnext;
 					} else {
 						ctx.DrawGlyphRun(foreground, glyph.CreateWithOffsetY0(new Point(x, y)));
 						xNoLastSpacing = x + glyph.TotalBoxWidth;
