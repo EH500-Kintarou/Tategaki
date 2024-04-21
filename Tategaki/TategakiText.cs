@@ -23,7 +23,7 @@ namespace Tategaki
 	{
 		StringGlyphIndexCache? textcache;
 		FontGlyphCache? glyphcache;
-		List<(List<(GlyphRunParam glyph, double width)> glyphs, Size size)> lines = new();
+		List<(List<GlyphRunParam> glyphs, Size size)> lines = new();
 		TextAlignment? lastTextAlignment = null;
 
 		public TategakiText()
@@ -349,7 +349,7 @@ namespace Tategaki
 
 				var lineheight = Math.Max(double.IsNaN(LineHeight) ? 0 : LineHeight, glyphcache.GlyphTypeface.Height * fontsize);
 
-				var line = new List<(GlyphRunParam glyph, double width)>();
+				var line = new List<GlyphRunParam>();
 				var context = new ContextAnalyzer() {
 					TextWrapping = TextWrapping,
 					AvailableWidth = availableSize.Height - Padding.Top - Padding.Bottom,  // 90°回るのでWidthとHeightが入れ替わる
@@ -358,13 +358,13 @@ namespace Tategaki
 					LastHangingChars = LastHangingChars,
 				};
 				context.NewSectionCallback = (int start, int endEx, double width) =>
-					line.Add((new GlyphRunParam(glyphcache, textcache, start, endEx, fontsize, spacing, language), width));
+					line.Add(new GlyphRunParam(glyphcache, textcache, start, endEx, fontsize, spacing, language));
 				context.NewLineCallback = (double width) => {
-					width -= (spacing - 100) / 100.0 * fontsize;
-					if(width < 0)
-						width = 0;
+					double widthtotal = 0;
+					for(int i = 0; i < line.Count; i++)
+						widthtotal += (i == line.Count - 1) ? line[i].TotalBoxWidth : line[i].TotalBoxWidthWithSpacing;
 
-					lines.Add((line, new Size(width, lineheight)));
+					lines.Add((line, new Size(widthtotal, lineheight)));
 					line = new();
 				};
 
@@ -393,38 +393,21 @@ namespace Tategaki
 			var nowAlign = TextAlignment;
 
 			// TextAlignmentの調整を行う
-			if(lastTextAlignment != TextAlignment.Justify && nowAlign == TextAlignment.Justify) {
+			if(lastTextAlignment != TextAlignment.Justify && nowAlign == TextAlignment.Justify) {	// Justify以外→Justifyに変化
 				var finalwidth = finalSize.Height - Padding.Top - Padding.Bottom;
 
 				foreach(var line in lines) {
-					var sectionwiths = line.glyphs.Select(p => p.glyph.AdvanceWidths.Sum()).ToArray();
-					var textwidth = sectionwiths.Sum();
-					var charcount = line.glyphs.Sum(p => p.glyph.AdvanceWidths.Count);
-					var spacing = charcount >= 2 ? (finalwidth - textwidth) / (charcount - 1) : 0.0;
+					var textwidth = line.glyphs.Sum(p => p.TotalAdvanceWidth);
+					var charcount = line.glyphs.Sum(p => p.AdvanceWidths.Count);
+					var spacing = (charcount >= 2 && textwidth <= finalwidth) ? (finalwidth - textwidth) / (charcount - 1) : 0.0;
 
-					for(int i = 0; i < line.glyphs.Count; i++) {
-						var glyph = line.glyphs[i].glyph;
-						for(int j = 0; j < glyph.GlyphOffsets.Count; j++)
-							glyph.GlyphOffsets[j] = new Point(spacing * j, 0);
-						line.glyphs[i] = (glyph, sectionwiths[i] + spacing * glyph.GlyphOffsets.Count);
-					}
+					foreach(var glyph in line.glyphs)
+						glyph.ApplyJustifyAlignmentOffset(spacing);					
 				}
-			} else if(lastTextAlignment == TextAlignment.Justify && nowAlign != TextAlignment.Justify) {
-				var spacing = (Spacing - 100) / 100 * fontsize;
-
+			} else if(lastTextAlignment == TextAlignment.Justify && nowAlign != TextAlignment.Justify) {    // Justify→Justify以外に変化
 				foreach(var line in lines) {
-					var sectionwiths = line.glyphs.Select(p => p.glyph.AdvanceWidths.Sum()).ToArray();
-
-					for(int i = 0; i < line.glyphs.Count; i++) {
-						var glyph = line.glyphs[i].glyph;
-						for(int j = 0; j < glyph.GlyphOffsets.Count; j++)
-							glyph.GlyphOffsets[j] = new Point(spacing * j, 0);
-
-						if(i == line.glyphs.Count - 1)
-							line.glyphs[i] = (glyph, sectionwiths[i] + spacing * Math.Max(0, glyph.GlyphOffsets.Count - 1));
-						else
-							line.glyphs[i] = (glyph, sectionwiths[i] + spacing * glyph.GlyphOffsets.Count);
-					}
+					foreach(var glyph in line.glyphs)
+						glyph.ApplyNormalAlignmentOffset();
 				}
 			}
 
@@ -466,9 +449,12 @@ namespace Tategaki
 					_ => Padding.Top,
 				};
 				var x = xstart;
+				var xNoLastSpacing = x;
 
-				foreach(var (glyph, width) in glyphs) {
+				foreach(var glyph in glyphs) {
 					if(altrender) {
+						var xnext = x + glyph.TotalBoxWidthWithSpacing;
+						xNoLastSpacing = x + glyph.TotalBoxWidth;
 						for(int i = 0; i < glyph.Text.Length; i++) {
 							var geometry = glyph.GlyphTypeface.GetGlyphOutline(glyph.GlyphIndices[i], FontSize, FontSize);
 							var aw = glyph.AdvanceWidths[i];
@@ -488,15 +474,18 @@ namespace Tategaki
 							ctx.DrawGeometry(foreground, null, geometry);
 							x += aw;
 						}
+						x = xnext;
 					} else {
 						ctx.DrawGlyphRun(foreground, glyph.CreateWithOffsetY0(new Point(x, y)));
-						x += width;
+						xNoLastSpacing = x + glyph.TotalBoxWidth;
+						x += glyph.TotalBoxWidthWithSpacing;
 					}
-
-					// 1行ごとに装飾も実施
-					foreach(var deco in decorations)
-						ctx.DrawLine(deco.pen, new Point(xstart, y + deco.y), new Point(x, y + deco.y));
 				}
+
+				// 1行ごとに装飾も実施
+				foreach(var deco in decorations)
+					ctx.DrawLine(deco.pen, new Point(xstart, y + deco.y), new Point(xNoLastSpacing, y + deco.y));
+
 				y += height;
 			}
 		}
@@ -592,7 +581,7 @@ namespace Tategaki
 			#endregion
 
 			int startPos = 0;				// 現在の区間のスタート位置
-			bool? currentVertical = null;	// 現在縦書きか横書きか
+			bool? prevvertical = null;		// 前の文字が縦書きか横書きか
 			double sectionWidth = 0;		// 区間の幅
 			double lineWidth = 0;           // 行の幅
 
@@ -603,7 +592,7 @@ namespace Tategaki
 			public void NextChar(char c, int pos, bool? isvertical, double width, double spacing)
 			{
 				if(c == '\n') {     // 改行
-					if(currentVertical != null && startPos < pos) {
+					if(prevvertical != null && startPos < pos) {
 						NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 						lineWidth += sectionWidth;
 						sectionWidth = 0;
@@ -611,14 +600,30 @@ namespace Tategaki
 
 					NewLineCallback?.Invoke(lineWidth);
 					lineWidth = 0;
-					currentVertical = null;
+					prevvertical = null;
 				} else if(isvertical == null) {    // 縦も横も無い文字（制御文字など）なら無視
-					if(currentVertical != null && startPos < pos) {
+					if(prevvertical != null && startPos < pos) {
 						NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 						lineWidth += sectionWidth;
 						sectionWidth = 0;
 					}
-					currentVertical = null;
+					prevvertical = null;
+				} else if(prevvertical != null && prevvertical != isvertical) { // 縦書き⇔横書きの変化なら強制的にブロック分け
+					if(startPos < pos) {
+						NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
+						lineWidth += sectionWidth;
+					}
+					startPos = pos;
+					sectionWidth = width + spacing;
+					isPrevLastForbidden = false;
+					blockStartPos = 0;
+					blockStartWidth = 0;
+					prevvertical = isvertical;
+
+					if(TextWrapping != TextWrapping.NoWrap && (lineWidth + width) > AvailableWidth) {	// 必要に応じて改行も実施
+						NewLineCallback?.Invoke(lineWidth);
+						lineWidth = 0;
+					}
 				} else {
 					// ○: 普通の文字 / ●: 文末禁止文字 / ◎: 文頭禁止文字
 					// 　　⇩オーバーフロー
@@ -648,12 +653,12 @@ namespace Tategaki
 						blockStartWidth = sectionWidth;
 					}
 
-					bool needWrap = TextWrapping != TextWrapping.NoWrap && (lineWidth + sectionWidth + width) > AvailableWidth;	// はみ出し判定にはspacingは使わない
+					bool needWrap = TextWrapping != TextWrapping.NoWrap && (lineWidth + sectionWidth + width) > AvailableWidth; // はみ出し判定にはspacingは使わない
 					if(needWrap && LastHangingChars.Contains(c))
 						needWrap = false;   // ぶらさげ文字だったらやっぱり改行は無しにする
 
 					// 区間の切り替わり目か確認
-					if(currentVertical != null && (currentVertical != isvertical || needWrap)) {
+					if(prevvertical != null && needWrap) {
 						if(startPos < blockStartPos) { // スタート地点以降につながっている部分がある
 							NewSectionCallback?.Invoke(startPos, blockStartPos, blockStartWidth);
 							lineWidth += blockStartWidth;
@@ -672,10 +677,10 @@ namespace Tategaki
 							lineWidth = 0;
 						}
 					}
-					if(currentVertical == null && isvertical != null)   // 無効な文字以降初めての有効な文字ならスタート地点とする
+					if(prevvertical == null && isvertical != null)   // 無効な文字以降初めての有効な文字ならスタート地点とする
 						startPos = pos;
 
-					currentVertical = isvertical;
+					prevvertical = isvertical;
 					sectionWidth += width + spacing;
 
 					isPrevLastForbidden = LastForbiddenChars.Contains(c) || CheckWordChars(c);
@@ -684,7 +689,7 @@ namespace Tategaki
 
 			public void GetRemaining(int pos)
 			{
-				if(currentVertical != null && startPos < pos) {
+				if(prevvertical != null && startPos < pos) {
 					NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 					lineWidth += sectionWidth;
 					sectionWidth = 0;

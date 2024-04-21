@@ -11,6 +11,8 @@ namespace Tategaki.Logic
 {
 	internal class GlyphRunParam
 	{
+		readonly Point[] glyphOffsetsBeforeSpacing;
+
 		public GlyphRunParam(FontGlyphCache glyphCache, StringGlyphIndexCache textCache, int sliceStart, int sliceEndExclusive, double size, double spacing, XmlLanguage language)
 		{
 			var sliceCount = sliceEndExclusive - sliceStart;
@@ -19,7 +21,7 @@ namespace Tategaki.Logic
 
 			GlyphIndices = new ushort[sliceCount];
 			AdvanceWidths = new double[sliceCount];
-			GlyphOffsets = new Point[sliceCount];
+			glyphOffsetsBeforeSpacing = new Point[sliceCount];
 			AlternateRenderingOffsets = new Point[sliceCount];
 			double totalwidth = 0;
 			for(int i = 0; i < sliceCount; i++) {
@@ -27,13 +29,17 @@ namespace Tategaki.Logic
 
 				GlyphIndices[i] = textCache.Indices[i + sliceStart];
 				AdvanceWidths[i] = width;
-				GlyphOffsets[i] = new Point((textCache.XOffset[i + sliceStart] + i * (spacing - 100) / 100) * size, 0);
+				glyphOffsetsBeforeSpacing[i] = new Point(textCache.XOffset[i + sliceStart] * size, 0);
 				AlternateRenderingOffsets[i] = new Point(textCache.AlternateRenderingXOffset[i + sliceStart] * size, 0);
 
 				totalwidth += width;
 			}
 
-			IsSideways = textCache.IsVerticals[sliceStart] ?? throw new ArgumentException($"{nameof(textCache)}.{nameof(textCache.IsVerticals)} must not be null", nameof(textCache));	// 簡単のため先頭だけ見る
+			TotalAdvanceWidth = totalwidth;
+			GlyphOffsets = new Point[sliceCount];
+			ApplyNormalAlignmentOffset();
+
+			IsSideways = textCache.IsVerticals[sliceStart] ?? throw new ArgumentException($"{nameof(textCache)}.{nameof(textCache.IsVerticals)} must not be null", nameof(textCache));  // 簡単のため先頭だけ見る
 			FontName = glyphCache.FontName.OutstandingFamilyName;
 			GlyphTypeface = glyphCache.GlyphTypeface;
 			RenderingEmSize = size;
@@ -57,6 +63,12 @@ namespace Tategaki.Logic
 
 		public IList<double> AdvanceWidths { get; }
 
+		public double TotalAdvanceWidth { get; }
+
+		public double TotalBoxWidth { get; private set; }
+
+		public double TotalBoxWidthWithSpacing { get; private set; }
+
 		public double Spacing { get; }
 
 		public IList<Point> GlyphOffsets { get; }
@@ -77,6 +89,29 @@ namespace Tategaki.Logic
 			var yoffset = (IsSideways ? GlyphTypeface.Height / 2.0 : GlyphTypeface.Baseline) * RenderingEmSize;
 
 			return Create(new Point(origin.X, origin.Y + yoffset));
+		}
+
+		public void ApplyNormalAlignmentOffset()
+		{
+			var size = RenderingEmSize;
+			var spacing = Spacing;
+
+			var count = Math.Min(GlyphOffsets.Count, glyphOffsetsBeforeSpacing.Length);
+			for(int i = 0; i < count; i++)
+				GlyphOffsets[i] = new Point(glyphOffsetsBeforeSpacing[i].X + i * (spacing - 100) / 100 * size, glyphOffsetsBeforeSpacing[i].Y);
+
+			TotalBoxWidth = GlyphOffsets[count - 1].X + TotalAdvanceWidth;
+			TotalBoxWidthWithSpacing = count * (spacing - 100) / 100 * size + TotalAdvanceWidth;
+		}
+
+		public void ApplyJustifyAlignmentOffset(double spacing)
+		{
+			var count = Math.Min(GlyphOffsets.Count, glyphOffsetsBeforeSpacing.Length);
+			for(int i = 0; i < count; i++)
+				GlyphOffsets[i] = new Point(glyphOffsetsBeforeSpacing[i].X + i * spacing, glyphOffsetsBeforeSpacing[i].Y);
+
+			TotalBoxWidth = GlyphOffsets[count - 1].X + TotalAdvanceWidth;
+			TotalBoxWidthWithSpacing = count * spacing + TotalAdvanceWidth;
 		}
 
 		public override string ToString()
