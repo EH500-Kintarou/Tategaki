@@ -360,11 +360,11 @@ namespace Tategaki
 				context.NewSectionCallback = (int start, int endEx, double width) =>
 					line.Add(new GlyphRunParam(glyphcache, textcache, start, endEx, fontsize, spacing, language));
 				context.NewLineCallback = (double width) => {
-					width -= (spacing - 100) / 100.0 * fontsize;
-					if(width < 0)
-						width = 0;
+					double widthtotal = 0;
+					for(int i = 0; i < line.Count; i++)
+						widthtotal += (i == line.Count - 1) ? line[i].TotalBoxWidth : line[i].TotalBoxWidthWithSpacing;
 
-					lines.Add((line, new Size(width, lineheight)));
+					lines.Add((line, new Size(widthtotal, lineheight)));
 					line = new();
 				};
 
