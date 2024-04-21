@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tategaki", "Tategaki\Tatega
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TategakiSample", "TategakiSample\TategakiSample.csproj", "{F4392762-8FB5-418B-9B81-3BD80A8992C5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TategakiTextTest", "TategakiTextTest\TategakiTextTest.csproj", "{5284992F-5378-464E-9BEC-FFFF807F0E64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,10 +23,10 @@ Global
 		{F4392762-8FB5-418B-9B81-3BD80A8992C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4392762-8FB5-418B-9B81-3BD80A8992C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4392762-8FB5-418B-9B81-3BD80A8992C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8DCE55AA-C1D6-43D0-A693-B5B61483B193}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8DCE55AA-C1D6-43D0-A693-B5B61483B193}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8DCE55AA-C1D6-43D0-A693-B5B61483B193}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8DCE55AA-C1D6-43D0-A693-B5B61483B193}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5284992F-5378-464E-9BEC-FFFF807F0E64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5284992F-5378-464E-9BEC-FFFF807F0E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5284992F-5378-464E-9BEC-FFFF807F0E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5284992F-5378-464E-9BEC-FFFF807F0E64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
