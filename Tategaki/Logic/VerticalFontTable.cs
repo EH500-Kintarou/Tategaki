@@ -25,9 +25,9 @@ namespace Tategaki.Logic
 					continue;   // GlyphTypefaceが取得できなければ用無し
 
 				try {
-					var opentype = new OpenTypeFont(gtf.FontUri);
+					var otf = new OpenTypeFont(gtf.FontUri);
 
-					if((opentype.Gsub?.FeatureRecords ?? Enumerable.Empty<FeatureRecord>()).Where(p => p.FeatureTag == "vert").Any()) {     // GSUBに"vert" FeatureTagがあるか判定
+					if((otf.Gsub?.FeatureRecords ?? Enumerable.Empty<FeatureRecord>()).Where(p => p.FeatureTag == "vert").Any()) {     // GSUBに"vert" FeatureTagがあるか判定
 						var vfi = new FontNameInfo(gtf, ff.Source);
 						namelist.Add(vfi.OutstandingFamilyName);
 						foreach(var name in vfi.FamilierFamilyNames.Select(p => p.familyname).Distinct())
