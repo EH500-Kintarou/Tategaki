@@ -1,75 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
-using System.Windows.Media;
 using System.Windows;
-using WaterTrans.TypeLoader;
+using System.Windows.Media;
+using Tategaki.Logic.Font;
+using Tategaki.Logic.Font.Tables.Glyph;
+using Tategaki.Logic.Font.Tables.GsubGpos;
+using Tategaki.Logic.Font.Tables.Metrix;
 
 namespace Tategaki.Logic
 {
-	internal class FontGlyphCache
+	internal class FontGlyphCache : IEquatable<FontGlyphCache>
 	{
-		readonly TypefaceInfo typeinfo;
-		readonly VerticalFontInfo fontinfo;
+		readonly OpenTypeFont otf;
 
-		public FontGlyphCache(string? fontname, FontWeight weight, FontStyle style)
+		public FontGlyphCache(FontNameInfo fontname, FontWeight weight, FontStyle style, FontStretch stretch)
 		{
-			fontinfo = VerticalFontTable.FromName(fontname);
-			var stylesim = ((weight == FontWeights.Normal) ? StyleSimulations.None : StyleSimulations.BoldSimulation) | ((style == FontStyles.Normal) ? StyleSimulations.None : StyleSimulations.ItalicSimulation);
-			var gtf = new GlyphTypeface(fontinfo.FontUri, stylesim);
+			var tf = new Typeface(new FontFamily(fontname.InvaliantFamilyName), style, weight, stretch);
+			if(!tf.TryGetGlyphTypeface(out var gtf))
+				throw new NotSupportedException("Cannot load GlyphTypeface");
 
-			int num = fontinfo.FontUri.Fragment == "" ? 0 : int.Parse(fontinfo.FontUri.Fragment.Replace("#", ""));
-			typeinfo = new TypefaceInfo(gtf.GetFontStream(), num);
+			otf = new OpenTypeFont(gtf.FontUri);
 
-			FontName = fontinfo.OutstandingFamilyName;
+			FontName = fontname;
 			FontWeight = weight;
 			FontStyle = style;
+			FontStretch = stretch;
 			GlyphTypeface = gtf;
+
+			var vert = new Dictionary<ushort, ushort>();
+			foreach(var table in (otf.Gsub?.GetSubstitution<SingleSubstitution>("vert") ?? Enumerable.Empty<SingleSubstitution>()).SelectMany(p => p.Table))
+				vert[table.Key] = table.Value;
+			VerticalSubstitution = new ReadOnlyDictionary<ushort, ushort>(vert);
+
+			var vpal = new Dictionary<ushort, GlyphAdjustment>();
+			foreach(var table in (otf.Gpos?.GetPositioning<SingleAdjustment>("vpal") ?? Enumerable.Empty<SingleAdjustment>()).SelectMany(p => p.Table))
+				vpal[table.Key] = new GlyphAdjustment() {
+					XPlacement = (double)table.Value.XPlacement / otf.Head.UnitsPerEm,
+					YPlacement = (double)table.Value.YPlacement / otf.Head.UnitsPerEm,
+					XAdvance = (double)table.Value.XAdvance / otf.Head.UnitsPerEm,
+					YAdvance = (double)table.Value.YAdvance / otf.Head.UnitsPerEm,
+				};
+			VerticalProportionalAdjustment = new ReadOnlyDictionary<ushort, GlyphAdjustment>(vpal);
+
+			GlyphMetrics = new ReadOnlyDictionary<ushort, GlyphMetrics>((otf.Glyf?.Glyphs ?? Enumerable.Empty<GlyphData?>())
+				.Select((gd, index) => (gd, index))
+				.Where(p => p.gd != null)
+				.ToDictionary(
+					p => (ushort)p.index,
+					p => new GlyphMetrics((double)p.gd!.XMin / otf.Head.UnitsPerEm, (double)p.gd.YMin / otf.Head.UnitsPerEm, (double)p.gd.XMax / otf.Head.UnitsPerEm, (double)p.gd.YMax / otf.Head.UnitsPerEm)));
 		}
 
-		public string FontName { get; }
+		public FontNameInfo FontName { get; }
 
 		public FontWeight FontWeight { get; }
 
 		public FontStyle FontStyle { get; }
 
+		public FontStretch FontStretch { get; }
+
 		public GlyphTypeface GlyphTypeface { get; }
 
-		public SingleGlyphConverter VerticalGlyphConverter
+		public IReadOnlyDictionary<ushort, ushort> VerticalSubstitution { get; }
+
+		public IReadOnlyDictionary<ushort, GlyphAdjustment> VerticalProportionalAdjustment { get; }
+
+		public IReadOnlyDictionary<ushort, GlyphMetrics> GlyphMetrics { get; }
+
+		public bool Equals(FontGlyphCache? other)
 		{
-			get
-			{
-				if(_VerticalGlyphConverter == null) {
-					if(fontinfo.ConverterType.HasFlag(VerticalConverterType.Advanced))
-						_VerticalGlyphConverter = typeinfo.GetAdvancedVerticalGlyphConverter();
-					else if(fontinfo.ConverterType.HasFlag(VerticalConverterType.Normal))
-						_VerticalGlyphConverter = typeinfo.GetVerticalGlyphConverter();
-					else
-						throw new InvalidOperationException("No font converter found");
-				}
-				return _VerticalGlyphConverter;
-			}
+			if(other == null)
+				return false;
+
+			return ParamEquals(other.FontName, other.FontWeight, other.FontStyle, other.FontStretch);
 		}
-		SingleGlyphConverter? _VerticalGlyphConverter = null;
 
-		public bool ParamEquals(string? fontname, FontWeight weight, FontStyle style)
+		public bool ParamEquals(FontNameInfo fontname, FontWeight weight, FontStyle style, FontStretch stretch)
 		{
-			var uri = VerticalFontTable.FromName(fontname);
-
-			return FontName == uri.OutstandingFamilyName && FontWeight == weight && FontStyle == style;
+			return FontName.Equals(fontname) && FontWeight.Equals(weight) && FontStyle.Equals(style) && FontStretch.Equals(stretch);
 		}
 
 		#region GlobalCache
 
 		static FontGlyphCache? cache = null;
 
-		public static FontGlyphCache GetCache(string? fontname, FontWeight weight, FontStyle style)
+		public static FontGlyphCache GetCache(FontNameInfo fontname, FontWeight weight, FontStyle style, FontStretch stretch)
 		{
-			if(cache == null || !cache.ParamEquals(fontname, weight, style))
-				cache = new FontGlyphCache(fontname, weight, style);
+			if(cache == null || !cache.ParamEquals(fontname, weight, style, stretch))
+				cache = new FontGlyphCache(fontname, weight, style, stretch);
 
 			return cache;
 		}

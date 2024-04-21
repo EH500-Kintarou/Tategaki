@@ -4,15 +4,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tategaki", "Tategaki\Tategaki.csproj", "{BEBAA42B-E05E-4F9B-99E8-503B32C499D8}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C6B18B79-9FF6-4758-984E-0E41F43A3196} = {C6B18B79-9FF6-4758-984E-0E41F43A3196}
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeLoader", "TypeLoader\TypeLoader.csproj", "{C6B18B79-9FF6-4758-984E-0E41F43A3196}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TategakiSample", "TategakiSample\TategakiSample.csproj", "{F4392762-8FB5-418B-9B81-3BD80A8992C5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TategakiTextTest", "TategakiTextTest\TategakiTextTest.csproj", "{8DCE55AA-C1D6-43D0-A693-B5B61483B193}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,10 +17,6 @@ Global
 		{BEBAA42B-E05E-4F9B-99E8-503B32C499D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEBAA42B-E05E-4F9B-99E8-503B32C499D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEBAA42B-E05E-4F9B-99E8-503B32C499D8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C6B18B79-9FF6-4758-984E-0E41F43A3196}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6B18B79-9FF6-4758-984E-0E41F43A3196}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C6B18B79-9FF6-4758-984E-0E41F43A3196}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C6B18B79-9FF6-4758-984E-0E41F43A3196}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F4392762-8FB5-418B-9B81-3BD80A8992C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F4392762-8FB5-418B-9B81-3BD80A8992C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4392762-8FB5-418B-9B81-3BD80A8992C5}.Release|Any CPU.ActiveCfg = Release|Any CPU

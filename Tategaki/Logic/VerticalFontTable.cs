@@ -7,7 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using WaterTrans.TypeLoader;
+using Tategaki.Logic.Font;
+using Tategaki.Logic.Font.Tables.GsubGpos;
 
 namespace Tategaki.Logic
 {
@@ -15,38 +16,34 @@ namespace Tategaki.Logic
 	{
 		static VerticalFontTable()
 		{
-			var fonttable = new Dictionary<string, VerticalFontInfo>();
+			var fonttable = new Dictionary<string, FontNameInfo>();
 			var namelist = new List<string>();
 
 			foreach(var ff in Fonts.SystemFontFamilies) {
 				var tf = new Typeface(ff.Source);
-				if(!tf.TryGetGlyphTypeface(out var gtf))	// GlyphTypefaceが取得できなければ用無し
-					continue;
+				if(!tf.TryGetGlyphTypeface(out var gtf))
+					continue;   // GlyphTypefaceが取得できなければ用無し
 
-				int num = gtf.FontUri.Fragment == "" ? 0 : int.Parse(gtf.FontUri.Fragment.Replace("#", ""));
-				var tfi = new TypefaceInfo(gtf.GetFontStream(), num);
+				try {
+					var opentype = new OpenTypeFont(gtf.FontUri);
 
-				VerticalConverterType convtype = VerticalConverterType.None;
-				if(tfi.GetVerticalGlyphConverter().Count > 0)
-					convtype |= VerticalConverterType.Normal;
-				if(tfi.GetAdvancedVerticalGlyphConverter().Count > 0)
-					convtype |= VerticalConverterType.Advanced;
-				if(convtype == VerticalConverterType.None)	// 縦書きコンバーターが取得できなければ用無し
-					continue;
-
-				var vfi = new VerticalFontInfo(gtf, ff.Source, convtype);
-				namelist.Add(vfi.OutstandingFamilyName);
-				foreach(var name in vfi.FamilierFamilyNames.Select(p => p.familyname).Distinct())
-					fonttable[name] = vfi;
+					if((opentype.Gsub?.FeatureRecords ?? Enumerable.Empty<FeatureRecord>()).Where(p => p.FeatureTag == "vert").Any()) {     // GSUBに"vert" FeatureTagがあるか判定
+						var vfi = new FontNameInfo(gtf, ff.Source);
+						namelist.Add(vfi.OutstandingFamilyName);
+						foreach(var name in vfi.FamilierFamilyNames.Select(p => p.familyname).Distinct())
+							fonttable[name] = vfi;
+					}
+				}
+				catch(NotSupportedException) { }	// 中にはサポートできないフォントもある
 			}
 
 			namelist.Sort();
 
-			Table = new ReadOnlyDictionary<string, VerticalFontInfo>(fonttable);
+			Table = new ReadOnlyDictionary<string, FontNameInfo>(fonttable);
 			FamilyNames = new ReadOnlyCollection<string>(namelist);
 		}
 
-		internal static IReadOnlyDictionary<string, VerticalFontInfo> Table { get;  }
+		internal static IReadOnlyDictionary<string, FontNameInfo> Table { get;  }
 		internal static IReadOnlyList<string> FamilyNames { get; }
 
 
@@ -56,7 +53,7 @@ namespace Tategaki.Logic
 		/// </summary>
 		/// <param name="name">フォント名</param>
 		/// <returns>フォント情報</returns>
-		internal static VerticalFontInfo FromName(string? name)
+		internal static FontNameInfo FromName(string? name)
 		{
 			if(name == null)
 				return Table[FamilyNames.First()];
