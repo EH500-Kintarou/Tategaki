@@ -9,8 +9,6 @@
 
     <Window.Resources>
         <vc:ColorToBrushConverter x:Key="ColorToBrushConv" />
-        <vc:BooleanToFontWeightConverter x:Key="BooleanToFontWeightConv" />
-        <vc:BooleanToFontStyleConverter x:Key="BooleanToFontStyleConv" />
         <vc:BooleanToUnderlineConverter x:Key="BooleanToUnderlineConv" />
     </Window.Resources>
 
@@ -51,30 +49,78 @@
         </Grid>
 
         <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <xctk:ColorPicker Grid.Column="0" Name="color_font" Margin="3" />
-            <ComboBox Grid.Column="1" Margin="3" Name="combobox_fontface" ItemsSource="{Binding Source={x:Static tg:TategakiText.AvailableFonts}}" SelectedValue="游明朝" />
-            <CheckBox Grid.Column="2" Content="Bold" Name="checkbox_isbold" VerticalAlignment="Center" Margin="3" />
-            <CheckBox Grid.Column="3" Content="Italic" Name="checkbox_isitalic" VerticalAlignment="Center" Margin="3" />
-            <CheckBox Grid.Column="4" Content="Underline" Name="checkbox_isunderline" VerticalAlignment="Center" Margin="3" />
+
+            <GroupBox Grid.Row="0" Grid.Column="0" Margin="2" Header="Font Family" >
+                <ComboBox Name="combobox_fontface" ItemsSource="{Binding Source={x:Static tg:TategakiText.AvailableFonts}}" SelectedValue="游明朝" />
+            </GroupBox>
+
+            <GroupBox Grid.Row="0" Grid.Column="1" Margin="2" Header="Font Color" >
+                <xctk:ColorPicker Name="color_font" SelectedColor="Black" />
+            </GroupBox>
+
+            <GroupBox Grid.Row="0" Grid.Column="2" Margin="2" Header="Font Weight" >
+                <ComboBox Name="combobox_fontweight" SelectedIndex="3" >
+                    <x:Static Member="FontWeights.Thin" />
+                    <x:Static Member="FontWeights.ExtraLight" />
+                    <x:Static Member="FontWeights.Light" />
+                    <x:Static Member="FontWeights.Normal" />
+                    <x:Static Member="FontWeights.Medium" />
+                    <x:Static Member="FontWeights.SemiBold" />
+                    <x:Static Member="FontWeights.Bold" />
+                    <x:Static Member="FontWeights.ExtraBold" />
+                    <x:Static Member="FontWeights.Black" />
+                    <x:Static Member="FontWeights.ExtraBlack" />
+                </ComboBox>
+            </GroupBox>
+
+            <GroupBox Grid.Row="0" Grid.Column="3" Margin="2" Header="Font Weight" >
+                <ComboBox Name="combobox_fontstyle" SelectedIndex="0" >
+                    <x:Static Member="FontStyles.Normal" />
+                    <x:Static Member="FontStyles.Italic" />
+                    <x:Static Member="FontStyles.Oblique" />
+                </ComboBox>
+            </GroupBox>
+
+            <GroupBox Grid.Row="0" Grid.Column="4" Margin="2" Header="Decoration" >
+                <CheckBox Content="Underline" Name="checkbox_isunderline" VerticalAlignment="Center" />
+            </GroupBox>
+
+            <GroupBox Grid.Row="0" Grid.Column="5" Margin="2" Header="Other Options" >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <CheckBox Grid.Column="0" Content="Proportional Alternate" Name="checkbox_isProportional" VerticalAlignment="Center" />
+                    <CheckBox Grid.Column="1" Content="Alternate Rendering" Name="checkbox_isAlternateRendering" VerticalAlignment="Center" />
+                </Grid>
+            </GroupBox>
         </Grid>
 
         <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" >
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
                 <tg:TategakiText Text="{Binding ElementName=textBox1, Path=Text, UpdateSourceTrigger=PropertyChanged}"
                                  Name="tategakiMul1" HorizontalAlignment="Right" VerticalAlignment="Top" TextWrapping="Wrap"
+                                 EnableProportionalAlternate="{Binding ElementName=checkbox_isProportional, Path=IsChecked}"
+                                 EnableAlternateRendering="{Binding ElementName=checkbox_isAlternateRendering, Path=IsChecked}"
                                  LineHeight="{Binding ElementName=slider_height, Path=Value}"
                                  FontSize="{Binding ElementName=slider_fontsize, Path=Value}"
                                  Spacing="{Binding ElementName=slider_spacing, Path=Value}"
                                  FontFamily="{Binding ElementName=combobox_fontface, Path=SelectedItem, Mode=OneWay}"
-                                 FontStyle="{Binding ElementName=checkbox_isitalic, Path=IsChecked, Converter={StaticResource BooleanToFontStyleConv}}"
-                                 FontWeight="{Binding ElementName=checkbox_isbold, Path=IsChecked, Converter={StaticResource BooleanToFontWeightConv}}"
+                                 FontStyle="{Binding ElementName=combobox_fontstyle, Path=SelectedItem, Mode=OneWay}"
+                                 FontWeight="{Binding ElementName=combobox_fontweight, Path=SelectedItem, Mode=OneWay}"
                                  TextDecorations="{Binding ElementName=checkbox_isunderline, Path=IsChecked, Converter={StaticResource BooleanToUnderlineConv}}"
                                  Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
                 <tg:TategakiText Text="芥川龍之介" TextAlignment="Right" FontSize="20" FontFamily="Yu Mincho" LineHeight="36"
