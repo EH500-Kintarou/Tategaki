@@ -18,6 +18,12 @@ namespace Tategaki.Logic
 			var sliceCount = sliceEndExclusive - sliceStart;
 
 			Text = textCache.Text.Substring(sliceStart, sliceCount);
+			FontName = glyphCache.FontName.OutstandingFamilyName;
+			GlyphTypeface = glyphCache.GlyphTypeface;
+			RenderingEmSize = size;
+			Spacing = spacing;
+			Language = language;
+			IsSideways = textCache.IsVerticals[sliceStart] ?? throw new ArgumentException($"{nameof(textCache)}.{nameof(textCache.IsVerticals)} must not be null", nameof(textCache));  // 簡単のため先頭だけ見る
 
 			GlyphIndices = new ushort[sliceCount];
 			AdvanceWidths = new double[sliceCount];
@@ -38,13 +44,6 @@ namespace Tategaki.Logic
 			TotalAdvanceWidth = totalwidth;
 			GlyphOffsets = new Point[sliceCount];
 			ApplyNormalAlignmentOffset();
-
-			IsSideways = textCache.IsVerticals[sliceStart] ?? throw new ArgumentException($"{nameof(textCache)}.{nameof(textCache.IsVerticals)} must not be null", nameof(textCache));  // 簡単のため先頭だけ見る
-			FontName = glyphCache.FontName.OutstandingFamilyName;
-			GlyphTypeface = glyphCache.GlyphTypeface;
-			RenderingEmSize = size;
-			Spacing = spacing;
-			Language = language;
 		}
 
 		#region Properties
