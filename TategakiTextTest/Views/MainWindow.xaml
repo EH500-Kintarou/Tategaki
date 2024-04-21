@@ -79,6 +79,7 @@
                             <tg:TategakiText Text="DrawGeometryを使って描画" EnableAlternateRendering="True" />
                             <tg:TategakiText Text="（DrawGlyphRunを使って引き伸ばし描画）" EnableAlternateRendering="False" TextAlignment="Justify" FontFamily="MS PMincho" />
                             <tg:TategakiText Text="（DrawGeometryを使って引き伸ばし描画）" EnableAlternateRendering="True" TextAlignment="Justify" FontFamily="MS PMincho" />
+                            <tg:TategakiText Text="Proportional Font（可変幅フォント）を使って引き伸ばし動作" EnableProportionalAlternate="True" TextAlignment="{Binding ChangingTextAlignment}" FontFamily="Yu Mincho" />
                         </StackPanel>
                     </Border>
 
