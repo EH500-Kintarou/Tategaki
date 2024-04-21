@@ -6,7 +6,7 @@
 		xmlns:tg="http://schemas.eh500-kintarou.com/Tategaki"
 		xmlns:vm="clr-namespace:TategakiTextTest.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="960" Width="1280" FontFamily="Yu Gothic" FontSize="16">
+        Title="MainWindow" Height="1080" Width="1920" FontFamily="Yu Gothic" FontSize="16">
 
     <Window.DataContext>
         <vm:MainWindowViewModel />
@@ -40,8 +40,10 @@
                             <tg:TategakiText Text="縦書きが存在しないフォント名" FontFamily="Yu Gothic UI" FontSize="24" />
                             <tg:TategakiText Text="太字・斜体" FontWeight="{Binding ChangingWeight}" FontStyle="{Binding ChangingStyle}" />
                             <tg:TategakiText Text="間隔広め" Spacing="200"/>
-                            <tg:TategakiText Text="Half-width vertical disabled" FontFamily="MS PMincho"/>
-                            <tg:TategakiText Text="Half-width vertical enabled" EnableHalfWidthCharVertical="True" FontFamily="MS PMincho" />
+                            <tg:TategakiText Text="プロポーショナルフォントを使わない" EnableProportionalAlternate="False" />
+                            <tg:TategakiText Text="プロポーショナルフォントを使う" EnableProportionalAlternate="True" />
+                            <tg:TategakiText Text="Half-width vertical disabled" />
+                            <tg:TategakiText Text="Half-width vertical enabled" EnableHalfWidthCharVertical="True" />
                             <tg:TategakiText Text="改行文字と行の高さが&#xa;ある文章" LineHeight="35" />
                             <tg:TategakiText Text="パディング＝10" Background="Yellow" Padding="10" />
                             <tg:TategakiText Text="文字配置" Background="SkyBlue" TextAlignment="{Binding ChangingTextAlignment}" Spacing="200" />
@@ -73,6 +75,10 @@
                             </tg:TategakiText>
                             <tg:TategakiText Text="looooooooooooooooooooooong text wrapping" TextWrapping="Wrap"/>
                             <tg:TategakiText Text="looooooooooooooooooooooong text wrapping with overflow" TextWrapping="WrapWithOverflow"/>
+                            <tg:TategakiText Text="DrawGlyphRunを使って描画" EnableAlternateRendering="False" />
+                            <tg:TategakiText Text="DrawGeometryを使って描画" EnableAlternateRendering="True" />
+                            <tg:TategakiText Text="（DrawGlyphRunを使って引き伸ばし描画）" EnableAlternateRendering="False" TextAlignment="Justify" FontFamily="MS PMincho" />
+                            <tg:TategakiText Text="（DrawGeometryを使って引き伸ばし描画）" EnableAlternateRendering="True" TextAlignment="Justify" FontFamily="MS PMincho" />
                         </StackPanel>
                     </Border>
 
