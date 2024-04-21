@@ -11,23 +11,19 @@
     <Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
     <Company>EH500_Kintarou</Company>
     <Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>3.1.0</VersionPrefix>
+	<VersionPrefix>3.2.0</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/EH500-Kintarou/Tategaki</RepositoryUrl>
-	<PackageTags>WPF;Tategaki;縦書き:Vertical writing</PackageTags>
+	<PackageTags>WPF;Tategaki;縦書き;Vertical writing</PackageTags>
 	<PackageProjectUrl>https://github.com/EH500-Kintarou/Tategaki</PackageProjectUrl>
-	<PackageReleaseNotes>- TategakiTextに以下の機能を実装
-  - TextWrappingプロパティを実装（複数行対応）
-  - 禁則文字（文末禁止文字、文頭禁止文字）、文末ぶらさげ文字を実装
-  - TextDecotarionsプロパティを実装（下線、取消線などを付けられるようになった）
-  - LineHeightプロパティを実装（行の高さを設定できるようになった）
-  - TextAlignmentプロパティを実装
-  - Paddingプロパティを実装
-  - EnableHalfWidthCharVerticalプロパティを追加（半角文字を縦書きにするか横書きにするかのオプション）
-- 使えるフォントの種類が増えた（今までは全ユーザー用にインストールされたフォントしか使えなかった）
-- TategakiMultilineにObsolete属性を追加（TategakiTextで複数行表示ができるようになり、使う必要がなくなったため）</PackageReleaseNotes>
+	<PackageReleaseNotes>- フォントファイルの読み込みをTypeLoaderから自前のコードに変更
+- 対応しているフォントを選択した場合、プロポーショナルフォントが使えるようになった。
+- 使用できるフォントの種類が増えた。
+- 代替描画機能を追加（AlternateRendering; 処理は重いが、ＭＳ Ｐ明朝などのフォントを美しく描画できる）
+- 折り返し設定なし、かつTextAlignment.Justify設定で表示範囲よりテキストのサイズのほうが大きかったとき、文字が重なる不具合を修正
+- 半角文字を横書きにするオプションが有効の場合、他の文末禁止文字との組み合わせによっては正しく横書きにならなかったり、正しく折り返されなかったりする不具合を修正	</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
