@@ -400,7 +400,7 @@ namespace Tategaki
 					var sectionwiths = line.glyphs.Select(p => p.glyph.AdvanceWidths.Sum()).ToArray();
 					var textwidth = sectionwiths.Sum();
 					var charcount = line.glyphs.Sum(p => p.glyph.AdvanceWidths.Count);
-					var spacing = charcount >= 2 ? (finalwidth - textwidth) / (charcount - 1) : 0.0;
+					var spacing = (charcount >= 2 && textwidth <= finalwidth) ? (finalwidth - textwidth) / (charcount - 1) : 0.0;
 
 					for(int i = 0; i < line.glyphs.Count; i++) {
 						var glyph = line.glyphs[i].glyph;
@@ -659,7 +659,7 @@ namespace Tategaki
 							lineWidth += blockStartWidth;
 							sectionWidth -= blockStartWidth;
 							startPos = blockStartPos;
-						} else if(TextWrapping == TextWrapping.Wrap) {  // 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
+						} else if(TextWrapping == TextWrapping.Wrap || currentVertical != null) {  // 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
 							NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 							lineWidth += sectionWidth;
 							sectionWidth = 0;
