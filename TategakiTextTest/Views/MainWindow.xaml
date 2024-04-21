@@ -37,7 +37,7 @@
                             <tg:TategakiText Text="フォントサイズ" FontSize="24" />
                             <tg:TategakiText Text="フォント名（日本語）" FontFamily="ＭＳ 明朝" FontSize="24" />
                             <tg:TategakiText Text="フォント名（英語）" FontFamily="MS Gothic" FontSize="24" />
-                            <tg:TategakiText Text="縦書きが「存在しない」フォント名" FontFamily="Yu Gothic UI" FontSize="24" />
+                            <tg:TategakiText Text="縦書きが「存在しない」フォント名" FontFamily="思源黑體 VF" FontSize="24" />
                             <tg:TategakiText Text="太字・斜体" FontWeight="{Binding ChangingWeight}" FontStyle="{Binding ChangingStyle}" />
                             <tg:TategakiText Text="間隔広め" Spacing="200"/>
                             <tg:TategakiText Text="プロポーショナルフォントを使わない" EnableProportionalAlternate="False" />

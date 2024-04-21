@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="1500" d:DesignWidth="800">
     <Canvas>
-        <tg:TategakiText Canvas.Top="2cm" Canvas.Left="2cm" FontSize="48" Text="「あかさたな」" FontFamily="Yu Gothic" />
+        <tg:TategakiText Canvas.Top="2cm" Canvas.Left="2cm" FontSize="48" Text="「あかさたな」" />
     </Canvas>
 </UserControl>
