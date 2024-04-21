@@ -393,37 +393,26 @@ namespace Tategaki
 			var nowAlign = TextAlignment;
 
 			// TextAlignmentの調整を行う
-			if(lastTextAlignment != TextAlignment.Justify && nowAlign == TextAlignment.Justify) {
+			if(lastTextAlignment != TextAlignment.Justify && nowAlign == TextAlignment.Justify) {	// Justify以外→Justifyに変化
 				var finalwidth = finalSize.Height - Padding.Top - Padding.Bottom;
 
 				foreach(var line in lines) {
-					var sectionwiths = line.glyphs.Select(p => p.glyph.AdvanceWidths.Sum()).ToArray();
-					var textwidth = sectionwiths.Sum();
+					var textwidth = line.glyphs.Sum(p => p.glyph.TotalAdvanceWidth);
 					var charcount = line.glyphs.Sum(p => p.glyph.AdvanceWidths.Count);
 					var spacing = (charcount >= 2 && textwidth <= finalwidth) ? (finalwidth - textwidth) / (charcount - 1) : 0.0;
 
 					for(int i = 0; i < line.glyphs.Count; i++) {
 						var glyph = line.glyphs[i].glyph;
-						for(int j = 0; j < glyph.GlyphOffsets.Count; j++)
-							glyph.GlyphOffsets[j] = new Point(spacing * j, 0);
-						line.glyphs[i] = (glyph, sectionwiths[i] + spacing * glyph.GlyphOffsets.Count);
+						glyph.ApplyJustifyAlignmentOffset(spacing);
+						line.glyphs[i] = (glyph, i == line.glyphs.Count - 1 ? glyph.TotalBoxWidth : glyph.TotalBoxWidthWithSpacing);
 					}
 				}
-			} else if(lastTextAlignment == TextAlignment.Justify && nowAlign != TextAlignment.Justify) {
-				var spacing = (Spacing - 100) / 100 * fontsize;
-
+			} else if(lastTextAlignment == TextAlignment.Justify && nowAlign != TextAlignment.Justify) {    // Justify→Justify以外に変化
 				foreach(var line in lines) {
-					var sectionwiths = line.glyphs.Select(p => p.glyph.AdvanceWidths.Sum()).ToArray();
-
 					for(int i = 0; i < line.glyphs.Count; i++) {
 						var glyph = line.glyphs[i].glyph;
-						for(int j = 0; j < glyph.GlyphOffsets.Count; j++)
-							glyph.GlyphOffsets[j] = new Point(spacing * j, 0);
-
-						if(i == line.glyphs.Count - 1)
-							line.glyphs[i] = (glyph, sectionwiths[i] + spacing * Math.Max(0, glyph.GlyphOffsets.Count - 1));
-						else
-							line.glyphs[i] = (glyph, sectionwiths[i] + spacing * glyph.GlyphOffsets.Count);
+						glyph.ApplyNormalAlignmentOffset();
+						line.glyphs[i] = (glyph, i == line.glyphs.Count - 1 ? glyph.TotalBoxWidth : glyph.TotalBoxWidthWithSpacing);
 					}
 				}
 			}
