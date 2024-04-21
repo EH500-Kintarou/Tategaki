@@ -594,7 +594,7 @@ namespace Tategaki
 			#endregion
 
 			int startPos = 0;				// 現在の区間のスタート位置
-			bool? currentVertical = null;	// 現在縦書きか横書きか
+			bool? prevvertical = null;		// 前の文字が縦書きか横書きか
 			double sectionWidth = 0;		// 区間の幅
 			double lineWidth = 0;           // 行の幅
 
@@ -605,7 +605,7 @@ namespace Tategaki
 			public void NextChar(char c, int pos, bool? isvertical, double width, double spacing)
 			{
 				if(c == '\n') {     // 改行
-					if(currentVertical != null && startPos < pos) {
+					if(prevvertical != null && startPos < pos) {
 						NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 						lineWidth += sectionWidth;
 						sectionWidth = 0;
@@ -613,14 +613,30 @@ namespace Tategaki
 
 					NewLineCallback?.Invoke(lineWidth);
 					lineWidth = 0;
-					currentVertical = null;
+					prevvertical = null;
 				} else if(isvertical == null) {    // 縦も横も無い文字（制御文字など）なら無視
-					if(currentVertical != null && startPos < pos) {
+					if(prevvertical != null && startPos < pos) {
 						NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 						lineWidth += sectionWidth;
 						sectionWidth = 0;
 					}
-					currentVertical = null;
+					prevvertical = null;
+				} else if(prevvertical != null && prevvertical != isvertical) { // 縦書き⇔横書きの変化なら強制的にブロック分け
+					if(startPos < pos) {
+						NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
+						lineWidth += sectionWidth;
+					}
+					startPos = pos;
+					sectionWidth = width + spacing;
+					isPrevLastForbidden = false;
+					blockStartPos = 0;
+					blockStartWidth = 0;
+					prevvertical = isvertical;
+
+					if(TextWrapping != TextWrapping.NoWrap && (lineWidth + width) > AvailableWidth) {	// 必要に応じて改行も実施
+						NewLineCallback?.Invoke(lineWidth);
+						lineWidth = 0;
+					}
 				} else {
 					// ○: 普通の文字 / ●: 文末禁止文字 / ◎: 文頭禁止文字
 					// 　　⇩オーバーフロー
@@ -650,18 +666,18 @@ namespace Tategaki
 						blockStartWidth = sectionWidth;
 					}
 
-					bool needWrap = TextWrapping != TextWrapping.NoWrap && (lineWidth + sectionWidth + width) > AvailableWidth;	// はみ出し判定にはspacingは使わない
+					bool needWrap = TextWrapping != TextWrapping.NoWrap && (lineWidth + sectionWidth + width) > AvailableWidth; // はみ出し判定にはspacingは使わない
 					if(needWrap && LastHangingChars.Contains(c))
 						needWrap = false;   // ぶらさげ文字だったらやっぱり改行は無しにする
 
 					// 区間の切り替わり目か確認
-					if(currentVertical != null && (currentVertical != isvertical || needWrap)) {
+					if(prevvertical != null && needWrap) {
 						if(startPos < blockStartPos) { // スタート地点以降につながっている部分がある
 							NewSectionCallback?.Invoke(startPos, blockStartPos, blockStartWidth);
 							lineWidth += blockStartWidth;
 							sectionWidth -= blockStartWidth;
 							startPos = blockStartPos;
-						} else if(TextWrapping == TextWrapping.Wrap || currentVertical != null) {  // 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
+						} else if(TextWrapping == TextWrapping.Wrap) {  // 区間の開始地点以降に改行できるところが無かったので、禁則処理を諦める
 							NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 							lineWidth += sectionWidth;
 							sectionWidth = 0;
@@ -674,10 +690,10 @@ namespace Tategaki
 							lineWidth = 0;
 						}
 					}
-					if(currentVertical == null && isvertical != null)   // 無効な文字以降初めての有効な文字ならスタート地点とする
+					if(prevvertical == null && isvertical != null)   // 無効な文字以降初めての有効な文字ならスタート地点とする
 						startPos = pos;
 
-					currentVertical = isvertical;
+					prevvertical = isvertical;
 					sectionWidth += width + spacing;
 
 					isPrevLastForbidden = LastForbiddenChars.Contains(c) || CheckWordChars(c);
@@ -686,7 +702,7 @@ namespace Tategaki
 
 			public void GetRemaining(int pos)
 			{
-				if(currentVertical != null && startPos < pos) {
+				if(prevvertical != null && startPos < pos) {
 					NewSectionCallback?.Invoke(startPos, pos, sectionWidth);
 					lineWidth += sectionWidth;
 					sectionWidth = 0;
