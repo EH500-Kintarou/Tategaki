@@ -469,6 +469,7 @@ namespace Tategaki
 
 				foreach(var (glyph, width) in glyphs) {
 					if(altrender) {
+						var xnext = x + width;
 						for(int i = 0; i < glyph.Text.Length; i++) {
 							var geometry = glyph.GlyphTypeface.GetGlyphOutline(glyph.GlyphIndices[i], FontSize, FontSize);
 							var aw = glyph.AdvanceWidths[i];
@@ -488,6 +489,7 @@ namespace Tategaki
 							ctx.DrawGeometry(foreground, null, geometry);
 							x += aw;
 						}
+						x = xnext;
 					} else {
 						ctx.DrawGlyphRun(foreground, glyph.CreateWithOffsetY0(new Point(x, y)));
 						x += width;
