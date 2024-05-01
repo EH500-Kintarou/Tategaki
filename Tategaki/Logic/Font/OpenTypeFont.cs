@@ -39,8 +39,8 @@ namespace Tategaki.Logic.Font
 			Tables = necessary.Tables;
 			Maxp = necessary.Maxp;
 			Head = necessary.Head;
-			Hhea = necessary.Hhea;
-			Hmtx = necessary.Hmtx;
+			//Hhea = necessary.Hhea;
+			//Hmtx = necessary.Hmtx;
 		}
 
 		private static bool IsWOFF2(ReadOnlySpan<byte> data)
@@ -73,8 +73,8 @@ namespace Tategaki.Logic.Font
 			var hhea = ReadHhea(data, tables);
 			var hmtx = ReadHmtx(data, tables, hhea, maxp);
 			Loca = ReadLoca(data, tables, maxp, head);
-			Vhea = ReadVhea(data, tables);
-			Vmtx = ReadVmtx(data, tables, Vhea, maxp);
+			//Vhea = ReadVhea(data, tables);
+			//Vmtx = ReadVmtx(data, tables, Vhea, maxp);
 			Gsub = ReadGsub(data, tables);
 			Gpos = ReadGpos(data, tables);
 			Glyf = ReadGlyf(data, tables, Loca);
@@ -215,11 +215,11 @@ namespace Tategaki.Logic.Font
 		public IReadOnlyDictionary<string, TableRecord> Tables { get; }
 		public MaxpTable Maxp { get; }
 		public HeadTable Head { get; }
-		public HheaTable Hhea { get; }
-		public HmtxTable Hmtx { get; }
+		//public HheaTable Hhea { get; }
+		//public HmtxTable Hmtx { get; }
 		public LocaTable? Loca { get; private set; } = null;
-		public VheaTable? Vhea { get; private set; } = null;
-		public VmtxTable? Vmtx { get; private set; } = null;
+		//public VheaTable? Vhea { get; private set; } = null;
+		//public VmtxTable? Vmtx { get; private set; } = null;
 		public GsubTable? Gsub { get; private set; } = null;
 		public GposTable? Gpos { get; private set; } = null;
 		public GlyfTable? Glyf { get; private set; } = null;
