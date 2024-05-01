@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -18,24 +19,28 @@ namespace Tategaki.Logic
 		{
 			var fonttable = new Dictionary<string, FontNameInfo>();
 			var namelist = new List<string>();
+			var lockobj = new object();
 
-			foreach(var ff in Fonts.SystemFontFamilies) {
+			Parallel.ForEach(Fonts.SystemFontFamilies, ff => {
 				var tf = new Typeface(ff.Source);
 				if(!tf.TryGetGlyphTypeface(out var gtf))
-					continue;   // GlyphTypefaceが取得できなければ用無し
+					return;     // GlyphTypefaceが取得できなければ用無し
 
 				try {
 					var otf = new OpenTypeFont(gtf.FontUri);
 
 					if((otf.Gsub?.FeatureRecords ?? Enumerable.Empty<FeatureRecord>()).Where(p => p.FeatureTag == "vert").Any()) {     // GSUBに"vert" FeatureTagがあるか判定
 						var vfi = new FontNameInfo(gtf, ff.Source);
-						namelist.Add(vfi.OutstandingFamilyName);
-						foreach(var name in vfi.FamilierFamilyNames.Select(p => p.familyname).Distinct())
-							fonttable[name] = vfi;
+
+						lock(lockobj) {
+							namelist.Add(vfi.OutstandingFamilyName);
+							foreach(var name in vfi.FamilierFamilyNames.Select(p => p.familyname).Distinct())
+								fonttable[name] = vfi;
+						}
 					}
 				}
-				catch(NotSupportedException) { }	// 中にはサポートできないフォントもある
-			}
+				catch(NotSupportedException) { }    // 中にはサポートできないフォントもある
+			});
 
 			namelist.Sort();
 
