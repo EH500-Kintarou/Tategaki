@@ -33,6 +33,10 @@ namespace Tategaki.Logic.Font.Tables.Head
 
 			if(MagicNumber != 0x5F0F3CF5)
 				throw new NotSupportedException("Magic number of HEAD table is not 0x5F0F3CF5.");
+			if(created > TimeSpan.MaxValue.TotalSeconds)
+				throw new NotSupportedException($"Created Time of HEAD table is too much big. {created} seconds");
+			if(modified > TimeSpan.MaxValue.TotalSeconds)
+				throw new NotSupportedException($"Modified Time HEAD table is too much big. {modified} seconds");
 
 			DateTime start = new DateTime(1904, 1, 1);
 			Created = start + TimeSpan.FromSeconds(created);

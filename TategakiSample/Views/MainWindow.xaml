@@ -84,7 +84,7 @@
                 </ComboBox>
             </GroupBox>
 
-            <GroupBox Grid.Row="0" Grid.Column="3" Margin="2" Header="Font Weight" >
+            <GroupBox Grid.Row="0" Grid.Column="3" Margin="2" Header="Font Style" >
                 <ComboBox Name="combobox_fontstyle" SelectedIndex="0" >
                     <x:Static Member="FontStyles.Normal" />
                     <x:Static Member="FontStyles.Italic" />
