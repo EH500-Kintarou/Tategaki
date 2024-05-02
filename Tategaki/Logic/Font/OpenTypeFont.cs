@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tategaki.Logic.Font.Tables;
+using Tategaki.Logic.Font.Tables.Base;
 using Tategaki.Logic.Font.Tables.Glyph;
 using Tategaki.Logic.Font.Tables.GsubGpos;
 using Tategaki.Logic.Font.Tables.Head;
@@ -78,6 +79,7 @@ namespace Tategaki.Logic.Font
 			Gsub = ReadGsub(data, tables);
 			Gpos = ReadGpos(data, tables);
 			Glyf = ReadGlyf(data, tables, Loca);
+			Base = ReadBase(data, tables);
 
 			return new NecessaryTables(tables, maxp, head, hhea, hmtx);
 		}
@@ -205,6 +207,13 @@ namespace Tategaki.Logic.Font
 				return null;
 		}
 
+		private static BaseTable? ReadBase(ReadOnlySpan<byte> data, IReadOnlyDictionary<string, TableRecord> tables)
+		{
+			if(tables.TryGetValue(TableNames.BASE, out var table))
+				return new BaseTable(data.Slice((int)table.Offset, (int)table.Length));
+			else
+				return null;
+		}
 
 		public uint Version { get; private set; }
 		public ushort NumTables { get; private set; }
@@ -223,6 +232,7 @@ namespace Tategaki.Logic.Font
 		public GsubTable? Gsub { get; private set; } = null;
 		public GposTable? Gpos { get; private set; } = null;
 		public GlyfTable? Glyf { get; private set; } = null;
+		public BaseTable? Base { get; private set; } = null;
 
 		private class NecessaryTables
 		{
