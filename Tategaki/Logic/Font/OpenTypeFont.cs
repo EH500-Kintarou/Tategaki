@@ -21,7 +21,7 @@ namespace Tategaki.Logic.Font
 	/// 参考1： https://learn.microsoft.com/en-us/typography/opentype/spec/
 	/// 参考2： https://aznote.jakou.com/prog/opentype/index.html
 	/// </summary>
-	internal class OpenTypeFont
+	internal partial class OpenTypeFont
 	{
 		public OpenTypeFont(Uri fontUri)
 		{
@@ -52,9 +52,9 @@ namespace Tategaki.Logic.Font
 
 		private NecessaryTables ReadCollectionTypeface(ReadOnlySpan<byte> data, int index)
 		{
-			ReadOnlySpan<byte> ttcTag = data.Slice(0, 4);
-			ushort majorVersion = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(4, 2));
-			ushort minorVersion = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(6, 2));
+			//ReadOnlySpan<byte> ttcTag = data.Slice(0, 4);
+			//ushort majorVersion = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(4, 2));
+			//ushort minorVersion = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(6, 2));
 			uint numFonts = BinaryPrimitives.ReadUInt32BigEndian(data.Slice(8, 4));
 
 			if(index >= numFonts || index < 0)
@@ -63,6 +63,8 @@ namespace Tategaki.Logic.Font
 			var offset = BinaryPrimitives.ReadUInt32BigEndian(data.Slice(12 + index * 4, 4));
 			return ReadTypeface(data, offset);
 		}
+
+		#region ReadTypeface
 
 		private NecessaryTables ReadTypeface(ReadOnlySpan<byte> data, uint offsetTablePos)
 		{
@@ -215,6 +217,10 @@ namespace Tategaki.Logic.Font
 				return null;
 		}
 
+		#endregion
+
+		#region Properties
+
 		public uint Version { get; private set; }
 		public ushort NumTables { get; private set; }
 		public ushort SearchRange { get; private set; }
@@ -233,6 +239,8 @@ namespace Tategaki.Logic.Font
 		public GposTable? Gpos { get; private set; } = null;
 		public GlyfTable? Glyf { get; private set; } = null;
 		public BaseTable? Base { get; private set; } = null;
+
+		#endregion
 
 		private class NecessaryTables
 		{
