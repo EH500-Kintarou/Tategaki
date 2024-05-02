@@ -11,19 +11,17 @@
     <Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
     <Company>EH500_Kintarou</Company>
     <Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>3.2.0</VersionPrefix>
+	<VersionPrefix>3.2.1</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/EH500-Kintarou/Tategaki</RepositoryUrl>
 	<PackageTags>WPF;Tategaki;縦書き;Vertical writing</PackageTags>
 	<PackageProjectUrl>https://github.com/EH500-Kintarou/Tategaki</PackageProjectUrl>
-	<PackageReleaseNotes>- フォントファイルの読み込みをTypeLoaderから自前のコードに変更
-- 対応しているフォントを選択した場合、プロポーショナルフォントが使えるようになった。
-- 使用できるフォントの種類が増えた。
-- 代替描画機能を追加（AlternateRendering; 処理は重いが、ＭＳ Ｐ明朝などのフォントを美しく描画できる）
-- 折り返し設定なし、かつTextAlignment.Justify設定で表示範囲よりテキストのサイズのほうが大きかったとき、文字が重なる不具合を修正
-- 半角文字を横書きにするオプションが有効の場合、他の文末禁止文字との組み合わせによっては正しく横書きにならなかったり、正しく折り返されなかったりする不具合を修正	</PackageReleaseNotes>
+	<PackageReleaseNotes>- 縦書き対応フォントを検索する際（初回TategakiText.AvailableFontsを呼び出す際）のパフォーマンスを大幅に改善
+- 下線/中線/上線の配置を改善（フォントファイルのBASEテーブルのデータに基づくようにした）
+  - それに伴い、テキストの左右の余白のバランスがおかしかったのも改善
+- フォントファイルの作成/修正日時が大きすぎたときに例外を吐いて落ちる不具合を修正</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
