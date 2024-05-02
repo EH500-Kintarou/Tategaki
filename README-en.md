@@ -7,7 +7,7 @@ WPF doesn't support vertical writing so that it is difficult to show a sentense 
 
 "Tategaki" means "Vertical writing" in Japanese.
 
-![](https://img.shields.io/badge/Nuget-3.2.0-blue?logo=nuget&style=plastic)
+![](https://img.shields.io/badge/Nuget-3.2.1-blue?logo=nuget&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.7.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-6-orange?logo=.net&style=plastic)
 
@@ -20,7 +20,7 @@ WPF doesn't support vertical writing so that it is difficult to show a sentense 
 
 ## Getting started
 ### 1. Get via Nuget
-![](https://img.shields.io/badge/Nuget-3.2.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
+![](https://img.shields.io/badge/Nuget-3.2.1-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
 
 ### 2. Add XAML namespace
 Add namespace of "http://schemas.eh500-kintarou.com/Tategaki" and add the elements of "TategakiText" in your XAML.
@@ -41,15 +41,21 @@ Add namespace of "http://schemas.eh500-kintarou.com/Tategaki" and add the elemen
 This repository contains [a sample project](https://github.com/EH500-Kintarou/Tategaki/tree/master/TategakiSample). It will make you more clear how to use it.
 
 ## Project URL
-![](https://img.shields.io/badge/Github-3.2.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
-![](https://img.shields.io/badge/Nuget-3.2.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
-![](https://img.shields.io/badge/Blogger-3.2.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
+![](https://img.shields.io/badge/Github-3.2.1-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
+![](https://img.shields.io/badge/Nuget-3.2.1-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
+![](https://img.shields.io/badge/Blogger-3.2.1-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
 
 ## Libraries which is reffered to
 - System.Memory: https://www.nuget.org/packages/System.Memory/
 - Extended WPF Toolkit (Only in sample app): https://github.com/xceedsoftware/wpftoolkit
 
 ## Version History
+### ver.3.2.1 (02-May-2024)
+- Performance improvement of loading vertical font list (about 5 times faster than before).
+- Arrangement improvement of Underline / Strikethrough line / Overline (Changed to be based on BASE table of the font file.
+  - Along with this, the margin of left and right of the text was balanced.
+- Fiexed the exception is thrown when created / modified time of the font file is too large.
+
 ### ver.3.2.0 (21-April-2024)
 - Font loading library was changed from TypeLoader to my original code.
   - An opotion of proportional font is supported if it is available.
