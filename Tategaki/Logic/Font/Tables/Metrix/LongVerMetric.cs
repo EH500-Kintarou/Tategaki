@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tategaki.Logic.Font.Tables.Metrix
+﻿namespace Tategaki.Logic.Font.Tables.Metrix
 {
 	internal struct LongVerMetric
 	{

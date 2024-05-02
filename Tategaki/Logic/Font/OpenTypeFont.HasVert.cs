@@ -1,12 +1,6 @@
-﻿using System;
-using System.Buffers.Binary;
-using System.Collections.Generic;
+﻿using System.Buffers.Binary;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Markup;
 using Tategaki.Logic.Font.Tables;
 using Tategaki.Logic.Font.Tables.GsubGpos;
 using Tategaki.Logic.Font.Tables.Head;
