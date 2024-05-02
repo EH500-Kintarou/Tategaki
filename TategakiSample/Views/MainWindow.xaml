@@ -9,8 +9,8 @@
 
     <Window.Resources>
         <vc:ColorToBrushConverter x:Key="ColorToBrushConv" />
-        <vc:BooleanToUnderlineConverter x:Key="BooleanToUnderlineConv" />
-    </Window.Resources>
+		<vc:SelectedValueToTextDecorationsConverter x:Key="TextDecorationsConv" />
+	</Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -92,8 +92,13 @@
                 </ComboBox>
             </GroupBox>
 
-            <GroupBox Grid.Row="0" Grid.Column="4" Margin="2" Header="Decoration" >
-                <CheckBox Content="Underline" Name="checkbox_isunderline" VerticalAlignment="Center" />
+            <GroupBox Grid.Row="0" Grid.Column="4" Margin="2" Header="Decorations" >
+				<xctk:CheckComboBox Name="checkcombobox_decorations" DisplayMemberPath="Content" >
+					<ComboBoxItem Content="OverLine" />
+					<ComboBoxItem Content="Strikethrough" />
+					<ComboBoxItem Content="Baseline" />
+					<ComboBoxItem Content="Underline" />
+				</xctk:CheckComboBox>
             </GroupBox>
 
             <GroupBox Grid.Row="0" Grid.Column="5" Margin="2" Header="Other Options" >
@@ -121,7 +126,7 @@
                                  FontFamily="{Binding ElementName=combobox_fontface, Path=SelectedItem, Mode=OneWay}"
                                  FontStyle="{Binding ElementName=combobox_fontstyle, Path=SelectedItem, Mode=OneWay}"
                                  FontWeight="{Binding ElementName=combobox_fontweight, Path=SelectedItem, Mode=OneWay}"
-                                 TextDecorations="{Binding ElementName=checkbox_isunderline, Path=IsChecked, Converter={StaticResource BooleanToUnderlineConv}}"
+                                 TextDecorations="{Binding ElementName=checkcombobox_decorations, Path=SelectedValue, Converter={StaticResource TextDecorationsConv}}"
                                  Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
                 <tg:TategakiText Text="芥川龍之介" TextAlignment="Right" FontSize="20" FontFamily="Yu Mincho" LineHeight="36"
 								 Foreground="{Binding ElementName=color_font, Path=SelectedColor, Converter={StaticResource ColorToBrushConv}}" />
