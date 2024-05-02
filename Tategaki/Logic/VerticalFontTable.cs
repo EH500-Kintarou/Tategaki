@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using Tategaki.Logic.Font;
-using Tategaki.Logic.Font.Tables.GsubGpos;
 
 namespace Tategaki.Logic
 {
@@ -27,9 +26,7 @@ namespace Tategaki.Logic
 					return;     // GlyphTypefaceが取得できなければ用無し
 
 				try {
-					var otf = new OpenTypeFont(gtf.FontUri);
-
-					if((otf.Gsub?.FeatureRecords ?? Enumerable.Empty<FeatureRecord>()).Where(p => p.FeatureTag == "vert").Any()) {     // GSUBに"vert" FeatureTagがあるか判定
+					if(OpenTypeFont.HasVert(gtf.FontUri)) {     // GSUBに"vert"FeatureTagがあるか判定
 						var vfi = new FontNameInfo(gtf, ff.Source);
 
 						lock(lockobj) {
