@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Windows;
 using System.Windows.Data;
-using System.Windows;
 
 namespace Tategaki.ValueConverters
 {
+	[Obsolete]
 	[ValueConversion(typeof(double), typeof(Thickness))]
 	public class LineMarginConverter : IValueConverter
 	{

@@ -5,7 +5,7 @@
 WPFアプリケーションにおいて縦書きを使用するためのコントロールライブラリです。  
 WPFはネイティブで縦書きをサポートしておらず簡単に日本語の縦書きのようなものを作ることができませんが、このコントロールを利用すれば、WPF標準のTextBlockコントロールを使うような感覚で縦書きを実現することができます。
 
-![](https://img.shields.io/badge/Nuget-3.2.0-blue?logo=nuget&style=plastic)
+![](https://img.shields.io/badge/Nuget-3.2.1-blue?logo=nuget&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.7.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-6-orange?logo=.net&style=plastic)
 
@@ -18,7 +18,7 @@ WPFはネイティブで縦書きをサポートしておらず簡単に日本�
 
 ## 使用方法
 ### 1. Nugetからインストール
-![](https://img.shields.io/badge/Nuget-3.2.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
+![](https://img.shields.io/badge/Nuget-3.2.1-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
 
 ### 2. XAML名前空間を設定
 XAMLで名前空間 "http://schemas.eh500-kintarou.com/Tategaki" を登録し、"TategakiText"要素を追加することで縦書きのテキストを表示させることができるようになります。
@@ -39,15 +39,21 @@ XAMLで名前空間 "http://schemas.eh500-kintarou.com/Tategaki" を登録し、
 このリポジトリにはサンプルコードが含まれています。 [サンプルコード](https://github.com/EH500-Kintarou/Tategaki/tree/master/TategakiSample) を見ることでより理解が深まります。
 
 ## プロジェクトURL
-![](https://img.shields.io/badge/Github-3.2.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
-![](https://img.shields.io/badge/Nuget-3.2.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
-![](https://img.shields.io/badge/Blogger-3.2.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
+![](https://img.shields.io/badge/Github-3.2.1-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
+![](https://img.shields.io/badge/Nuget-3.2.1-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
+![](https://img.shields.io/badge/Blogger-3.2.1-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
 
 ## 利用しているライブラリ
 - System.Memory: https://www.nuget.org/packages/System.Memory/
 - Extended WPF Toolkit (サンプルコード内のみ): https://github.com/xceedsoftware/wpftoolkit
 
 ## バージョン履歴
+### ver.3.2.1 (2024/05/02)
+- 縦書き対応フォントを検索する際（初回TategakiText.AvailableFontsを呼び出す際）のパフォーマンスを大幅に改善
+- 下線/中線/上線の配置を改善（フォントファイルのBASEテーブルのデータに基づくようにした）
+  - それに伴い、テキストの左右の余白のバランスがおかしかったのも改善
+- フォントファイルの作成/修正日時が大きすぎたときに例外を吐いて落ちる不具合を修正
+
 ### ver.3.2.0 (2024/04/21)
 - フォントファイルの読み込みをTypeLoaderから自前のコードに変更
   - 対応しているフォントを選択した場合、プロポーショナルフォントが使えるようになった。
