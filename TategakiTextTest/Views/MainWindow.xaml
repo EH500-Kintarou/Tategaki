@@ -223,7 +223,24 @@
                     </Border>
                 </Grid>
             </TabItem>
-            <TabItem Header="DocumentViewer">
+			<TabItem Header="Content" >
+				<Canvas>
+					<Button Canvas.Left="10" Canvas.Top="10">
+						<tg:TategakiText Text="縦書きのボタン" />
+					</Button>
+					<CheckBox Canvas.Left="60" Canvas.Top="10" VerticalAlignment="Center" VerticalContentAlignment="Center" >
+						<tg:TategakiText Text="縦書きのチェックボックス" >
+							<tg:TategakiText.LayoutTransform>
+								<RotateTransform Angle="-90" />
+							</tg:TategakiText.LayoutTransform>
+						</tg:TategakiText>
+						<CheckBox.RenderTransform>
+							<RotateTransform Angle="90"/>
+						</CheckBox.RenderTransform>
+					</CheckBox>
+				</Canvas>
+			</TabItem>
+			<TabItem Header="DocumentViewer">
                 <DocumentViewer x:Name="documentViewer" />
             </TabItem>
         </TabControl>
