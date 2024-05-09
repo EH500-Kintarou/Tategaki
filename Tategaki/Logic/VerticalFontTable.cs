@@ -18,7 +18,7 @@ namespace Tategaki.Logic
 					return;     // GlyphTypefaceが取得できなければ用無し
 
 				try {
-					if(OpenTypeFont.HasVert(gtf.FontUri)) {     // GSUBに"vert"FeatureTagがあるか判定
+					if(GsubLoader.HasVert(gtf.FontUri)) {     // GSUBに"vert"FeatureTagがあるか判定
 						var vfi = new FontNameInfo(gtf, ff.Source);
 
 						lock(lockobj) {
