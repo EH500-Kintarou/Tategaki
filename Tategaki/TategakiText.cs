@@ -29,7 +29,7 @@ namespace Tategaki
 			get
 			{
 				if(_AvailableFonts == null)
-					_AvailableFonts = VerticalFontTable.FamilyNames.ToArray();
+					_AvailableFonts = VerticalFontTable.GetInstance().FamilyNames.ToArray();
 				return _AvailableFonts;
 			}
 		}
@@ -319,7 +319,7 @@ namespace Tategaki
 				textcache = null;
 				lines.Add((new(), new(0, FontSize)));
 			} else {
-				var fontname = VerticalFontTable.FromName(FontFamily?.Source);
+				var fontname = VerticalFontTable.GetInstance().GetValueWithFallback(FontFamily?.Source);
 				var weight = FontWeight;
 				var style = FontStyle;
 				var stretch = FontStretch;

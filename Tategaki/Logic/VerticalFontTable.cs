@@ -1,66 +1,207 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml.Linq;
 using Tategaki.Logic.Font;
 
 namespace Tategaki.Logic
 {
-	internal class VerticalFontTable
+	internal class VerticalFontTable : IReadOnlyDictionary<string, FontNameInfo>
 	{
-		static VerticalFontTable()
+		private VerticalFontTable() { }
+
+		#region Font Loading
+
+		readonly object tablelock = new();
+		readonly Dictionary<string, FontNameInfo> internalTable = new();
+		bool allLoaded = false;
+
+		private void GetAllFontNameInfo()
 		{
-			var fonttable = new Dictionary<string, FontNameInfo>();
-			var namelist = new List<string>();
-			var lockobj = new object();
+			if(allLoaded) return;
 
-			Parallel.ForEach(Fonts.SystemFontFamilies, ff => {
-				var tf = new Typeface(ff.Source);
-				if(!tf.TryGetGlyphTypeface(out var gtf))
-					return;     // GlyphTypefaceが取得できなければ用無し
+			Parallel.ForEach(Fonts.SystemFontFamilies, ff => GetFontNameInfo(ff.Source));
 
-				try {
-					if(OpenTypeFont.HasVert(gtf.FontUri)) {     // GSUBに"vert"FeatureTagがあるか判定
-						var vfi = new FontNameInfo(gtf, ff.Source);
-
-						lock(lockobj) {
-							namelist.Add(vfi.OutstandingFamilyName);
-							foreach(var name in vfi.FamilierFamilyNames.Select(p => p.familyname).Distinct())
-								fonttable[name] = vfi;
-						}
-					}
-				}
-				catch(NotSupportedException) { }    // 中にはサポートできないフォントもある
-			});
-
-			namelist.Sort();
-
-			Table = new ReadOnlyDictionary<string, FontNameInfo>(fonttable);
-			FamilyNames = new ReadOnlyCollection<string>(namelist);
+			allLoaded = true;
 		}
 
-		internal static IReadOnlyDictionary<string, FontNameInfo> Table { get;  }
-		internal static IReadOnlyList<string> FamilyNames { get; }
-
-
-		/// <summary>
-		/// フォント名からUriを取得するメソッド
-		/// 存在しない場合は適当なフォントにフォールバックする。
-		/// </summary>
-		/// <param name="name">フォント名</param>
-		/// <returns>フォント情報</returns>
-		internal static FontNameInfo FromName(string? name)
+		private FontNameInfo? GetFontNameInfo(string familyname)
 		{
-			if(name == null)
-				return Table[FamilyNames.First()];
+			lock(tablelock) {
+				if(internalTable.TryGetValue(familyname, out var fni))
+					return fni;
+			}
 
-			if(Table.TryGetValue(name, out var info))
-				return info;
-			else {
-				var include = Table.Keys.Where(p => p.Contains(name) || name.Contains(p)).FirstOrDefault();
-				if(include != null)
-					return Table[include];
-				else
-					return Table.First().Value;
+			var tf = new Typeface(familyname);
+			if(!tf.TryGetGlyphTypeface(out var gtf))
+				return null;    // GlyphTypefaceが取得できなかった
+
+			try {
+				if(GsubLoader.HasVert(gtf.FontUri)) {       // GSUBに"vert"FeatureTagがあるか判定
+					var fni = new FontNameInfo(gtf, familyname);
+
+					lock(tablelock) {
+						familyNames.Add(fni.OutstandingFamilyName);
+						foreach(var name in fni.FamilierFamilyNames.Select(p => p.familyname).Distinct())
+							internalTable[name] = fni;
+					}
+
+					return fni;
+				}
+			}
+			catch(NotSupportedException) { }    // 中にはサポートできないフォントもある
+
+			return null;
+		}
+
+		readonly List<string> familyNames = new();
+		IReadOnlyList<string>? readOnlyFamilyNames = null;
+		public IReadOnlyList<string> FamilyNames
+		{
+			get
+			{
+				if(readOnlyFamilyNames == null) {
+					GetAllFontNameInfo();
+					familyNames.Sort();
+					readOnlyFamilyNames = familyNames.AsReadOnly();
+				}
+				return readOnlyFamilyNames;
 			}
 		}
+
+		#endregion
+
+		#region Dictionary Implement
+
+		public FontNameInfo this[string key]
+		{
+			get
+			{
+				var fni = GetFontNameInfo(key);
+				if(fni == null)
+					throw new KeyNotFoundException($"Key \"{key}\" is not found");
+				else
+					return fni;
+			}
+		}
+
+		public IEnumerable<string> Keys
+		{
+			get
+			{
+				GetAllFontNameInfo();
+				return internalTable.Keys;
+			}
+		}
+
+		public IEnumerable<FontNameInfo> Values
+		{
+			get
+			{
+				GetAllFontNameInfo();
+				return internalTable.Values;
+			}
+		}
+
+		public int Count
+		{
+			get
+			{
+				GetAllFontNameInfo();
+				return internalTable.Count;
+			}
+		}
+
+		public bool ContainsKey(string key)
+		{
+			return GetFontNameInfo(key) != null;
+		}
+
+#if NETCOREAPP3_0_OR_GREATER
+		public bool TryGetValue(string key, [MaybeNullWhen(false)] out FontNameInfo value)
+		{
+			value = GetFontNameInfo(key);
+			return value != null;
+		}
+#else
+		public bool TryGetValue(string key, out FontNameInfo value)	// MaybeNullWhenは.NET 4.7.2では未対応
+		{
+			value = GetFontNameInfo(key)!;
+			return value != null;
+		}
+#endif
+
+		public FontNameInfo GetValueWithFallback(string? familyname)
+		{
+			// フォント名が無かったらデフォルトのフォントを返す
+			if(familyname == null)
+				return Default;
+
+			// 一致するフォントが取得できればそれを返す
+			var fni = GetFontNameInfo(familyname);
+			if(fni != null)
+				return fni;
+
+			// 部分一致のフォントがあるか探す。あるなら文字数が最も近いのが優先。
+			var include = Keys.Where(p => p.Contains(familyname) || familyname.Contains(p)).OrderBy(p => Math.Abs(p.Length - familyname.Length)).FirstOrDefault();
+			if(include != null)
+				return internalTable[include];
+			else
+				return Default;
+		}
+
+		public IEnumerator<KeyValuePair<string, FontNameInfo>> GetEnumerator()
+		{
+			GetAllFontNameInfo();
+			return internalTable.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		#endregion
+
+		#region Default Font
+
+		private FontNameInfo Default
+		{
+			get
+			{
+				if(_Default == null) {
+					var familyname = SystemFonts.MessageFontFamily.Source;
+					var fni = GetFontNameInfo(familyname);
+
+					if(fni != null)
+						_Default = fni;
+					else {
+						GetAllFontNameInfo();
+						_Default = internalTable.Values.First();
+					}
+				}
+				return _Default;
+			}
+		}
+		FontNameInfo? _Default = null;
+
+		#endregion
+
+		#region Singleton
+
+		public static VerticalFontTable GetInstance()
+		{
+			if(_instance == null)
+				_instance = new VerticalFontTable();
+
+			return _instance;
+		}
+		private static VerticalFontTable? _instance = null;
+
+		#endregion
 	}
 }
