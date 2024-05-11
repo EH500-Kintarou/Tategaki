@@ -11,17 +11,15 @@
     <Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
     <Company>EH500_Kintarou</Company>
     <Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>3.2.1</VersionPrefix>
+	<VersionPrefix>3.2.2</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/EH500-Kintarou/Tategaki</RepositoryUrl>
 	<PackageTags>WPF;Tategaki;縦書き;Vertical writing</PackageTags>
 	<PackageProjectUrl>https://github.com/EH500-Kintarou/Tategaki</PackageProjectUrl>
-	<PackageReleaseNotes>- 縦書き対応フォントを検索する際（初回TategakiText.AvailableFontsを呼び出す際）のパフォーマンスを大幅に改善
-- 下線/中線/上線の配置を改善（フォントファイルのBASEテーブルのデータに基づくようにした）
-  - それに伴い、テキストの左右の余白のバランスがおかしかったのも改善
-- フォントファイルの作成/修正日時が大きすぎたときに例外を吐いて落ちる不具合を修正</PackageReleaseNotes>
+	<PackageReleaseNotes>- フォント読み込み時のパフォーマンス改善
+- 必要最低限のフォントファイルのみを読み込むように修正</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
