@@ -8,10 +8,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Title>Tategaki</Title>
     <Description>WPF Vertical Text Control Library</Description>
-    <Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
+    <Copyright>Copyright © 2014-2025 EH500_Kintarou</Copyright>
     <Company>EH500_Kintarou</Company>
     <Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>3.2.2</VersionPrefix>
+	<VersionPrefix>3.2.3</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
