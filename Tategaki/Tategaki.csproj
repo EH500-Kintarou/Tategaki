@@ -18,8 +18,12 @@
 	<RepositoryUrl>https://github.com/EH500-Kintarou/Tategaki</RepositoryUrl>
 	<PackageTags>WPF;Tategaki;縦書き;Vertical writing</PackageTags>
 	<PackageProjectUrl>https://github.com/EH500-Kintarou/Tategaki</PackageProjectUrl>
-	<PackageReleaseNotes>- フォント読み込み時のパフォーマンス改善
-- 必要最低限のフォントファイルのみを読み込むように修正</PackageReleaseNotes>
+	<PackageReleaseNotes>- ターゲットフレームワークに以下を追加
+  - .NET Framework 4.6.1（現行サポートされている最低バージョン）
+  - .NET Framework 4.6.2（GlyphRunのオーバーロードが変更になるバージョン）
+  - .NET Core 3.0（.NET CoreでWindows Desktopがサポートされた最低バージョン）
+  - .NET8.0（最新のLTSバージョン）
+	</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
