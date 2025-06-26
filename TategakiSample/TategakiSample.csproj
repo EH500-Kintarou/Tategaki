@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net6.0-windows;net472</TargetFrameworks>
-	<LangVersion>11</LangVersion>
+    <TargetFrameworks>net8.0-windows;net6.0-windows;net472;net462;net461</TargetFrameworks>
+	<LangVersion>13</LangVersion>
 	<Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25104.5739" />
   </ItemGroup>
 
   <ItemGroup>

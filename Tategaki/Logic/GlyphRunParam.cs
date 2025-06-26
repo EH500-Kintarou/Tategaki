@@ -75,7 +75,11 @@ namespace Tategaki.Logic
 
 		public GlyphRun Create(Point origin)
 		{
+#if NET462_OR_GREATER || NETCOREAPP3_0_OR_GREATER
 			return new GlyphRun(GlyphTypeface, 0, IsSideways, RenderingEmSize, 1, GlyphIndices, origin, AdvanceWidths, GlyphOffsets, Text.ToArray(), FontName, null, null, Language);
+#else
+			return new GlyphRun(GlyphTypeface, 0, IsSideways, RenderingEmSize, GlyphIndices, origin, AdvanceWidths, GlyphOffsets, Text.ToArray(), FontName, null, null, Language);
+#endif
 		}
 
 		public GlyphRun CreateWithOffsetY0(Point origin)

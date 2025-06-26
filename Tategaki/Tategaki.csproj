@@ -1,17 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0-windows;net472</TargetFrameworks>
-	<LangVersion>11</LangVersion>
+    <TargetFrameworks>net8.0-windows;net6.0-windows;netcoreapp3.0;net472;net462;net461</TargetFrameworks>
+	<LangVersion>13</LangVersion>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
     <Title>Tategaki</Title>
     <Description>WPF Vertical Text Control Library</Description>
-    <Copyright>Copyright © 2014-2024 EH500_Kintarou</Copyright>
+    <Copyright>Copyright © 2014-2025 EH500_Kintarou</Copyright>
     <Company>EH500_Kintarou</Company>
     <Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>3.2.2</VersionPrefix>
+	<VersionPrefix>3.2.3</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -33,8 +33,17 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <PackageReference Include="System.Memory" Version="4.6.3" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
+  </ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+		<PackageReference Include="System.Memory" Version="4.5.5" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
+	</ItemGroup>
 </Project>
