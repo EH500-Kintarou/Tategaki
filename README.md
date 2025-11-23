@@ -5,13 +5,14 @@
 WPFアプリケーションにおいて縦書きを使用するためのコントロールライブラリです。  
 WPFはネイティブで縦書きをサポートしておらず簡単に日本語の縦書きのようなものを作ることができませんが、このコントロールを利用すれば、WPF標準のTextBlockコントロールを使うような感覚で縦書きを実現することができます。
 
-![](https://img.shields.io/badge/Nuget-3.2.3-blue?logo=nuget&style=plastic)
+![](https://img.shields.io/badge/Nuget-3.3.0-blue?logo=nuget&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.6.1-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.6.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.7.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Core-3.0-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-6.0-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-8.0-orange?logo=.net&style=plastic)
+![](https://img.shields.io/badge/.NET-10.0-orange?logo=.net&style=plastic)
 
 ![Screenshot of Tategaki](https://raw.githubusercontent.com/EH500-Kintarou/Tategaki/master/Images/SampleScreenshot.png)
 
@@ -22,7 +23,7 @@ WPFはネイティブで縦書きをサポートしておらず簡単に日本�
 
 ## 使用方法
 ### 1. Nugetからインストール
-![](https://img.shields.io/badge/Nuget-3.2.3-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
+![](https://img.shields.io/badge/Nuget-3.3.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
 
 ### 2. XAML名前空間を設定
 XAMLで名前空間 "http://schemas.eh500-kintarou.com/Tategaki" を登録し、"TategakiText"要素を追加することで縦書きのテキストを表示させることができるようになります。
@@ -43,9 +44,9 @@ XAMLで名前空間 "http://schemas.eh500-kintarou.com/Tategaki" を登録し、
 このリポジトリにはサンプルコードが含まれています。 [サンプルコード](https://github.com/EH500-Kintarou/Tategaki/tree/master/TategakiSample) を見ることでより理解が深まります。
 
 ## プロジェクトURL
-![](https://img.shields.io/badge/Github-3.2.3-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
-![](https://img.shields.io/badge/Nuget-3.2.3-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
-![](https://img.shields.io/badge/Blogger-3.2.3-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
+![](https://img.shields.io/badge/Github-3.3.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
+![](https://img.shields.io/badge/Nuget-3.3.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
+![](https://img.shields.io/badge/Blogger-3.3.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
 
 ## 利用しているライブラリ
 - System.Memory (.NET Frameworkのみ): https://www.nuget.org/packages/System.Memory/
@@ -53,6 +54,11 @@ XAMLで名前空間 "http://schemas.eh500-kintarou.com/Tategaki" を登録し、
 - Extended WPF Toolkit (サンプルコード内のみ): https://github.com/xceedsoftware/wpftoolkit
 
 ## バージョン履歴
+### ver.3.3.0 (2025/11/23)
+- ターゲットフレームワークに.NET10.0を追加
+- フォントファイルの読み込みルーチンを微修正（.NET10.0で出るようになった警告CA2022を回避するため）
+- TategakiMultilineを削除（ver.3.1.0以降Obsolete属性が付いていたもの）
+
 ### ver.3.2.3 (2025/06/26)
 - ターゲットフレームワークに以下を追加
   - .NET Framework 4.6.1（現行サポートされている最低バージョン）
