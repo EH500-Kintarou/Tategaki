@@ -7,13 +7,14 @@ WPF doesn't support vertical writing so that it is difficult to show a sentense 
 
 "Tategaki" means "Vertical writing" in Japanese.
 
-![](https://img.shields.io/badge/Nuget-3.2.3-blue?logo=nuget&style=plastic)
+![](https://img.shields.io/badge/Nuget-3.3.0-blue?logo=nuget&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.6.1-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.6.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Framework-4.7.2-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET_Core-3.0-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-6.0-orange?logo=.net&style=plastic)
 ![](https://img.shields.io/badge/.NET-8.0-orange?logo=.net&style=plastic)
+![](https://img.shields.io/badge/.NET-10.0-orange?logo=.net&style=plastic)
 
 ![Screenshot of Tategaki](https://raw.githubusercontent.com/EH500-Kintarou/Tategaki/master/Images/SampleScreenshot.png)
 
@@ -24,7 +25,7 @@ WPF doesn't support vertical writing so that it is difficult to show a sentense 
 
 ## Getting started
 ### 1. Get via Nuget
-![](https://img.shields.io/badge/Nuget-3.2.3-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
+![](https://img.shields.io/badge/Nuget-3.3.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/
 
 ### 2. Add XAML namespace
 Add namespace of "http://schemas.eh500-kintarou.com/Tategaki" and add the elements of "TategakiText" in your XAML.
@@ -45,9 +46,9 @@ Add namespace of "http://schemas.eh500-kintarou.com/Tategaki" and add the elemen
 This repository contains [a sample project](https://github.com/EH500-Kintarou/Tategaki/tree/master/TategakiSample). It will make you more clear how to use it.
 
 ## Project URL
-![](https://img.shields.io/badge/Github-3.2.3-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
-![](https://img.shields.io/badge/Nuget-3.2.3-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
-![](https://img.shields.io/badge/Blogger-3.2.3-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
+![](https://img.shields.io/badge/Github-3.3.0-green?logo=github&style=plastic) https://github.com/EH500-Kintarou/Tategaki  
+![](https://img.shields.io/badge/Nuget-3.3.0-blue?logo=nuget&style=plastic) https://www.nuget.org/packages/Tategaki/  
+![](https://img.shields.io/badge/Blogger-3.3.0-orange?logo=blogger&style=plastic) https://days-of-programming.blogspot.com/search/label/WPF%E7%94%A8%E7%B8%A6%E6%9B%B8%E3%81%8D%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%83%96%E3%83%AD%E3%83%83%E3%82%AF%20Tategaki
 
 ## Libraries which is reffered to
 - System.Memory (Only for .NET Framework): https://www.nuget.org/packages/System.Memory/
@@ -55,6 +56,11 @@ This repository contains [a sample project](https://github.com/EH500-Kintarou/Ta
 - Extended WPF Toolkit (Only in sample app): https://github.com/xceedsoftware/wpftoolkit
 
 ## Version History
+### ver.3.3.0 (23-Nov-2025)
+- Added .NET10.0 for a target framework.
+- Slightly modified the font file loading routine (to avoid warning CA2022 which appears in .NET10.0).
+- Removed TategakiMultiline, which had Obsolete attribute since ver.3.1.0.
+
 ### ver.3.2.3 (26-Jun-2025)
 - Added following target frameworks
   - .NET Framework 4.6.1（Oldest version which is supported now）

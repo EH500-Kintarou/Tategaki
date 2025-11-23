@@ -11,19 +11,16 @@
     <Copyright>Copyright © 2014-2025 EH500_Kintarou</Copyright>
     <Company>EH500_Kintarou</Company>
     <Authors>EH500_Kintarou</Authors>
-	<VersionPrefix>3.2.3</VersionPrefix>
+	<VersionPrefix>3.3.0</VersionPrefix>
 	<VersionSuffix></VersionSuffix>
 	<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<RepositoryUrl>https://github.com/EH500-Kintarou/Tategaki</RepositoryUrl>
 	<PackageTags>WPF;Tategaki;縦書き;Vertical writing</PackageTags>
 	<PackageProjectUrl>https://github.com/EH500-Kintarou/Tategaki</PackageProjectUrl>
-	<PackageReleaseNotes>- ターゲットフレームワークに以下を追加
-  - .NET Framework 4.6.1（現行サポートされている最低バージョン）
-  - .NET Framework 4.6.2（GlyphRunのオーバーロードが変更になるバージョン）
-  - .NET Core 3.0（.NET CoreでWindows Desktopがサポートされた最低バージョン）
-  - .NET8.0（最新のLTSバージョン）
-	</PackageReleaseNotes>
+	<PackageReleaseNotes>- ターゲットフレームワークに.NET10.0を追加
+- フォントファイルの読み込みルーチンを微修正（.NET10.0で出るようになった警告CA2022を回避するため）
+- TategakiMultilineを削除（ver.3.1.0以降Obsolete属性が付いていたもの）</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
