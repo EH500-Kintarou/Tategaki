@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -66,87 +59,75 @@ namespace TategakiTextTest.ViewModels
 
 		public string? ChangingText
 		{
-			get { return _ChangingText; }
+			get;
 			set
 			{
-				if(_ChangingText == value)
+				if(field == value)
 					return;
-				_ChangingText = value;
+				field = value;
 				RaisePropertyChanged();
 			}
 		}
-		private string? _ChangingText;
-
 
 		public TextAlignment ChangingTextAlignment
 		{
-			get
-			{ return _ChangingTextAlignment; }
+			get;
 			set
 			{
-				if(_ChangingTextAlignment == value)
+				if(field == value)
 					return;
-				_ChangingTextAlignment = value;
+				field = value;
 				RaisePropertyChanged();
 			}
 		}
-		private TextAlignment _ChangingTextAlignment;
 
 		public HorizontalAlignment ChangingHorizontal
 		{
-			get
-			{ return _ChangingHorizontal; }
+			get;
 			set
 			{ 
-				if(_ChangingHorizontal == value)
+				if(field == value)
 					return;
-				_ChangingHorizontal = value;
+				field = value;
 				RaisePropertyChanged();
 			}
 		}
-		private HorizontalAlignment _ChangingHorizontal;
 
 		public VerticalAlignment ChangingVertical
 		{
-			get
-			{ return _ChangingVertical; }
+			get;
 			set
 			{
-				if(_ChangingVertical == value)
+				if(field == value)
 					return;
-				_ChangingVertical = value;
+				field = value;
 				RaisePropertyChanged();
 			}
 		}
-		private VerticalAlignment _ChangingVertical;
 
 		public FontWeight ChangingWeight
 		{
-			get
-			{ return _ChangingWeight; }
+			get;
 			set
 			{
-				if(_ChangingWeight == value)
+				if(field == value)
 					return;
-				_ChangingWeight = value;
+				field = value;
 				RaisePropertyChanged();
 			}
 		}
-		private FontWeight _ChangingWeight;
 
 		public FontStyle ChangingStyle
 		{
-			get
-			{ return _ChangingStyle; }
+			get;
 			set
 			{
-				if(_ChangingStyle == value)
+				if(field == value)
 					return;
-				_ChangingStyle = value;
+				field = value;
 				RaisePropertyChanged();
 			}
 		}
-		private FontStyle _ChangingStyle;
 
 		#region INotifyPropertyChanged
 
