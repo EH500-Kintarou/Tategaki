@@ -5,6 +5,7 @@ using Tategaki.Logic.Font.Tables;
 using Tategaki.Logic.Font.Tables.Head;
 using Tategaki.Logic.Font.Tables.Maxp;
 using Tategaki.Logic.Font.Tables.Metrix;
+using Tategaki.Logic.Util;
 
 namespace Tategaki.Logic.Font
 {
@@ -16,7 +17,7 @@ namespace Tategaki.Logic.Font
 			int index = fontUri.Fragment == "" ? 0 : int.Parse(fontUri.Fragment.Replace("#", ""));
 
 			var ttcTag = new byte[4];
-			stream.Read(ttcTag, 0, 4);
+			stream.ReadExactly(ttcTag, 0, 4);
 			var data = ttcTag.AsSpan();
 
 			if(IsWOFF2(data))
@@ -38,7 +39,7 @@ namespace Tategaki.Logic.Font
 		private NecessaryTables ReadCollectionTypeface(Stream stream, int index, IReadOnlyList<string> filter, bool validateChecksum)
 		{
 			var buffer = new byte[12];
-			stream.Read(buffer, 0, 12);
+			stream.ReadExactly(buffer, 0, 12);
 			var data = buffer.AsSpan();
 
 			//ReadOnlySpan<byte> ttcTag = data.Slice(0, 4);
@@ -51,7 +52,7 @@ namespace Tategaki.Logic.Font
 
 			buffer = new byte[4];
 			stream.Seek(12 + index * 4, SeekOrigin.Begin);
-			stream.Read(buffer, 0, 4);
+			stream.ReadExactly(buffer, 0, 4);
 
 			var offset = BinaryPrimitives.ReadUInt32BigEndian(buffer.AsSpan());
 			stream.Seek(0, SeekOrigin.Begin);
@@ -86,7 +87,7 @@ namespace Tategaki.Logic.Font
 		private static IReadOnlyDictionary<string, TableRecord> ReadOffsetTable(Stream stream)
 		{
 			var buffer = new byte[12];
-			stream.Read(buffer, 0, 12);
+			stream.ReadExactly(buffer, 0, 12);
 			var data = buffer.AsSpan();
 
 			//var version = BinaryPrimitives.ReadUInt32BigEndian(data.Slice(0, 4));
@@ -96,7 +97,7 @@ namespace Tategaki.Logic.Font
 			//var rangeShift = BinaryPrimitives.ReadUInt16BigEndian(data.Slice(10, 2));
 
 			buffer = new byte[16 * numTables];
-			stream.Read(buffer, 0, buffer.Length);
+			stream.ReadExactly(buffer, 0, buffer.Length);
 			data = buffer.AsSpan();
 
 			var tables = new Dictionary<string, TableRecord>();
@@ -116,7 +117,7 @@ namespace Tategaki.Logic.Font
 		{
 			var buffer = new byte[table.Length];
 			stream.Seek(table.Offset, SeekOrigin.Begin);
-			stream.Read(buffer, 0, buffer.Length);
+			stream.ReadExactly(buffer, 0, buffer.Length);
 
 			if(validateChecksum) {
 				if(!ValidateTableChecksum(buffer, table))
