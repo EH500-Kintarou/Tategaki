@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net10.0-windows;net8.0-windows;net6.0-windows;net472;net462;net461</TargetFrameworks>
+    <TargetFrameworks>net10.0-windows;net8.0-windows;net472;net462;net461</TargetFrameworks>
 	<LangVersion>14</LangVersion>
 	<Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
